@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Briefcase, Eye, EyeOff, Loader2 } from "lucide-react";
 import { UserRole } from "@/types";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const defaultRole = (searchParams.get("role") as UserRole) ?? "job_seeker";
@@ -68,20 +68,126 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <div className="text-center card p-10 max-w-md w-full">
-          <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-            <svg className="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-bold text-gray-900">Account created!</h2>
-          <p className="text-sm text-gray-500 mt-2">Redirecting you now…</p>
+      <div className="text-center card p-10">
+        <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+          <svg className="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
         </div>
+        <h2 className="text-xl font-bold text-gray-900">Account created!</h2>
+        <p className="text-sm text-gray-500 mt-2">Redirecting you now…</p>
       </div>
     );
   }
 
+  return (
+    <div className="card p-8">
+      {/* Role selector */}
+      <div className="flex rounded-lg bg-gray-100 p-1 mb-6 gap-1">
+        {(["job_seeker", "employer"] as UserRole[]).map((r) => (
+          <button
+            key={r}
+            type="button"
+            onClick={() => setRole(r)}
+            className={`flex-1 rounded-md py-2 text-sm font-medium transition ${
+              role === r
+                ? "bg-white shadow text-gray-900"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {r === "job_seeker" ? "Job Seeker" : "Employer"}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={handleRegister} className="space-y-5">
+        <div>
+          <label htmlFor="fullName" className="label">Full name</label>
+          <input
+            id="fullName"
+            type="text"
+            required
+            className="input"
+            placeholder="Jane Doe"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+          />
+        </div>
+
+        {role === "employer" && (
+          <div>
+            <label htmlFor="companyName" className="label">Company name</label>
+            <input
+              id="companyName"
+              type="text"
+              required
+              className="input"
+              placeholder="Acme Corp"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+            />
+          </div>
+        )}
+
+        <div>
+          <label htmlFor="email" className="label">Email address</label>
+          <input
+            id="email"
+            type="email"
+            required
+            className="input"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="password" className="label">Password</label>
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={8}
+              className="input pr-10"
+              placeholder="Min. 8 characters"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        <button type="submit" disabled={loading} className="btn-primary w-full">
+          {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+          {loading ? "Creating account…" : "Create account"}
+        </button>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-gray-500">
+        Already have an account?{" "}
+        <Link href="/auth/login" className="font-medium text-brand-600 hover:underline">
+          Sign in
+        </Link>
+      </p>
+    </div>
+  );
+}
+
+export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
       <div className="w-full max-w-md">
@@ -93,109 +199,9 @@ export default function RegisterPage() {
           <p className="mt-1 text-sm text-gray-500">Join VacancyHub today</p>
         </div>
 
-        <div className="card p-8">
-          {/* Role selector */}
-          <div className="flex rounded-lg bg-gray-100 p-1 mb-6 gap-1">
-            {(["job_seeker", "employer"] as UserRole[]).map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => setRole(r)}
-                className={`flex-1 rounded-md py-2 text-sm font-medium transition ${
-                  role === r
-                    ? "bg-white shadow text-gray-900"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                {r === "job_seeker" ? "Job Seeker" : "Employer"}
-              </button>
-            ))}
-          </div>
-
-          <form onSubmit={handleRegister} className="space-y-5">
-            <div>
-              <label htmlFor="fullName" className="label">Full name</label>
-              <input
-                id="fullName"
-                type="text"
-                required
-                className="input"
-                placeholder="Jane Doe"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-              />
-            </div>
-
-            {role === "employer" && (
-              <div>
-                <label htmlFor="companyName" className="label">Company name</label>
-                <input
-                  id="companyName"
-                  type="text"
-                  required
-                  className="input"
-                  placeholder="Acme Corp"
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                />
-              </div>
-            )}
-
-            <div>
-              <label htmlFor="email" className="label">Email address</label>
-              <input
-                id="email"
-                type="email"
-                required
-                className="input"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="label">Password</label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  minLength={8}
-                  className="input pr-10"
-                  placeholder="Min. 8 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                {error}
-              </div>
-            )}
-
-            <button type="submit" disabled={loading} className="btn-primary w-full">
-              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {loading ? "Creating account…" : "Create account"}
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Already have an account?{" "}
-            <Link href="/auth/login" className="font-medium text-brand-600 hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </div>
+        <Suspense fallback={<div className="card p-8 animate-pulse h-80" />}>
+          <RegisterForm />
+        </Suspense>
       </div>
     </div>
   );
