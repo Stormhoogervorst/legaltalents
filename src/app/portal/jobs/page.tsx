@@ -1,0 +1,198 @@
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { Plus, Briefcase } from "lucide-react";
+import JobActions from "./JobActions";
+
+// ─── Status badge ─────────────────────────────────────────────────────────────
+
+function StatusBadge({ status }: { status: string }) {
+  if (status === "active") {
+    return (
+      <span className="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+        Actief
+      </span>
+    );
+  }
+  if (status === "draft") {
+    return (
+      <span className="bg-yellow-100 text-yellow-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+        Concept
+      </span>
+    );
+  }
+  return (
+    <span className="bg-gray-100 text-gray-500 text-xs font-semibold px-2.5 py-1 rounded-full">
+      Gesloten
+    </span>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default async function JobsPage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const { data: firm } = await supabase
+    .from("firms")
+    .select("id, slug")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!firm) redirect("/portal/profile");
+
+  // Fetch jobs with application count
+  const { data: jobs } = await supabase
+    .from("jobs")
+    .select(`
+      id,
+      title,
+      slug,
+      location,
+      type,
+      practice_area,
+      description,
+      salary_indication,
+      start_date,
+      required_education,
+      hours_per_week,
+      status,
+      created_at,
+      firm_id,
+      applications(count)
+    `)
+    .eq("firm_id", firm.id)
+    .order("created_at", { ascending: false });
+
+  const jobList = (jobs ?? []).map((j) => ({
+    ...j,
+    firm_slug: firm.slug,
+    applicationCount: (j.applications as unknown as { count: number }[])?.[0]?.count ?? 0,
+  }));
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-black">Vacatures</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            {jobList.length === 0
+              ? "Nog geen vacatures aangemaakt"
+              : `${jobList.length} vacature${jobList.length !== 1 ? "s" : ""}`}
+          </p>
+        </div>
+        <Link
+          href="/portal/jobs/new"
+          className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors"
+        >
+          <Plus className="h-4 w-4" />
+          Nieuwe vacature
+        </Link>
+      </div>
+
+      {/* Empty state */}
+      {jobList.length === 0 ? (
+        <div className="bg-white border border-gray-200 rounded-2xl p-12 flex flex-col items-center justify-center text-center">
+          <div className="w-14 h-14 bg-primary-light rounded-2xl flex items-center justify-center mb-4">
+            <Briefcase className="h-7 w-7 text-primary" />
+          </div>
+          <h2 className="text-lg font-semibold text-black mb-2">
+            Nog geen vacatures
+          </h2>
+          <p className="text-sm text-gray-500 mb-6 max-w-sm">
+            Maak je eerste vacature aan en bereik studenten rechtstreeks via Legal Talents.
+          </p>
+          <Link
+            href="/portal/jobs/new"
+            className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Nieuwe vacature
+          </Link>
+        </div>
+      ) : (
+        /* Table */
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+          {/* Desktop table */}
+          <div className="hidden sm:block overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50">
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-6 py-3.5">
+                    Titel
+                  </th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3.5">
+                    Status
+                  </th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3.5">
+                    Aangemaakt op
+                  </th>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3.5">
+                    Sollicitaties
+                  </th>
+                  <th className="px-4 py-3.5" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {jobList.map((job) => (
+                  <tr key={job.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div>
+                        <p className="text-sm font-semibold text-black">{job.title}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{job.location}</p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <StatusBadge status={job.status} />
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-500">
+                      {new Date(job.created_at).toLocaleDateString("nl-NL", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="px-4 py-4">
+                      <span className="text-sm font-semibold text-black">
+                        {job.applicationCount}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <JobActions job={job} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile card list */}
+          <div className="sm:hidden divide-y divide-gray-100">
+            {jobList.map((job) => (
+              <div key={job.id} className="px-4 py-4 flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-black truncate">{job.title}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{job.location}</p>
+                  <div className="flex items-center gap-3 mt-2">
+                    <StatusBadge status={job.status} />
+                    <span className="text-xs text-gray-400">
+                      {job.applicationCount} sollicitatie{job.applicationCount !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                </div>
+                <JobActions job={job} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

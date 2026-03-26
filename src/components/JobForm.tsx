@@ -1,0 +1,443 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { nanoid } from "nanoid";
+import {
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  Bold,
+  Italic,
+  List,
+} from "lucide-react";
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const PRACTICE_AREAS = [
+  "Arbeidsrecht",
+  "Bestuursrecht",
+  "Erfrecht",
+  "Familierecht",
+  "Intellectueel eigendom",
+  "IT-recht",
+  "Ondernemingsrecht",
+  "Onroerend goed",
+  "Personen- en familierecht",
+  "Strafrecht",
+  "Vastgoedrecht",
+  "Verbintenissenrecht",
+  "Overig",
+] as const;
+
+const JOB_TYPES = [
+  { value: "full-time", label: "Voltijd" },
+  { value: "part-time", label: "Deeltijd" },
+  { value: "internship", label: "Stage" },
+  { value: "student", label: "Studentbaan" },
+] as const;
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export type JobData = {
+  id?: string;
+  title: string;
+  location: string;
+  type: string;
+  practice_area: string;
+  description: string;
+  salary_indication: string | null;
+  start_date: string | null;
+  required_education: string | null;
+  hours_per_week: number | null;
+  status: string;
+};
+
+type Props = {
+  firmId: string;
+  firmSlug: string;
+  job?: JobData;
+};
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+const inputCls =
+  "w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors";
+
+const labelCls = "block text-sm font-medium text-gray-700 mb-1";
+
+// ─── Tiptap toolbar button ────────────────────────────────────────────────────
+
+function ToolbarButton({
+  onClick,
+  active,
+  title,
+  children,
+}: {
+  onClick: () => void;
+  active?: boolean;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      className={`p-1.5 rounded-md transition-colors ${
+        active
+          ? "bg-primary text-white"
+          : "text-gray-600 hover:bg-gray-100 hover:text-black"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
+export default function JobForm({ firmId, firmSlug, job }: Props) {
+  const router = useRouter();
+  const supabase = createClient();
+
+  const [title, setTitle] = useState(job?.title ?? "");
+  const [location, setLocation] = useState(job?.location ?? "");
+  const [type, setType] = useState(job?.type ?? "");
+  const [practiceArea, setPracticeArea] = useState(job?.practice_area ?? "");
+  const [salaryIndication, setSalaryIndication] = useState(
+    job?.salary_indication ?? ""
+  );
+  const [startDate, setStartDate] = useState(job?.start_date ?? "");
+  const [requiredEducation, setRequiredEducation] = useState(
+    job?.required_education ?? ""
+  );
+  const [hoursPerWeek, setHoursPerWeek] = useState<string>(
+    job?.hours_per_week != null ? String(job.hours_per_week) : ""
+  );
+
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [savedStatus, setSavedStatus] = useState<string | null>(null);
+
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: job?.description ?? "",
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-sm max-w-none min-h-[180px] px-4 py-3 text-sm text-black focus:outline-none",
+      },
+    },
+  });
+
+  const handleSubmit = useCallback(
+    async (targetStatus: "draft" | "active") => {
+      if (!title.trim() || !location.trim() || !type || !practiceArea) {
+        setSaveError("Vul alle verplichte velden in.");
+        return;
+      }
+
+      const description = editor?.getHTML() ?? "";
+      if (description === "<p></p>" || description.trim() === "") {
+        setSaveError("Voeg een beschrijving toe.");
+        return;
+      }
+
+      setSaving(true);
+      setSaveError(null);
+      setSaveSuccess(false);
+
+      const slug = job?.id
+        ? undefined
+        : `${firmSlug}-${title
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "")}-${nanoid(6)}`;
+
+      const payload = {
+        firm_id: firmId,
+        title: title.trim(),
+        location: location.trim(),
+        type,
+        practice_area: practiceArea,
+        description,
+        salary_indication: salaryIndication.trim() || null,
+        start_date: startDate || null,
+        required_education: requiredEducation.trim() || null,
+        hours_per_week: hoursPerWeek ? parseInt(hoursPerWeek, 10) : null,
+        status: targetStatus,
+        updated_at: new Date().toISOString(),
+        ...(slug ? { slug } : {}),
+      };
+
+      let dbError;
+
+      if (job?.id) {
+        const { error } = await supabase
+          .from("jobs")
+          .update(payload)
+          .eq("id", job.id);
+        dbError = error;
+      } else {
+        const { error } = await supabase.from("jobs").insert(payload);
+        dbError = error;
+      }
+
+      if (dbError) {
+        setSaveError(dbError.message);
+        setSaving(false);
+        return;
+      }
+
+      setSaveSuccess(true);
+      setSavedStatus(targetStatus);
+      setSaving(false);
+
+      setTimeout(() => router.push("/portal/jobs"), 800);
+    },
+    [
+      title,
+      location,
+      type,
+      practiceArea,
+      salaryIndication,
+      startDate,
+      requiredEducation,
+      hoursPerWeek,
+      editor,
+      firmId,
+      firmSlug,
+      job,
+      router,
+      supabase,
+    ]
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* ── Verplichte velden ─────────────────────────────────────── */}
+      <section className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5">
+        <h2 className="text-lg font-semibold text-black">
+          Vacaturegegevens <span className="text-red-500 text-sm font-normal">* verplicht</span>
+        </h2>
+
+        {/* Vacaturetitel */}
+        <div>
+          <label className={labelCls}>
+            Vacaturetitel <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            required
+            placeholder="Bijv. Juridisch stagiair arbeidsrecht"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+
+        {/* Vestigingsplaats */}
+        <div>
+          <label className={labelCls}>
+            Vestigingsplaats <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            required
+            placeholder="Bijv. Amsterdam"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+
+        {/* Type + Rechtsgebied */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label className={labelCls}>
+              Type <span className="text-red-500">*</span>
+            </label>
+            <select
+              required
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className={inputCls}
+            >
+              <option value="">Kies type…</option>
+              {JOB_TYPES.map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className={labelCls}>
+              Rechtsgebied <span className="text-red-500">*</span>
+            </label>
+            <select
+              required
+              value={practiceArea}
+              onChange={(e) => setPracticeArea(e.target.value)}
+              className={inputCls}
+            >
+              <option value="">Kies rechtsgebied…</option>
+              {PRACTICE_AREAS.map((area) => (
+                <option key={area} value={area}>
+                  {area}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Beschrijving (Tiptap) */}
+        <div>
+          <label className={labelCls}>
+            Beschrijving <span className="text-red-500">*</span>
+          </label>
+
+          {/* Toolbar */}
+          <div className="flex items-center gap-1 px-3 py-2 border border-gray-200 border-b-0 rounded-t-lg bg-gray-50">
+            <ToolbarButton
+              title="Vet"
+              onClick={() => editor?.chain().focus().toggleBold().run()}
+              active={editor?.isActive("bold")}
+            >
+              <Bold className="h-4 w-4" />
+            </ToolbarButton>
+            <ToolbarButton
+              title="Cursief"
+              onClick={() => editor?.chain().focus().toggleItalic().run()}
+              active={editor?.isActive("italic")}
+            >
+              <Italic className="h-4 w-4" />
+            </ToolbarButton>
+            <div className="w-px h-4 bg-gray-200 mx-1" />
+            <ToolbarButton
+              title="Opsomming"
+              onClick={() => editor?.chain().focus().toggleBulletList().run()}
+              active={editor?.isActive("bulletList")}
+            >
+              <List className="h-4 w-4" />
+            </ToolbarButton>
+          </div>
+
+          {/* Editor */}
+          <div className="border border-gray-200 rounded-b-lg bg-white focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-colors">
+            <EditorContent editor={editor} />
+          </div>
+          <p className="mt-1 text-xs text-gray-400">
+            Beschrijf de functie, taken en wat jullie zoeken in een kandidaat.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Optionele velden ──────────────────────────────────────── */}
+      <section className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5">
+        <h2 className="text-lg font-semibold text-black">
+          Extra informatie{" "}
+          <span className="text-sm font-normal text-gray-400">(optioneel)</span>
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {/* Salarisindicatie */}
+          <div>
+            <label className={labelCls}>Salarisindicatie</label>
+            <input
+              type="text"
+              placeholder="Bijv. €500–€700 per maand"
+              value={salaryIndication}
+              onChange={(e) => setSalaryIndication(e.target.value)}
+              className={inputCls}
+            />
+          </div>
+
+          {/* Uren per week */}
+          <div>
+            <label className={labelCls}>Uren per week</label>
+            <input
+              type="number"
+              min={1}
+              max={60}
+              placeholder="Bijv. 32"
+              value={hoursPerWeek}
+              onChange={(e) => setHoursPerWeek(e.target.value)}
+              className={inputCls}
+            />
+          </div>
+
+          {/* Startdatum */}
+          <div>
+            <label className={labelCls}>Startdatum</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className={inputCls}
+            />
+          </div>
+
+          {/* Vereiste opleiding */}
+          <div>
+            <label className={labelCls}>Vereiste opleiding / studierichting</label>
+            <input
+              type="text"
+              placeholder="Bijv. HBO Rechtsgeleerdheid"
+              value={requiredEducation}
+              onChange={(e) => setRequiredEducation(e.target.value)}
+              className={inputCls}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Feedback ─────────────────────────────────────────────── */}
+      {saveError && (
+        <div className="flex items-start gap-3 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+          {saveError}
+        </div>
+      )}
+
+      {saveSuccess && (
+        <div className="flex items-center gap-3 rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+          <CheckCircle className="h-4 w-4 shrink-0" />
+          {savedStatus === "active"
+            ? "Vacature gepubliceerd! Je wordt doorgestuurd…"
+            : "Vacature opgeslagen als concept. Je wordt doorgestuurd…"}
+        </div>
+      )}
+
+      {/* ── Action buttons ─────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pb-6">
+        <button
+          type="button"
+          disabled={saving}
+          onClick={() => handleSubmit("draft")}
+          className="flex items-center justify-center gap-2 border border-primary text-primary hover:bg-primary-light text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+          Opslaan als concept
+        </button>
+        <button
+          type="button"
+          disabled={saving}
+          onClick={() => handleSubmit("active")}
+          className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+          Publiceren
+        </button>
+      </div>
+    </div>
+  );
+}

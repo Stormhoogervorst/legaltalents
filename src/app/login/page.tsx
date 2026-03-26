@@ -1,0 +1,230 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
+
+type View = "login" | "forgot";
+
+export default function LoginPage() {
+  const router = useRouter();
+  const [view, setView] = useState<View>("login");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [resetSent, setResetSent] = useState(false);
+
+  const supabase = createClient();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      setError(
+        signInError.message === "Invalid login credentials"
+          ? "E-mailadres of wachtwoord is onjuist."
+          : signInError.message
+      );
+      setLoading(false);
+    } else {
+      router.push("/portal");
+      router.refresh();
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${location.origin}/api/auth/callback?next=/portal/settings`,
+    });
+
+    if (resetError) {
+      setError(resetError.message);
+      setLoading(false);
+    } else {
+      setResetSent(true);
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/" className="font-extrabold italic text-primary text-2xl">
+            Legal Talents.
+          </Link>
+          <h1 className="mt-4 text-2xl font-bold text-black">
+            {view === "login" ? "Inloggen" : "Wachtwoord vergeten"}
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            {view === "login"
+              ? "Welkom terug — log in op je kantoorportaal"
+              : "Vul je e-mailadres in, dan sturen we een resetlink"}
+          </p>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-2xl p-8">
+          {/* ── Login form ── */}
+          {view === "login" && (
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  E-mailadres
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  placeholder="kantoor@voorbeeld.nl"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                    Wachtwoord
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => { setView("forgot"); setError(null); }}
+                    className="text-xs text-primary hover:underline font-medium"
+                  >
+                    Wachtwoord vergeten?
+                  </button>
+                </div>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 pr-10 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label={showPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {error && (
+                <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-3 rounded-lg transition-colors"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {loading ? "Inloggen…" : "Inloggen"}
+              </button>
+            </form>
+          )}
+
+          {/* ── Forgot password form ── */}
+          {view === "forgot" && !resetSent && (
+            <form onSubmit={handleForgotPassword} className="space-y-5">
+              <div>
+                <label htmlFor="resetEmail" className="block text-sm font-medium text-gray-700 mb-1">
+                  E-mailadres
+                </label>
+                <input
+                  id="resetEmail"
+                  type="email"
+                  required
+                  placeholder="kantoor@voorbeeld.nl"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                />
+              </div>
+
+              {error && (
+                <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-3 rounded-lg transition-colors"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                {loading ? "Versturen…" : "Resetlink versturen"}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setView("login"); setError(null); }}
+                className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                ← Terug naar inloggen
+              </button>
+            </form>
+          )}
+
+          {/* ── Reset email sent ── */}
+          {view === "forgot" && resetSent && (
+            <div className="text-center py-2">
+              <div className="w-14 h-14 rounded-full bg-primary-light flex items-center justify-center mx-auto mb-5">
+                <Mail className="h-7 w-7 text-primary" />
+              </div>
+              <h2 className="text-base font-bold text-black mb-2">Resetlink verstuurd</h2>
+              <p className="text-sm text-gray-500 leading-relaxed">
+                Check je inbox op{" "}
+                <span className="font-medium text-black">{email}</span> voor de resetlink.
+              </p>
+              <button
+                type="button"
+                onClick={() => { setView("login"); setResetSent(false); setError(null); }}
+                className="mt-6 text-sm text-primary hover:underline font-medium"
+              >
+                ← Terug naar inloggen
+              </button>
+            </div>
+          )}
+
+          {/* Register link */}
+          {view === "login" && (
+            <p className="mt-6 text-center text-sm text-gray-500">
+              Nog geen account?{" "}
+              <Link href="/register" className="font-medium text-primary hover:underline">
+                Kantoor aanmelden
+              </Link>
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
