@@ -366,11 +366,11 @@ export default async function HomePage() {
                 </h3>
                 {firm.location && (
                   <p
-                    className="flex items-center gap-1.5 mt-2 min-w-0 whitespace-nowrap overflow-hidden text-ellipsis"
-                    style={{ fontSize: "13px", color: "#8B91B8" }}
+                    className="flex items-center gap-1 mt-2 w-full overflow-hidden"
+                    style={{ fontSize: "12px", color: "#8B91B8", letterSpacing: "-0.01em", lineHeight: 1.3 }}
                   >
-                    <MapPin className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate tracking-tight">
+                    <MapPin className="h-3 w-3 shrink-0" />
+                    <span className="min-w-0 truncate">
                       {firm.location}
                       {firm.team_size && (
                         <><span className="mx-1">·</span>{firm.team_size} medewerkers</>

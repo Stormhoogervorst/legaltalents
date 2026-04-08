@@ -47,9 +47,9 @@ export async function generateMetadata({
   const { id: city } = await params;
   const name = cityDisplayName(city);
   return {
-    title: `Vacatures Advocatuur ${name} | Legal Talents`,
-    description: `Vind de beste vacatures in de advocatuur in ${name}. Bekijk actuele posities voor advocaten, stagiaires en juristen bij topkantoren.`,
-    keywords: ["Advocatuur", "vacatures", name, `vacatures ${name}`, `advocatuur ${name}`, "juridische vacatures", "Legal Talents"],
+    title: `Juridische Vacatures ${name} | Legal Talents`,
+    description: `Bekijk alle actuele juridische vacatures in ${name}. Vind je nieuwe uitdaging bij topwerkgevers in de juridische sector.`,
+    keywords: ["juridische vacatures", "vacatures", name, `juridische vacatures ${name}`, `vacatures ${name}`, "advocatuur", `advocatuur ${name}`, "Legal Talents"],
   };
 }
 
@@ -107,7 +107,7 @@ export default async function CityJobsPage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: `Vacatures Advocatuur ${name}`,
+    name: `Juridische Vacatures ${name}`,
     numberOfItems: jobList.length,
     itemListElement: jobList.map((job, i) => ({
       "@type": "ListItem",
@@ -140,7 +140,7 @@ export default async function CityJobsPage({
             className="font-bold tracking-[-0.03em] leading-[1.05] text-[#0A0A0A]"
             style={{ fontSize: "clamp(48px, 6vw, 80px)" }}
           >
-            Vacatures Advocatuur {name}
+            Juridische Vacatures {name}
           </h1>
           <p
             className="mt-6 leading-relaxed max-w-[640px]"

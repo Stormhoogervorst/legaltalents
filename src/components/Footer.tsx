@@ -121,7 +121,7 @@ export default function Footer() {
                   className="hover:text-white transition-colors duration-200"
                   style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)" }}
                 >
-                  Vacatures Advocatuur {cityDisplayName(slug)}
+                  Juridische Vacatures {cityDisplayName(slug)}
                 </Link>
               ))}
             </div>
@@ -140,7 +140,7 @@ export default function Footer() {
                   className="hover:text-white transition-colors duration-200"
                   style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)" }}
                 >
-                  Stages Advocatuur {cityDisplayName(slug)}
+                  Juridische Stages {cityDisplayName(slug)}
                 </Link>
               ))}
             </div>

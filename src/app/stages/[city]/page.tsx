@@ -43,9 +43,9 @@ export async function generateMetadata({
   const { city } = await params;
   const name = cityDisplayName(city);
   return {
-    title: `Stages Advocatuur ${name} | Legal Talents`,
-    description: `Vind de beste stages in de advocatuur in ${name}. Bekijk actuele stageplekken voor rechtenstudenten bij topkantoren.`,
-    keywords: ["Advocatuur", "stages", name, `stages ${name}`, `advocatuur ${name}`, "juridische stages", "Legal Talents"],
+    title: `Juridische Stages ${name} | Legal Talents`,
+    description: `Op zoek naar een juridische stage in ${name}? Bekijk het meest complete overzicht van stages bij advocatenkantoren en juridische organisaties.`,
+    keywords: ["juridische stages", "stages", name, `juridische stages ${name}`, `stages ${name}`, "advocatuur", `advocatuur ${name}`, "Legal Talents"],
   };
 }
 
@@ -99,7 +99,7 @@ export default async function CityStagesPage({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: `Stages Advocatuur ${name}`,
+    name: `Juridische Stages ${name}`,
     numberOfItems: jobList.length,
     itemListElement: jobList.map((job, i) => ({
       "@type": "ListItem",
@@ -132,7 +132,7 @@ export default async function CityStagesPage({
             className="font-bold tracking-[-0.03em] leading-[1.05] text-[#0A0A0A]"
             style={{ fontSize: "clamp(48px, 6vw, 80px)" }}
           >
-            Stages Advocatuur {name}
+            Juridische Stages {name}
           </h1>
           <p
             className="mt-6 leading-relaxed max-w-[640px]"

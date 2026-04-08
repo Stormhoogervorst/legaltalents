@@ -45,9 +45,9 @@ export default function FirmCard({ firm }: Props) {
           {firm.name}
         </h3>
 
-        <div className="mt-1 flex items-center overflow-hidden">
+        <div className="mt-1 w-full flex items-center overflow-hidden">
           <p
-            className="min-w-0 text-[13px] font-medium tracking-tight whitespace-nowrap overflow-hidden text-ellipsis"
+            className="min-w-0 w-full text-[12px] font-medium leading-tight tracking-tight whitespace-nowrap overflow-hidden text-ellipsis"
             style={{ color: "#999999" }}
           >
             {firm.location && firm.team_size ? (
