@@ -28,7 +28,8 @@ export default function LinkedInQuickApply({ jobId, jobSlug }: Props) {
     setError(null);
 
     const supabase = createClient();
-    const callbackUrl = `${window.location.origin}/api/auth/linkedin-apply?job_id=${encodeURIComponent(jobId)}&slug=${encodeURIComponent(jobSlug)}`;
+    const base = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    const callbackUrl = `${base}/api/auth/linkedin-apply?job_id=${encodeURIComponent(jobId)}&slug=${encodeURIComponent(jobSlug)}`;
 
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "linkedin_oidc",

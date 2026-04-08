@@ -80,8 +80,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Logged-in users are sent to /portal when they visit auth pages
-  if (user && (pathname.startsWith("/login") || pathname.startsWith("/register"))) {
+  // Logged-in users are sent to /portal when they visit auth pages.
+  // Explicitly excluded: the LinkedIn apply confirmation flow at
+  // /vacatures/[slug]/solliciteren/... so users arriving after OAuth
+  // are never bounced away mid-application.
+  const isApplyFlow = pathname.startsWith("/vacatures/") && pathname.includes("/solliciteren/");
+  if (
+    user &&
+    !isApplyFlow &&
+    (pathname.startsWith("/login") || pathname.startsWith("/register"))
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/portal";
     return NextResponse.redirect(url);
