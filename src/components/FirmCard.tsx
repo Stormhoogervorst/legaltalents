@@ -45,23 +45,23 @@ export default function FirmCard({ firm }: Props) {
           {firm.name}
         </h3>
 
-        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-0.5">
-          {firm.location && (
-            <span
-              className="text-[13px] font-medium tracking-wide"
-              style={{ color: "#999999" }}
-            >
-              {firm.location}
-            </span>
-          )}
-          {firm.team_size && (
-            <span
-              className="text-[13px] font-medium tracking-wide"
-              style={{ color: "#999999" }}
-            >
-              {firm.team_size} medewerkers
-            </span>
-          )}
+        <div className="mt-1 flex items-center overflow-hidden">
+          <p
+            className="text-[13px] font-medium tracking-wide whitespace-nowrap overflow-hidden text-ellipsis"
+            style={{ color: "#999999" }}
+          >
+            {firm.location && firm.team_size ? (
+              <>
+                {firm.location}
+                <span className="mx-1">·</span>
+                {firm.team_size} medewerkers
+              </>
+            ) : firm.location ? (
+              firm.location
+            ) : firm.team_size ? (
+              <>{firm.team_size} medewerkers</>
+            ) : null}
+          </p>
         </div>
 
         {firm.practice_areas && firm.practice_areas.length > 0 && (
