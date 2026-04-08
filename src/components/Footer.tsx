@@ -110,37 +110,37 @@ export default function Footer() {
 
           {/* Vacatures per stad */}
           <div className="mt-14 pt-10 border-t border-[#2E3247]">
-            <p style={{ fontSize: "13px", fontWeight: 500, letterSpacing: "0.02em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "12px" }}>
-              Populaire steden — Vacatures
+            <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>
+              Juridische Vacatures
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-12 gap-y-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start">
               {CITIES.map((slug) => (
                 <Link
                   key={slug}
                   href={`/vacatures/${slug}`}
-                  className="hover:text-white transition-colors duration-200"
-                  style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)" }}
+                  title={`Juridische Vacatures ${cityDisplayName(slug)}`}
+                  className="text-sm text-slate-400 hover:text-[#668dff] transition-colors duration-200"
                 >
-                  Juridische Vacatures {cityDisplayName(slug)}
+                  {cityDisplayName(slug)}
                 </Link>
               ))}
             </div>
           </div>
 
           {/* Stages per stad */}
-          <div className="mt-8 pt-8 border-t border-[#2E3247]">
-            <p style={{ fontSize: "13px", fontWeight: 500, letterSpacing: "0.02em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "12px" }}>
-              Populaire steden — Stages
+          <div className="mt-10 pt-10 border-t border-[#2E3247]">
+            <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>
+              Juridische Stages
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-12 gap-y-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start">
               {CITIES.map((slug) => (
                 <Link
                   key={slug}
                   href={`/stages/${slug}`}
-                  className="hover:text-white transition-colors duration-200"
-                  style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)" }}
+                  title={`Juridische Stages ${cityDisplayName(slug)}`}
+                  className="text-sm text-slate-400 hover:text-[#668dff] transition-colors duration-200"
                 >
-                  Juridische Stages {cityDisplayName(slug)}
+                  {cityDisplayName(slug)}
                 </Link>
               ))}
             </div>
