@@ -1,32 +1,13 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Plus, Briefcase } from "lucide-react";
 import JobActions from "./JobActions";
+import JobStatusToggle from "./JobStatusToggle";
 
-// ─── Status badge ─────────────────────────────────────────────────────────────
-
-function StatusBadge({ status }: { status: string }) {
-  if (status === "active") {
-    return (
-      <span className="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">
-        Actief
-      </span>
-    );
-  }
-  if (status === "draft") {
-    return (
-      <span className="bg-yellow-100 text-yellow-700 text-xs font-semibold px-2.5 py-1 rounded-full">
-        Concept
-      </span>
-    );
-  }
-  return (
-    <span className="bg-gray-100 text-gray-500 text-xs font-semibold px-2.5 py-1 rounded-full">
-      Gesloten
-    </span>
-  );
-}
+// Always fetch fresh data — no caching for authenticated portal pages
+export const dynamic = "force-dynamic";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -39,16 +20,25 @@ export default async function JobsPage() {
 
   if (!user) redirect("/login");
 
-  const { data: firm } = await supabase
+  // Step 1: fetch firm for this user
+  const { data: firm, error: firmError } = await supabase
     .from("firms")
     .select("id, slug")
     .eq("user_id", user.id)
     .maybeSingle();
 
+  if (firmError) {
+    console.error("[portal/jobs] Firm fetch error (user_id:", user.id, "):", firmError);
+  }
+  console.log("[portal/jobs] user.id:", user.id, "| firm:", firm);
+
   if (!firm) redirect("/portal/profile");
 
-  // Fetch jobs with application count
-  const { data: jobs } = await supabase
+  // Step 2: fetch jobs via admin client so RLS on the applications
+  // sub-table never blocks the count. Auth is already verified above.
+  const admin = createAdminClient();
+
+  const { data: jobs, error: jobsError } = await admin
     .from("jobs")
     .select(`
       id,
@@ -64,20 +54,45 @@ export default async function JobsPage() {
       hours_per_week,
       status,
       created_at,
-      firm_id,
-      applications(count)
+      firm_id
     `)
     .eq("firm_id", firm.id)
     .order("created_at", { ascending: false });
 
+  if (jobsError) {
+    console.error("[portal/jobs] Jobs fetch error (firm_id:", firm.id, "):", jobsError);
+  }
+  console.log("[portal/jobs] Jobs found:", jobs?.length ?? 0);
+
+  // Step 3: fetch application counts per job separately
+  const jobIds = (jobs ?? []).map((j) => j.id);
+  const countMap: Record<string, number> = {};
+
+  if (jobIds.length > 0) {
+    const { data: counts, error: countsError } = await admin
+      .from("applications")
+      .select("job_id")
+      .in("job_id", jobIds);
+
+    if (countsError) {
+      // Non-fatal: job_id column may not exist yet in the DB schema.
+      // Run: ALTER TABLE applications ADD COLUMN IF NOT EXISTS job_id uuid REFERENCES jobs(id) ON DELETE CASCADE;
+      console.error("[portal/jobs] Application counts error (schema fix needed):", countsError.message);
+    }
+
+    for (const row of (counts ?? []) as { job_id: string }[]) {
+      if (row.job_id) countMap[row.job_id] = (countMap[row.job_id] ?? 0) + 1;
+    }
+  }
+
   const jobList = (jobs ?? []).map((j) => ({
     ...j,
     firm_slug: firm.slug,
-    applicationCount: (j.applications as unknown as { count: number }[])?.[0]?.count ?? 0,
+    applicationCount: countMap[j.id] ?? 0,
   }));
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+    <div className="max-w-6xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -90,7 +105,7 @@ export default async function JobsPage() {
         </div>
         <Link
           href="/portal/jobs/new"
-          className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors"
+          className="btn-primary"
         >
           <Plus className="h-4 w-4" />
           Nieuwe vacature
@@ -111,7 +126,7 @@ export default async function JobsPage() {
           </p>
           <Link
             href="/portal/jobs/new"
-            className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors"
+            className="btn-primary"
           >
             <Plus className="h-4 w-4" />
             Nieuwe vacature
@@ -142,15 +157,33 @@ export default async function JobsPage() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {jobList.map((job) => (
-                  <tr key={job.id} className="hover:bg-gray-50 transition-colors">
+                  <tr
+                    key={job.id}
+                    className={`transition-colors ${
+                      job.status === "draft" ? "bg-orange-50/50 hover:bg-orange-50" : "hover:bg-gray-50"
+                    }`}
+                  >
                     <td className="px-6 py-4">
                       <div>
-                        <p className="text-sm font-semibold text-black">{job.title}</p>
+                        <Link
+                          href={`/portal/jobs/${job.id}/edit`}
+                          className="text-sm font-semibold text-black hover:text-primary hover:underline transition-colors"
+                        >
+                          {job.title}
+                        </Link>
                         <p className="text-xs text-gray-400 mt-0.5">{job.location}</p>
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      <StatusBadge status={job.status} />
+                      <div className="flex items-center gap-2.5">
+                        <JobStatusToggle jobId={job.id} initialStatus={job.status} />
+                        {job.status === "draft" && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-[11px] font-semibold text-orange-700">
+                            <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
+                            Concept
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-500">
                       {new Date(job.created_at).toLocaleDateString("nl-NL", {
@@ -176,12 +209,28 @@ export default async function JobsPage() {
           {/* Mobile card list */}
           <div className="sm:hidden divide-y divide-gray-100">
             {jobList.map((job) => (
-              <div key={job.id} className="px-4 py-4 flex items-start justify-between gap-3">
+              <div
+                key={job.id}
+                className={`px-4 py-4 flex items-start justify-between gap-3 ${
+                  job.status === "draft" ? "bg-orange-50/50" : ""
+                }`}
+              >
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-black truncate">{job.title}</p>
+                  <Link
+                    href={`/portal/jobs/${job.id}/edit`}
+                    className="text-sm font-semibold text-black hover:text-primary hover:underline transition-colors truncate block"
+                  >
+                    {job.title}
+                  </Link>
                   <p className="text-xs text-gray-400 mt-0.5">{job.location}</p>
                   <div className="flex items-center gap-3 mt-2">
-                    <StatusBadge status={job.status} />
+                    <JobStatusToggle jobId={job.id} initialStatus={job.status} />
+                    {job.status === "draft" && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-[11px] font-semibold text-orange-700">
+                        <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
+                        Concept
+                      </span>
+                    )}
                     <span className="text-xs text-gray-400">
                       {job.applicationCount} sollicitatie{job.applicationCount !== 1 ? "s" : ""}
                     </span>

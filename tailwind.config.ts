@@ -10,26 +10,50 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#6B7BF7',
-          dark: '#4F5FD6',
-          light: '#EEF0FE',
+          DEFAULT: "#587DFE",
+          dark: "#4A6CE6",
+          light: "#EEF1FF",
         },
         brand: {
-          50:  "#eff6ff",
-          100: "#dbeafe",
-          200: "#bfdbfe",
-          300: "#93c5fd",
-          400: "#60a5fa",
-          500: "#3b82f6",
-          600: "#2563eb",
-          700: "#1d4ed8",
-          800: "#1e40af",
-          900: "#1e3a8a",
+          50: "#F5F7FF",
+          100: "#EEF1FF",
+          200: "#E9EEFF",
+          300: "#BDD0FF",
+          400: "#8CA6FE",
+          500: "#587DFE",
+          600: "#4A6CE6",
+          700: "#3B4CA7",
+          800: "#2C337A",
+          900: "#2C337A",
+        },
+        navy: {
+          DEFAULT: "#2C337A",
+          light: "#3B4CA7",
+        },
+        accent: {
+          DEFAULT: "#587DFE",
+          hover: "#4A6CE6",
+          light: "#8CA6FE",
+          lighter: "#BDD0FF",
+          lightest: "#E9EEFF",
+        },
+        surface: {
+          DEFAULT: "#FFFFFF",
+          subtle: "#F5F7FF",
+          muted: "#EEF1FF",
+        },
+        text: {
+          primary: "#2C337A",
+          secondary: "#5A6094",
+          muted: "#8B91B8",
+        },
+        border: {
+          DEFAULT: "#E2E5F0",
         },
       },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
 };
 
 export default config;

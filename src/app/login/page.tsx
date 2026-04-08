@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
 
@@ -67,15 +68,22 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="font-extrabold italic text-primary text-2xl">
-            Legal Talents.
+          <Link href="/" className="inline-flex items-center justify-center">
+            <Image
+              src="/legal-talents-logo.png"
+              alt="Legal Talents Logo"
+              width={150}
+              height={40}
+              className="h-10 w-auto"
+              priority
+            />
           </Link>
-          <h1 className="mt-4 text-2xl font-bold text-black">
+          <h1 className="mt-6 text-2xl font-bold text-black">
             {view === "login" ? "Inloggen" : "Wachtwoord vergeten"}
           </h1>
           <p className="mt-1 text-sm text-gray-500">
             {view === "login"
-              ? "Welkom terug — log in op je kantoorportaal"
+              ? "Welkom terug — log in op je werkgeverportaal"
               : "Vul je e-mailadres in, dan sturen we een resetlink"}
           </p>
         </div>
@@ -92,7 +100,7 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   required
-                  placeholder="kantoor@voorbeeld.nl"
+                  placeholder="werkgever@voorbeeld.nl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
@@ -142,7 +150,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-3 rounded-lg transition-colors"
+                className="btn-primary w-full"
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {loading ? "Inloggen…" : "Inloggen"}
@@ -161,7 +169,7 @@ export default function LoginPage() {
                   id="resetEmail"
                   type="email"
                   required
-                  placeholder="kantoor@voorbeeld.nl"
+                  placeholder="werkgever@voorbeeld.nl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
@@ -177,7 +185,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-3 rounded-lg transition-colors"
+                className="btn-primary w-full"
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {loading ? "Versturen…" : "Resetlink versturen"}
@@ -186,7 +194,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => { setView("login"); setError(null); }}
-                className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                className="btn-secondary w-full"
               >
                 ← Terug naar inloggen
               </button>
@@ -219,7 +227,7 @@ export default function LoginPage() {
             <p className="mt-6 text-center text-sm text-gray-500">
               Nog geen account?{" "}
               <Link href="/register" className="font-medium text-primary hover:underline">
-                Kantoor aanmelden
+                Werkgever aanmelden
               </Link>
             </p>
           )}

@@ -19,13 +19,13 @@ export default async function ProfilePage() {
     .maybeSingle();
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-3xl">
+    <div className="max-w-3xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-black">Mijn profiel</h1>
         <p className="mt-1 text-sm text-gray-500">
           {firm
-            ? "Beheer de informatie van je kantoor die zichtbaar is op Legal Talents."
-            : "Stel je kantoorprofiel in om zichtbaar te worden op Legal Talents."}
+            ? "Beheer de informatie van je werkgever die zichtbaar is op Legal Talents."
+            : "Stel je werkgeversprofiel in om zichtbaar te worden op Legal Talents."}
         </p>
       </div>
 

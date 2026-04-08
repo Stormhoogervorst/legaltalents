@@ -11,6 +11,10 @@
   body {
     @apply bg-gray-50 text-gray-900 antialiased;
   }
+
+  button {
+    @apply rounded-full;
+  }
 }
 
 /* ── Tiptap editor prose styles ─────────────────────────────── */
@@ -52,15 +56,15 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-[#587DFE] px-5 py-2.5 text-[14px] font-medium text-white transition-all duration-200 hover:scale-[1.03] hover:bg-[#4A6CE6] focus:outline-none focus:ring-2 focus:ring-[#587DFE]/40 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-[14px] font-medium text-[#2C337A] ring-1 ring-inset ring-[#E2E5F0] transition-all duration-200 hover:scale-[1.03] hover:bg-[#F5F7FF] focus:outline-none focus:ring-2 focus:ring-[#587DFE]/40 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-red-500 px-5 py-2.5 text-[14px] font-medium text-white transition-all duration-200 hover:scale-[1.03] hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400/40 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
   }
 
   .input {

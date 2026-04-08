@@ -2,7 +2,7 @@
 
 import { useState, useRef, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client"; // used only for logo storage upload
 import {
   Loader2,
   CheckCircle,
@@ -31,8 +31,6 @@ const PRACTICE_AREAS = [
   "Overig",
 ] as const;
 
-const TEAM_SIZES = ["1–10", "11–50", "51–200", "200+"];
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Firm = {
@@ -45,7 +43,6 @@ type Firm = {
   contact_person: string;
   notification_email: string;
   logo_url: string | null;
-  team_size: string | null;
   why_work_with_us: string | null;
   website_url: string | null;
   linkedin_url: string | null;
@@ -105,16 +102,11 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
   );
 
   // Optional fields
-  const [teamSize, setTeamSize] = useState(firm?.team_size ?? "");
   const [whyWorkWithUs, setWhyWorkWithUs] = useState(
     firm?.why_work_with_us ?? ""
   );
   const [websiteUrl, setWebsiteUrl] = useState(firm?.website_url ?? "");
   const [linkedinUrl, setLinkedinUrl] = useState(firm?.linkedin_url ?? "");
-  const [salaryIndication, setSalaryIndication] = useState(
-    firm?.salary_indication ?? ""
-  );
-
   // Logo state
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(
@@ -138,7 +130,7 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
     notificationEmail.trim() !== "";
 
   const missingFields = [
-    !name.trim() && "Naam kantoor",
+    !name.trim() && "Naam werkgever",
     !location.trim() && "Vestigingsplaats",
     practiceAreas.length === 0 && "Rechtsgebieden",
     !description.trim() && "Omschrijving",
@@ -207,9 +199,8 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
       logoUrl = null;
     }
 
+    // user_id and slug are managed server-side — do not send from client
     const payload = {
-      user_id: userId,
-      slug: firm?.slug ?? generateSlug(name),
       name: name.trim(),
       location: location.trim(),
       practice_areas: practiceAreas,
@@ -217,37 +208,39 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
       contact_person: contactPerson.trim(),
       notification_email: notificationEmail.trim(),
       logo_url: logoUrl,
-      team_size: teamSize || null,
       why_work_with_us: whyWorkWithUs.trim() || null,
       website_url: websiteUrl.trim() || null,
       linkedin_url: linkedinUrl.trim() || null,
-      salary_indication: salaryIndication.trim() || null,
-      is_published: requiredFilled,
     };
 
-    let dbError;
-    if (firm?.id) {
-      // Update existing record
-      const { error } = await supabase
-        .from("firms")
-        .update(payload)
-        .eq("id", firm.id);
-      dbError = error;
-    } else {
-      // Insert new record
-      const { error } = await supabase.from("firms").insert(payload);
-      dbError = error;
-    }
+    // Send to API route — ownership is verified server-side via auth session.
+    // The firm.id / user_id from client props is never trusted for the WHERE
+    // clause; the server always re-derives the firm from the session.
+    const res = await fetch("/api/firms/me", {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-    if (dbError) {
-      setSaveError(dbError.message);
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}));
+      if (res.status === 403) {
+        setSaveError(
+          typeof json?.error === "string" && json.error
+            ? json.error
+            : "Geen toegang: je kunt alleen je eigen werkgeversprofiel bewerken."
+        );
+      } else {
+        setSaveError(json?.error ?? "Opslaan mislukt.");
+      }
       setSaving(false);
       return;
     }
 
     setSaveSuccess(true);
     setSaving(false);
-    router.refresh();
+    router.push("/portal");
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -290,10 +283,10 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
           Verplichte informatie
         </h2>
 
-        {/* Naam kantoor */}
+        {/* Naam werkgever */}
         <div>
           <label className={labelCls}>
-            Naam kantoor <span className="text-red-500">*</span>
+            Naam werkgever <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -371,7 +364,7 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
           <textarea
             required
             rows={5}
-            placeholder="Beschrijf het kantoor in max. 300 woorden. Denk aan specialisaties, cultuur en type zaken."
+            placeholder="Beschrijf de werkgever in max. 300 woorden. Denk aan specialisaties, cultuur en type zaken."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className={`${inputCls} resize-none`}
@@ -407,7 +400,7 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
           <input
             type="email"
             required
-            placeholder="sollicitaties@kantoor.nl"
+            placeholder="sollicitaties@werkgever.nl"
             value={notificationEmail}
             onChange={(e) => setNotificationEmail(e.target.value)}
             className={inputCls}
@@ -479,23 +472,6 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
           </p>
         </div>
 
-        {/* Teamgrootte */}
-        <div>
-          <label className={labelCls}>Teamgrootte</label>
-          <select
-            value={teamSize}
-            onChange={(e) => setTeamSize(e.target.value)}
-            className={inputCls}
-          >
-            <option value="">Kies teamgrootte…</option>
-            {TEAM_SIZES.map((size) => (
-              <option key={size} value={size}>
-                {size} medewerkers
-              </option>
-            ))}
-          </select>
-        </div>
-
         {/* Waarom bij ons werken */}
         <div>
           <label className={labelCls}>Waarom bij ons werken?</label>
@@ -515,7 +491,7 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
             <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="url"
-              placeholder="https://www.kantoor.nl"
+              placeholder="https://www.werkgever.nl"
               value={websiteUrl}
               onChange={(e) => setWebsiteUrl(e.target.value)}
               className={`${inputCls} pl-9`}
@@ -530,7 +506,7 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
             <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="url"
-              placeholder="https://linkedin.com/company/kantoor"
+              placeholder="https://linkedin.com/company/werkgever"
               value={linkedinUrl}
               onChange={(e) => setLinkedinUrl(e.target.value)}
               className={`${inputCls} pl-9`}
@@ -538,17 +514,6 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
           </div>
         </div>
 
-        {/* Salarisindicatie */}
-        <div>
-          <label className={labelCls}>Salarisindicatie</label>
-          <input
-            type="text"
-            placeholder="Bijv. €500–€700 per maand (stage)"
-            value={salaryIndication}
-            onChange={(e) => setSalaryIndication(e.target.value)}
-            className={inputCls}
-          />
-        </div>
       </section>
 
       {/* ── Save feedback + button ────────────────────────────────── */}
@@ -573,7 +538,7 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
         <button
           type="submit"
           disabled={saving || wordCount > 300}
-          className="flex items-center gap-2 bg-primary hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold px-6 py-3 rounded-lg transition-colors"
+          className="btn-primary"
         >
           {saving && <Loader2 className="h-4 w-4 animate-spin" />}
           {saving ? "Opslaan…" : "Profiel opslaan"}

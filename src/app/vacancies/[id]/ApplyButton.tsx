@@ -23,7 +23,7 @@ const statusLabels: Record<string, string> = {
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
-  reviewing: "bg-blue-50 text-blue-700 border-blue-200",
+  reviewing: "bg-primary-light text-primary-dark border-primary/25",
   interview: "bg-purple-50 text-purple-700 border-purple-200",
   rejected: "bg-red-50 text-red-700 border-red-200",
   accepted: "bg-green-50 text-green-700 border-green-200",

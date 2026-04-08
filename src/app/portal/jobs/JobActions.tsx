@@ -1,19 +1,17 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import {
   MoreHorizontal,
   Pencil,
-  Copy,
   Trash2,
   Eye,
   EyeOff,
   XCircle,
   Loader2,
 } from "lucide-react";
-import { nanoid } from "nanoid";
 
 type Job = {
   id: string;
@@ -29,7 +27,6 @@ type Job = {
   hours_per_week: number | null;
   status: string;
   firm_id: string;
-  firm_slug: string;
 };
 
 type Props = {
@@ -38,22 +35,48 @@ type Props = {
 
 export default function JobActions({ job }: Props) {
   const router = useRouter();
-  const supabase = createClient();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
 
-  // Close dropdown on outside click
+  const updatePosition = useCallback(() => {
+    if (!btnRef.current) return;
+    const rect = btnRef.current.getBoundingClientRect();
+    setPos({
+      top: rect.bottom + 4,
+      left: rect.right - 192, // 192px = w-48
+    });
+  }, []);
+
   useEffect(() => {
-    function handler(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+    if (!open) return;
+    updatePosition();
+
+    function onClickOutside(e: MouseEvent) {
+      const target = e.target as Node;
+      if (
+        menuRef.current && !menuRef.current.contains(target) &&
+        btnRef.current && !btnRef.current.contains(target)
+      ) {
         setOpen(false);
       }
     }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+    function onScrollOrResize() {
+      updatePosition();
+    }
+
+    document.addEventListener("mousedown", onClickOutside);
+    window.addEventListener("scroll", onScrollOrResize, true);
+    window.addEventListener("resize", onScrollOrResize);
+    return () => {
+      document.removeEventListener("mousedown", onClickOutside);
+      window.removeEventListener("scroll", onScrollOrResize, true);
+      window.removeEventListener("resize", onScrollOrResize);
+    };
+  }, [open, updatePosition]);
 
   const run = async (fn: () => Promise<void>) => {
     setLoading(true);
@@ -71,69 +94,36 @@ export default function JobActions({ job }: Props) {
 
   const changeStatus = (status: "draft" | "active" | "closed") =>
     run(async () => {
-      const { error } = await supabase
-        .from("jobs")
-        .update({ status, updated_at: new Date().toISOString() })
-        .eq("id", job.id);
-      if (error) throw error;
-    });
-
-  const duplicate = () =>
-    run(async () => {
-      const slug = `${job.firm_slug}-${job.title
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")}-${nanoid(6)}`;
-
-      const { error } = await supabase.from("jobs").insert({
-        firm_id: job.firm_id,
-        title: `${job.title} (kopie)`,
-        slug,
-        location: job.location,
-        type: job.type,
-        practice_area: job.practice_area,
-        description: job.description,
-        salary_indication: job.salary_indication,
-        start_date: job.start_date,
-        required_education: job.required_education,
-        hours_per_week: job.hours_per_week,
-        status: "draft",
+      const res = await fetch(`/api/jobs/${job.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
       });
-      if (error) throw error;
+      if (!res.ok) {
+        const { error } = await res.json();
+        throw new Error(error ?? "Status wijzigen mislukt.");
+      }
     });
 
   const deleteJob = () => {
     if (!window.confirm(`Vacature "${job.title}" permanent verwijderen?`)) return;
     run(async () => {
-      const { error } = await supabase.from("jobs").delete().eq("id", job.id);
-      if (error) throw error;
+      const res = await fetch(`/api/jobs/${job.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const { error } = await res.json();
+        if (res.status === 403) throw new Error("Geen toegang: dit is niet jouw vacature.");
+        throw new Error(error ?? "Verwijderen mislukt.");
+      }
     });
   };
 
-  return (
-    <div className="relative" ref={menuRef}>
-      {error && (
-        <p className="text-xs text-red-500 mb-1">{error}</p>
-      )}
-
-      <button
-        onClick={() => setOpen((v) => !v)}
-        disabled={loading}
-        className="p-1.5 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50"
-        aria-label="Acties"
-      >
-        {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <MoreHorizontal className="h-4 w-4" />
-        )}
-      </button>
-
-      {open && (
-        <div className="absolute right-0 top-8 z-50 w-48 bg-white border border-gray-200 rounded-xl shadow-lg py-1 text-sm">
-          {/* Bewerken */}
+  const dropdown = open
+    ? createPortal(
+        <div
+          ref={menuRef}
+          style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 9999 }}
+          className="w-48 bg-white border border-gray-200 rounded-xl shadow-lg py-1 text-sm"
+        >
           <a
             href={`/portal/jobs/${job.id}/edit`}
             className="flex items-center gap-2.5 px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-black transition-colors"
@@ -142,18 +132,8 @@ export default function JobActions({ job }: Props) {
             Bewerken
           </a>
 
-          {/* Dupliceren */}
-          <button
-            onClick={duplicate}
-            className="w-full flex items-center gap-2.5 px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-black transition-colors"
-          >
-            <Copy className="h-4 w-4" />
-            Dupliceren
-          </button>
-
           <div className="my-1 border-t border-gray-100" />
 
-          {/* Status wijzigen */}
           {job.status !== "active" && (
             <button
               onClick={() => changeStatus("active")}
@@ -184,7 +164,6 @@ export default function JobActions({ job }: Props) {
 
           <div className="my-1 border-t border-gray-100" />
 
-          {/* Verwijderen */}
           <button
             onClick={deleteJob}
             className="w-full flex items-center gap-2.5 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
@@ -192,8 +171,32 @@ export default function JobActions({ job }: Props) {
             <Trash2 className="h-4 w-4" />
             Verwijderen
           </button>
-        </div>
+        </div>,
+        document.body,
+      )
+    : null;
+
+  return (
+    <div className="relative">
+      {error && (
+        <p className="text-xs text-red-500 mb-1">{error}</p>
       )}
+
+      <button
+        ref={btnRef}
+        onClick={() => setOpen((v) => !v)}
+        disabled={loading}
+        className="p-1.5 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50"
+        aria-label="Acties"
+      >
+        {loading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <MoreHorizontal className="h-4 w-4" />
+        )}
+      </button>
+
+      {dropdown}
     </div>
   );
 }

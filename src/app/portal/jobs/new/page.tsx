@@ -22,7 +22,7 @@ export default async function NewJobPage() {
   if (!firm) redirect("/portal/profile");
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
+    <div className="max-w-2xl">
       {/* Back link */}
       <Link
         href="/portal/jobs"

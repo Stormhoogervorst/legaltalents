@@ -38,7 +38,7 @@ export default async function EditJobPage({ params }: Props) {
   if (!job) notFound();
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
+    <div className="max-w-2xl">
       {/* Back link */}
       <Link
         href="/portal/jobs"

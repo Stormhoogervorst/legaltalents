@@ -1,182 +1,628 @@
 import Link from "next/link";
-import { Search, MapPin, Building2, Briefcase, CheckCircle, ArrowRight, ChevronRight } from "lucide-react";
+import Image from "next/image";
+import { MapPin, Clock, Building2, ArrowUpRight, Search } from "lucide-react";
 import NavbarPublic from "@/components/NavbarPublic";
+import Footer from "@/components/Footer";
+import CtaBand from "@/components/CtaBand";
+import { createClient } from "@/lib/supabase/server";
+import { Firm, Job, jobTypeLabels } from "@/types";
 
-export default function HomePage() {
-  const featuredFirms = [
-    {
-      name: "Van der Berg Advocaten",
-      location: "Amsterdam",
-      practiceAreas: ["Ondernemingsrecht", "Arbeidsrecht"],
-      teamSize: "11–50",
-      initials: "VB",
-    },
-    {
-      name: "De Groot & Partners",
-      location: "Rotterdam",
-      practiceAreas: ["Vastgoedrecht", "Familierecht"],
-      teamSize: "1–10",
-      initials: "DG",
-    },
-    {
-      name: "Notariskantoor Jansen",
-      location: "Utrecht",
-      practiceAreas: ["Erfrecht", "Personen- en familierecht"],
-      teamSize: "1–10",
-      initials: "NJ",
-    },
-  ];
+interface BlogPreview {
+  id: string;
+  title: string;
+  slug: string;
+  category: string;
+  content: string;
+  image_url: string | null;
+  created_at: string;
+  firms: { name: string; logo_url: string | null } | null;
+}
+
+const blogCategoryLabels: Record<string, string> = {
+  carriere: "Carrière",
+  juridisch: "Juridisch",
+  kantoorleven: "Kantoorleven",
+};
+
+
+export default async function HomePage() {
+  const supabase = await createClient();
+
+  const { data: allFirms } = await supabase
+    .from("firms")
+    .select("id, name, slug, location, practice_areas, logo_url, team_size, is_published")
+    .eq("is_published", true);
+
+  const firms = (allFirms ?? []) as Firm[];
+  const featuredFirms = firms
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 4);
+
+  const { data: topJobs } = await supabase
+    .from("jobs")
+    .select(`
+      id, firm_id, title, slug, location, type, practice_area,
+      salary_indication, hours_per_week, status, created_at,
+      firms ( name, logo_url, slug )
+    `)
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  const featuredJobs = (topJobs ?? []).map((j) => ({
+    ...j,
+    firms: Array.isArray(j.firms) ? (j.firms[0] ?? null) : (j.firms ?? null),
+  })) as Job[];
+
+  const { data: blogData } = await supabase
+    .from("blogs")
+    .select(`
+      id, title, slug, category, content, image_url, created_at,
+      firms ( name, logo_url )
+    `)
+    .eq("status", "published")
+    .order("created_at", { ascending: false })
+    .limit(3);
+
+  const latestBlogs = ((blogData ?? []) as unknown as BlogPreview[]).map((b) => ({
+    ...b,
+    firms: Array.isArray(b.firms) ? b.firms[0] ?? null : b.firms,
+  }));
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="relative min-h-screen flex flex-col bg-white">
       <NavbarPublic />
 
-      {/* Hero */}
-      <section className="bg-primary">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold italic text-white leading-tight">
-            Vind jouw stage of baan in de juridische wereld.
+      {/* ── Hero ──────────────────────────────────────────────── */}
+      <section className="bg-white relative overflow-visible pb-10 md:pb-20">
+        <div
+          className="max-w-[1400px] mx-auto"
+          style={{ padding: "clamp(60px, 8vh, 120px) clamp(24px, 5vw, 80px) 0" }}
+        >
+          {/* Badge */}
+          <span
+            className="inline-flex items-center gap-2 rounded-full bg-[#E9EEFF]"
+            style={{
+              padding: "7px 16px",
+              fontSize: "13px",
+              fontWeight: 500,
+              letterSpacing: "0.02em",
+              color: "#587DFE",
+            }}
+          >
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#587DFE] opacity-80" />
+            #1 Juridisch Carrièreplatform
+          </span>
+
+          {/* Headline */}
+          <h1
+            style={{
+              fontSize: "clamp(44px, 5.5vw, 76px)",
+              fontWeight: 700,
+              lineHeight: 1.05,
+              letterSpacing: "-0.03em",
+              color: "#0A0A0A",
+              marginTop: "24px",
+              maxWidth: "820px",
+            }}
+          >
+            Vind jouw{" "}
+            <span style={{ color: "#587DFE" }}>stage of baan</span>
+            <br />
+            in de juridische wereld
           </h1>
-          <p className="mt-5 text-base sm:text-lg text-white/80 max-w-xl mx-auto">
-            Ontdek stages en vacatures bij advocaten- en notariskantoren door heel Nederland.
+
+          {/* Subheadline */}
+          <p
+            style={{
+              fontSize: "clamp(15px, 1.1vw, 17px)",
+              lineHeight: 1.65,
+              color: "#5A6094",
+              maxWidth: "520px",
+              marginTop: "24px",
+            }}
+          >
+            Ontdek stages en vacatures bij de beste juridische werkgevers van
+            Nederland. Het platform voor studenten en young professionals.
           </p>
 
-          {/* Search bar */}
+          {/* Composite pill search bar */}
           <form
-            action="/vacancies"
+            action="/jobs"
             method="GET"
-            className="mt-8 bg-white rounded-xl shadow-lg p-2 flex flex-col sm:flex-row gap-2 max-w-2xl mx-auto"
+            className="mt-8"
+            style={{ maxWidth: "580px" }}
           >
-            <div className="flex items-center gap-2 flex-1 px-3 py-1.5 border border-gray-200 rounded-lg">
-              <Search className="h-4 w-4 text-gray-400 shrink-0" />
+            <div
+              className="flex items-center bg-[#EEF1FF] rounded-full"
+              style={{
+                padding: "6px 6px 6px 22px",
+              }}
+            >
+              <Search
+                className="h-[18px] w-[18px] shrink-0"
+                style={{ color: "#8B91B8" }}
+              />
               <input
                 name="q"
                 type="text"
-                placeholder="Wat zoek je? (functie, rechtsgebied)"
-                className="w-full text-sm text-black placeholder-gray-400 focus:outline-none bg-transparent"
+                placeholder="Functie of rechtsgebied..."
+                className="flex-1 min-w-0 bg-transparent border-none outline-none focus:outline-none"
+                style={{
+                  padding: "10px 14px",
+                  fontSize: "15px",
+                  color: "#2C337A",
+                }}
               />
+              <button
+                type="submit"
+                className="shrink-0 rounded-full inline-flex items-center justify-center font-semibold text-white transition-all duration-200 hover:bg-[#4A6CE6] hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-[#587DFE]/40 focus:ring-offset-2"
+                style={{
+                  padding: "12px 26px",
+                  fontSize: "14px",
+                  background: "#587DFE",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Zoeken
+              </button>
             </div>
-            <div className="flex items-center gap-2 flex-1 px-3 py-1.5 border border-gray-200 rounded-lg">
-              <MapPin className="h-4 w-4 text-gray-400 shrink-0" />
-              <input
-                name="locatie"
-                type="text"
-                placeholder="Stad of regio"
-                className="w-full text-sm text-black placeholder-gray-400 focus:outline-none bg-transparent"
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors shrink-0"
-            >
-              Zoeken
-            </button>
           </form>
+
+        </div>
+
+        {/* Image strip */}
+        <div className="mt-12 sm:mt-16 w-full overflow-x-hidden relative z-10">
+          <div className="flex items-end justify-center gap-3 md:gap-5 -mx-8">
+            <div className="shrink-0 hidden lg:block w-[160px] h-[160px] rounded-full bg-[#BDD0FF]" />
+            <div className="shrink-0 w-[110px] h-[110px] sm:w-[140px] sm:h-[140px] rounded-full overflow-hidden relative">
+              <Image src="/foto 1.jpg" alt="" fill className="object-cover" sizes="140px" />
+            </div>
+            <div className="shrink-0 w-[80px] h-[140px] sm:w-[100px] sm:h-[180px] rounded-full overflow-hidden relative">
+              <Image src="/foto 4.jpg" alt="" fill className="object-cover" sizes="100px" />
+            </div>
+            <div className="shrink-0 hidden md:block w-[80px] h-[80px] rounded-full bg-[#587DFE]" />
+            <div className="shrink-0 w-[130px] h-[130px] sm:w-[170px] sm:h-[170px] rounded-full overflow-hidden relative">
+              <Image src="/foto 2.jpg" alt="" fill className="object-cover" sizes="170px" priority />
+            </div>
+            <div className="shrink-0 hidden md:flex w-[70px] h-[150px] sm:w-[90px] sm:h-[180px] rounded-full overflow-hidden bg-[#587DFE] items-end justify-center">
+              <div className="w-[70px] h-[70px] sm:w-[90px] sm:h-[90px] rounded-full bg-[#8CA6FE]" />
+            </div>
+            <div className="shrink-0 w-[80px] h-[140px] sm:w-[100px] sm:h-[180px] rounded-full overflow-hidden relative">
+              <Image src="/foto 5.jpg" alt="" fill className="object-cover" sizes="100px" />
+            </div>
+            <div className="shrink-0 w-[110px] h-[110px] sm:w-[140px] sm:h-[140px] rounded-full overflow-hidden relative">
+              <Image src="/foto-3.jpg" alt="" fill className="object-cover" sizes="140px" />
+            </div>
+            <div className="shrink-0 hidden lg:block w-[160px] h-[160px] rounded-full bg-[#8CA6FE]" />
+          </div>
         </div>
       </section>
 
-      {/* Stats bar */}
-      <section className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
-            <div className="flex items-center justify-center gap-3 py-4 sm:py-2 sm:px-8">
-              <Building2 className="h-5 w-5 text-primary shrink-0" />
-              <div>
-                <span className="text-lg font-bold text-black">50+</span>
-                <span className="text-sm text-gray-500 ml-1.5">kantoren</span>
+      {/* ── Top vacatures ─────────────────────────────────────── */}
+      <section
+        className="pt-16 md:pt-32"
+        style={{ paddingBottom: "clamp(80px, 10vh, 160px)", paddingLeft: "clamp(24px, 5vw, 80px)", paddingRight: "clamp(24px, 5vw, 80px)" }}
+      >
+        <div className="max-w-[1400px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">
+            <div className="lg:sticky lg:top-24">
+              <h2
+                style={{
+                  fontSize: "clamp(32px, 4vw, 56px)",
+                  fontWeight: 700,
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.025em",
+                  color: "#0A0A0A",
+                }}
+              >
+                De nieuwste juridische vacatures
+                <span style={{ color: "#587DFE" }}>.</span>
+              </h2>
+              <p
+                style={{
+                  fontSize: "clamp(15px, 1.1vw, 17px)",
+                  lineHeight: 1.65,
+                  color: "#5A6094",
+                  marginTop: "20px",
+                }}
+              >
+                Ontdek de meest uitdagende posities van dit moment bij top werkgevers.
+              </p>
+              <div className="mt-8 flex flex-row flex-wrap gap-4">
+                <Link href="/jobs" className="btn-primary">
+                  Alle vacatures
+                </Link>
+                <Link
+                  href="/firms"
+                  className="inline-flex items-center justify-center rounded-full border border-[#D1D5E8] bg-white px-6 py-3 text-sm font-semibold text-[#5A6094] transition-colors duration-200 hover:bg-[#F5F7FF] hover:border-[#D1D5E8]"
+                >
+                  Bekijk werkgevers
+                </Link>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-3 py-4 sm:py-2 sm:px-8">
-              <Briefcase className="h-5 w-5 text-primary shrink-0" />
-              <div>
-                <span className="text-lg font-bold text-black">200+</span>
-                <span className="text-sm text-gray-500 ml-1.5">vacatures</span>
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-3 py-4 sm:py-2 sm:px-8">
-              <CheckCircle className="h-5 w-5 text-primary shrink-0" />
-              <div>
-                <span className="text-sm font-semibold text-black">Solliciteer zonder account</span>
-              </div>
+
+            <div>
+              {featuredJobs.length > 0 ? (
+                <div className="border-t border-[#E2E5F0]">
+                  {featuredJobs.map((job) => {
+                    const firmName = job.firms?.name ?? "";
+                    const logoUrl = job.firms?.logo_url ?? null;
+                    return (
+                      <Link
+                        key={job.id}
+                        href={`/jobs/${job.slug}`}
+                        className="group flex gap-5 py-5 border-b border-[#E2E5F0] transition-colors hover:bg-[#F5F7FF] -mx-4 px-4 rounded-none"
+                      >
+                        <div className="w-11 h-11 rounded-[8px] bg-[#F5F7FF] border border-[#E2E5F0] flex items-center justify-center shrink-0 overflow-hidden p-1.5">
+                          {logoUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={logoUrl} alt={firmName} className="w-full h-full object-contain" />
+                          ) : (
+                            <Building2 className="h-4 w-4" style={{ color: "#8B91B8" }} />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3
+                            className="group-hover:text-[#587DFE] transition-colors duration-200"
+                            style={{
+                              fontSize: "clamp(16px, 1.3vw, 20px)",
+                              fontWeight: 600,
+                              lineHeight: 1.3,
+                              letterSpacing: "-0.01em",
+                              color: "#2C337A",
+                            }}
+                          >
+                            {job.title}
+                          </h3>
+                          <div
+                            className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5"
+                            style={{ fontSize: "13px", color: "#8B91B8" }}
+                          >
+                            {firmName && <span>{firmName}</span>}
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {job.location}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {jobTypeLabels[job.type] ?? job.type}
+                            </span>
+                          </div>
+                        </div>
+                        <span
+                          className="hidden sm:inline-flex items-center self-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                          style={{ color: "#587DFE" }}
+                        >
+                          <ArrowUpRight className="w-5 h-5" />
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p style={{ fontSize: "15px", color: "#8B91B8" }}>
+                  Er zijn momenteel geen vacatures beschikbaar.
+                </p>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured firms */}
-      <section className="bg-gray-50 py-10 sm:py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-black">Uitgelichte kantoren</h2>
-            <Link href="/firms" className="text-primary hover:underline text-sm font-semibold flex items-center gap-1">
-              Bekijk alle kantoren <ChevronRight className="h-4 w-4" />
+      {/* ── Werkgevers grid ───────────────────────────────────── */}
+      <section
+        className="bg-white"
+        style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
+      >
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex flex-col sm:flex-row items-start justify-between gap-6 mb-12 sm:mb-16">
+            <h2
+              style={{
+                fontSize: "clamp(32px, 4vw, 56px)",
+                fontWeight: 700,
+                lineHeight: 1.1,
+                letterSpacing: "-0.025em",
+                color: "#0A0A0A",
+              }}
+            >
+              Uitgelichte werkgevers
+              <span style={{ color: "#587DFE" }}>.</span>
+            </h2>
+            <Link href="/firms" className="btn-primary shrink-0">
+              Alle werkgevers
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {featuredFirms.map((firm) => (
-              <div
-                key={firm.name}
-                className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md hover:border-primary transition-all cursor-pointer"
+              <Link
+                key={firm.id}
+                href={`/firms/${firm.slug}`}
+                className="group bg-[#F5F7FF] rounded-[8px] p-6 transition-all duration-300 hover:-translate-y-1"
               >
-                {/* Firm logo placeholder */}
-                <div className="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center mb-4">
-                  <span className="text-primary font-bold text-sm">{firm.initials}</span>
-                </div>
-
-                <h3 className="text-lg font-semibold text-black mb-1">{firm.name}</h3>
-                <p className="text-sm text-gray-500 flex items-center gap-1 mb-3">
-                  <MapPin className="h-3.5 w-3.5 shrink-0" />
-                  {firm.location} · {firm.teamSize} medewerkers
-                </p>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {firm.practiceAreas.map((area) => (
-                    <span
-                      key={area}
-                      className="bg-primary-light text-primary text-xs font-medium px-2.5 py-1 rounded-full"
-                    >
-                      {area}
+                <div className="w-14 h-14 rounded-[8px] bg-white border border-[#E2E5F0] flex items-center justify-center mb-5 overflow-hidden p-2">
+                  {firm.logo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={firm.logo_url} alt={firm.name} className="w-full h-full object-contain" />
+                  ) : (
+                    <span style={{ fontSize: "14px", fontWeight: 700, color: "#2C337A" }}>
+                      {firm.name.slice(0, 2).toUpperCase()}
                     </span>
-                  ))}
+                  )}
                 </div>
-              </div>
+
+                <h3
+                  className="group-hover:text-[#587DFE] transition-colors duration-200"
+                  style={{
+                    fontSize: "clamp(17px, 1.4vw, 20px)",
+                    fontWeight: 600,
+                    lineHeight: 1.3,
+                    letterSpacing: "-0.01em",
+                    color: "#2C337A",
+                  }}
+                >
+                  {firm.name}
+                </h3>
+                {firm.location && (
+                  <p
+                    className="flex items-center gap-1.5 mt-2"
+                    style={{ fontSize: "13px", color: "#8B91B8" }}
+                  >
+                    <MapPin className="h-3.5 w-3.5" />
+                    {firm.location}
+                    {firm.team_size && ` · ${firm.team_size} medewerkers`}
+                  </p>
+                )}
+                {firm.practice_areas && firm.practice_areas.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {firm.practice_areas.slice(0, 2).map((area) => (
+                      <span
+                        key={area}
+                        className="bg-[#668dff] text-white text-[12px] font-semibold px-3 py-1 rounded-full"
+                      >
+                        {area}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA for firms */}
-      <section className="bg-white py-10 sm:py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="bg-primary-light rounded-2xl px-8 py-12 text-center">
-            <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
-              <Building2 className="h-7 w-7 text-primary" />
+      {/* ── Voor werkgevers ───────────────────────────────────── */}
+      <section
+        className="bg-[#F5F7FF]"
+        style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
+      >
+        <div className="max-w-[1400px] mx-auto">
+          <div
+            className="grid grid-cols-1 lg:grid-cols-2 items-stretch gap-12 lg:gap-20"
+          >
+            {/* Left column */}
+            <div className="flex flex-col">
+              <h2
+                style={{
+                  fontSize: "clamp(36px, 4vw, 52px)",
+                  fontWeight: 700,
+                  lineHeight: 1.15,
+                  letterSpacing: "-0.01em",
+                  color: "#0A0A0A",
+                }}
+              >
+                Bereik juridisch talent gemakkelijk online
+                <span style={{ color: "#587DFE" }}>.</span>
+              </h2>
+
+
+              <p
+                style={{
+                  fontSize: "16px",
+                  lineHeight: 1.65,
+                  color: "#5A6094",
+                  maxWidth: "480px",
+                  marginTop: "24px",
+                }}
+              >
+                Plaats uw werkgeversprofiel en vacatures op Legal Talents en
+                ontvang sollicitaties van studenten en young professionals
+                die doelgericht zoeken binnen de juridische markt.
+              </p>
+              <p
+                style={{
+                  fontSize: "15px",
+                  lineHeight: 1.6,
+                  color: "#5A6094",
+                  maxWidth: "480px",
+                  marginTop: "12px",
+                  fontWeight: 500,
+                }}
+              >
+                Vind de beste juridische stages bij topkantoren — of bied ze aan.
+              </p>
+
+              <div className="flex flex-col gap-5 mt-8">
+                {[
+                  { label: "Gratis profiel", desc: "Maak direct een werkgeversprofiel aan." },
+                  { label: "Onbeperkt plaatsen", desc: "Publiceer zoveel vacatures als u wilt." },
+                  { label: "Direct ontvangen", desc: "Sollicitaties recht in uw inbox." },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-start gap-3.5">
+                    <div className="w-7 h-7 rounded-full bg-[#587DFE] flex items-center justify-center shrink-0 mt-0.5">
+                      <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
+                        <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <p style={{ fontSize: "15px", lineHeight: 1.5, color: "#5A6094" }}>
+                      <span style={{ fontWeight: 600, color: "#2C337A" }}>{item.label}</span>
+                      {" – "}
+                      {item.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                <Link href="/voor-werkgevers" className="btn-secondary sm:w-auto w-full">
+                  Meer info
+                </Link>
+                <Link href="/aanmelden" className="btn-primary sm:w-auto w-full">
+                  Upload vacature
+                </Link>
+              </div>
             </div>
-            <h2 className="text-2xl font-bold text-black mb-3">
-              Plaats je kantoor op Legal Talents
-            </h2>
-            <p className="text-base text-gray-600 max-w-md mx-auto mb-7">
-              Bereik honderden juridische studenten en young professionals. Gratis profiel, eenvoudig vacatures plaatsen.
-            </p>
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-6 py-3 rounded-lg transition-colors"
-            >
-              Kantoor aanmelden
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+
+            {/* Right column — image with floating pills */}
+            <div className="relative lg:overflow-visible overflow-hidden h-full">
+              <div className="relative rounded-[16px] overflow-hidden h-full min-h-[400px]">
+                <Image
+                  src="/foto 4.jpg"
+                  alt="Juridisch team in vergadering"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </div>
+
+              {/* Floating pills */}
+              <div
+                className="absolute hidden sm:block rounded-full"
+                style={{
+                  top: "20%",
+                  right: "-20px",
+                  padding: "10px 20px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  letterSpacing: "0.02em",
+                  color: "#FFFFFF",
+                  background: "#587DFE",
+                  transform: "rotate(3deg)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                JURIDISCH TALENT
+              </div>
+              <div
+                className="absolute hidden sm:block rounded-full"
+                style={{
+                  top: "38%",
+                  right: "-30px",
+                  padding: "10px 20px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  letterSpacing: "0.02em",
+                  color: "#FFFFFF",
+                  background: "#3B4CA7",
+                  transform: "rotate(-2deg)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                YOUNG PROFESSIONALS
+              </div>
+              <div
+                className="absolute hidden sm:block rounded-full"
+                style={{
+                  top: "56%",
+                  right: "-15px",
+                  padding: "10px 20px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  letterSpacing: "0.02em",
+                  color: "#FFFFFF",
+                  background: "#8CA6FE",
+                  transform: "rotate(4deg)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                RECHTENSTUDENTEN
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="mt-auto border-t border-gray-100 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-extrabold italic text-primary text-xl">Legal Talents.</span>
-          <p className="text-sm text-gray-400">© {new Date().getFullYear()} Legal Talents VOF. Alle rechten voorbehouden.</p>
-        </div>
-      </footer>
+      {/* ── Kennisbank ────────────────────────────────────────── */}
+      {latestBlogs.length > 0 && (
+        <section
+          style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
+        >
+          <div className="max-w-[1400px] mx-auto">
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-6 mb-12 sm:mb-16">
+              <h2
+                style={{
+                  fontSize: "clamp(32px, 4vw, 56px)",
+                  fontWeight: 700,
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.025em",
+                  color: "#0A0A0A",
+                }}
+              >
+                Artikelen &amp; inzichten
+                <span style={{ color: "#587DFE" }}>.</span>
+              </h2>
+              <Link href="/kennisbank" className="btn-primary shrink-0">
+                Alle artikelen
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {latestBlogs.slice(0, 3).map((blog) => (
+                <Link
+                  key={blog.id}
+                  href={`/kennisbank/${blog.slug}`}
+                  className="group block"
+                >
+                  <div className="relative w-full aspect-video rounded-xl overflow-hidden">
+                    {blog.image_url ? (
+                      <Image
+                        src={blog.image_url}
+                        alt={blog.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-[#EEF1FF]" />
+                    )}
+                  </div>
+                  <div className="mt-5">
+                    <span
+                      className="inline-block rounded-full bg-[#E9EEFF]"
+                      style={{
+                        padding: "4px 12px",
+                        fontSize: "12px",
+                        fontWeight: 500,
+                        letterSpacing: "0.02em",
+                        color: "#587DFE",
+                      }}
+                    >
+                      {blogCategoryLabels[blog.category] ?? blog.category}
+                    </span>
+                    <h3
+                      className="mt-3 line-clamp-2 group-hover:text-[#587DFE] transition-colors duration-200"
+                      style={{
+                        fontSize: "clamp(16px, 1.4vw, 20px)",
+                        fontWeight: 600,
+                        lineHeight: 1.25,
+                        letterSpacing: "-0.015em",
+                        color: "#2C337A",
+                      }}
+                    >
+                      {blog.title}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <CtaBand />
+
+      <Footer />
     </div>
   );
 }

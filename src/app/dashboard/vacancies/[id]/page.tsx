@@ -10,7 +10,7 @@ import ApplicationStatusSelect from "./ApplicationStatusSelect";
 
 const appStatusColors: Record<string, string> = {
   pending:   "bg-yellow-50 text-yellow-700",
-  reviewing: "bg-blue-50 text-blue-700",
+  reviewing: "bg-primary-light text-primary-dark",
   interview: "bg-purple-50 text-purple-700",
   rejected:  "bg-red-50 text-red-700",
   accepted:  "bg-green-50 text-green-700",

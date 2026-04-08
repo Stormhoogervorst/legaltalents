@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
   LayoutDashboard,
   User,
   Briefcase,
+  Users,
+  FileText,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -15,6 +18,8 @@ const navItems = [
   { href: "/portal", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/portal/profile", label: "Mijn profiel", icon: User },
   { href: "/portal/jobs", label: "Vacatures", icon: Briefcase },
+  { href: "/portal/blogs", label: "Blogs", icon: FileText },
+  { href: "/portal/applications", label: "Sollicitanten", icon: Users },
   { href: "/portal/settings", label: "Instellingen", icon: Settings },
 ];
 
@@ -37,9 +42,16 @@ export default function PortalNav() {
       {/* ── Desktop sidebar (fixed) ─────────────────────────────── */}
       <aside className="hidden md:flex fixed inset-y-0 left-0 w-60 flex-col bg-white border-r border-gray-100 z-40">
         {/* Logo */}
-        <div className="px-5 py-5 border-b border-gray-100 shrink-0">
-          <Link href="/" className="font-extrabold italic text-primary text-xl">
-            Legal Talents.
+        <div className="px-5 py-6 border-b border-gray-100 shrink-0">
+          <Link href="/" className="inline-flex items-center">
+            <Image
+              src="/legal-talents-logo.png"
+              alt="Legal Talents Logo"
+              width={150}
+              height={40}
+              className="h-8 w-auto"
+              priority
+            />
           </Link>
         </div>
 
@@ -76,8 +88,15 @@ export default function PortalNav() {
       {/* ── Mobile top bar (sticky) ─────────────────────────────── */}
       <header className="md:hidden sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
         <div className="flex items-center justify-between px-4 h-14">
-          <Link href="/" className="font-extrabold italic text-primary text-xl">
-            Legal Talents.
+          <Link href="/" className="inline-flex items-center">
+            <Image
+              src="/legal-talents-logo.png"
+              alt="Legal Talents Logo"
+              width={150}
+              height={40}
+              className="h-7 w-auto"
+              priority
+            />
           </Link>
           <button
             onClick={handleSignOut}

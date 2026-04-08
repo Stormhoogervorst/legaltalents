@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { nanoid } from "nanoid";
@@ -34,10 +33,10 @@ const PRACTICE_AREAS = [
 ] as const;
 
 const JOB_TYPES = [
-  { value: "full-time", label: "Voltijd" },
-  { value: "part-time", label: "Deeltijd" },
-  { value: "internship", label: "Stage" },
-  { value: "student", label: "Studentbaan" },
+  { value: "fulltime",        label: "Fulltime" },
+  { value: "parttime",        label: "Parttime" },
+  { value: "business-course", label: "Business Course" },
+  { value: "stage",           label: "Stage" },
 ] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -102,7 +101,6 @@ function ToolbarButton({
 
 export default function JobForm({ firmId, firmSlug, job }: Props) {
   const router = useRouter();
-  const supabase = createClient();
 
   const [title, setTitle] = useState(job?.title ?? "");
   const [location, setLocation] = useState(job?.location ?? "");
@@ -125,6 +123,7 @@ export default function JobForm({ firmId, firmSlug, job }: Props) {
   const [savedStatus, setSavedStatus] = useState<string | null>(null);
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [StarterKit],
     content: job?.description ?? "",
     editorProps: {
@@ -137,6 +136,11 @@ export default function JobForm({ firmId, firmSlug, job }: Props) {
 
   const handleSubmit = useCallback(
     async (targetStatus: "draft" | "active") => {
+      if (!firmId) {
+        setSaveError("Geen werkgever gekoppeld aan dit account. Maak eerst een bedrijfsprofiel aan.");
+        return;
+      }
+
       if (!title.trim() || !location.trim() || !type || !practiceArea) {
         setSaveError("Vul alle verplichte velden in.");
         return;
@@ -161,8 +165,10 @@ export default function JobForm({ firmId, firmSlug, job }: Props) {
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/^-|-$/g, "")}-${nanoid(6)}`;
 
+      // firmId is provided by the server component but the API route
+      // re-derives the real firm from the authenticated session, so
+      // it is only used here to build the slug prefix.
       const payload = {
-        firm_id: firmId,
         title: title.trim(),
         location: location.trim(),
         type,
@@ -173,25 +179,27 @@ export default function JobForm({ firmId, firmSlug, job }: Props) {
         required_education: requiredEducation.trim() || null,
         hours_per_week: hoursPerWeek ? parseInt(hoursPerWeek, 10) : null,
         status: targetStatus,
-        updated_at: new Date().toISOString(),
         ...(slug ? { slug } : {}),
       };
 
-      let dbError;
-
+      let res: Response;
       if (job?.id) {
-        const { error } = await supabase
-          .from("jobs")
-          .update(payload)
-          .eq("id", job.id);
-        dbError = error;
+        res = await fetch(`/api/jobs/${job.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
       } else {
-        const { error } = await supabase.from("jobs").insert(payload);
-        dbError = error;
+        res = await fetch("/api/jobs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
       }
 
-      if (dbError) {
-        setSaveError(dbError.message);
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        setSaveError(json?.error ?? "Opslaan mislukt.");
         setSaving(false);
         return;
       }
@@ -200,9 +208,13 @@ export default function JobForm({ firmId, firmSlug, job }: Props) {
       setSavedStatus(targetStatus);
       setSaving(false);
 
-      setTimeout(() => router.push("/portal/jobs"), 800);
+      setTimeout(() => {
+        router.refresh();
+        router.push("/portal/jobs");
+      }, 800);
     },
     [
+      firmId,
       title,
       location,
       type,
@@ -212,11 +224,9 @@ export default function JobForm({ firmId, firmSlug, job }: Props) {
       requiredEducation,
       hoursPerWeek,
       editor,
-      firmId,
       firmSlug,
       job,
       router,
-      supabase,
     ]
   );
 
@@ -423,7 +433,7 @@ export default function JobForm({ firmId, firmSlug, job }: Props) {
           type="button"
           disabled={saving}
           onClick={() => handleSubmit("draft")}
-          className="flex items-center justify-center gap-2 border border-primary text-primary hover:bg-primary-light text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          className="btn-secondary"
         >
           {saving && <Loader2 className="h-4 w-4 animate-spin" />}
           Opslaan als concept
@@ -432,7 +442,7 @@ export default function JobForm({ firmId, firmSlug, job }: Props) {
           type="button"
           disabled={saving}
           onClick={() => handleSubmit("active")}
-          className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          className="btn-primary"
         >
           {saving && <Loader2 className="h-4 w-4 animate-spin" />}
           Publiceren
