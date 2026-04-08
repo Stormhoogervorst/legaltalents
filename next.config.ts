@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const allowedOrigins = [
-  "http://localhost:3001",
+  process.env.NEXT_PUBLIC_SITE_URL,
   "https://legal-talents.nl",
-];
+].filter(Boolean) as string[];
 
 const nextConfig: NextConfig = {
   images: {

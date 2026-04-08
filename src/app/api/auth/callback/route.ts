@@ -7,6 +7,8 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/portal";
 
+  const base = process.env.NEXT_PUBLIC_SITE_URL || origin;
+
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
@@ -19,15 +21,15 @@ export async function GET(request: NextRequest) {
       if (user?.user_metadata?.invitation_token) {
         const processed = await processInvitationToken(user);
         if (processed) {
-          return NextResponse.redirect(`${origin}/portal`);
+          return NextResponse.redirect(`${base}/portal`);
         }
       }
 
-      return NextResponse.redirect(`${origin}${next}`);
+      return NextResponse.redirect(`${base}${next}`);
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+  return NextResponse.redirect(`${base}/login?error=auth_callback_failed`);
 }
 
 async function processInvitationToken(user: {
