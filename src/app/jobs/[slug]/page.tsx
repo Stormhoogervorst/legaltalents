@@ -84,7 +84,7 @@ function buildJobPostingJsonLd(
 
 interface Props {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; status?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -118,8 +118,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function JobDetailPage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const { error: errorParam } = await searchParams;
+  const { error: errorParam, status: statusParam } = await searchParams;
   const alreadyApplied = errorParam === "already_applied";
+  const linkedInSuccess = statusParam === "success";
   const supabase = await createClient();
 
   const { data: job } = await supabase
@@ -304,18 +305,36 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
               </div>
 
               {/* LinkedIn quick-apply CTA */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-[#E5E5E5] bg-slate-50 p-6 mb-12">
-                <p className="text-[15px] font-semibold text-[#0A0A0A]">
-                  {alreadyApplied
-                    ? "Je sollicitatie is ontvangen."
-                    : "Geen zin in gedoe? Solliciteer binnen 1 minuut."}
-                </p>
-                <LinkedInQuickApply
-                  jobId={typedJob.id}
-                  jobSlug={typedJob.slug}
-                  alreadyApplied={alreadyApplied}
-                />
-              </div>
+              {linkedInSuccess ? (
+                <div className="flex items-center gap-4 rounded-xl border border-emerald-200 bg-emerald-50 p-6 mb-12">
+                  <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-[15px] font-semibold text-emerald-800">
+                      Bedankt! Je sollicitatie via LinkedIn is succesvol ontvangen.
+                    </p>
+                    <p className="text-[13px] text-emerald-600 mt-1">
+                      De werkgever neemt zo snel mogelijk contact met je op.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-[#E5E5E5] bg-slate-50 p-6 mb-12">
+                  <p className="text-[15px] font-semibold text-[#0A0A0A] mb-4">
+                    {alreadyApplied
+                      ? "Je sollicitatie is ontvangen."
+                      : "Geen zin in gedoe? Solliciteer binnen 1 minuut."}
+                  </p>
+                  <LinkedInQuickApply
+                    jobId={typedJob.id}
+                    jobSlug={typedJob.slug}
+                    alreadyApplied={alreadyApplied}
+                  />
+                </div>
+              )}
 
               {/* Description */}
               {typedJob.description && (
