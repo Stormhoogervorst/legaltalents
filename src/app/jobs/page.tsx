@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
-import JobCard from "@/components/JobCard";
+import VacatureCard from "@/components/VacatureCard";
 import { Job, JobFirmPreview, JOB_TYPE_OPTIONS } from "@/types";
 
 const PRACTICE_AREAS = [
@@ -254,7 +254,7 @@ export default async function JobsPage({
         }}
       >
         <div className="max-w-[1400px] mx-auto">
-          <div className="flex items-baseline justify-between mb-2">
+          <div className="flex items-baseline justify-between mb-6">
             <p className="text-[13px] font-medium tracking-[0.02em] text-[#999999]">
               {jobList.length === 0
                 ? "Geen resultaten"
@@ -263,14 +263,14 @@ export default async function JobsPage({
           </div>
 
           {jobList.length > 0 ? (
-            <div className="border-t border-[#E5E5E5]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
               {jobList.map((job) => (
-                <JobCard key={job.id} job={job} />
+                <VacatureCard key={job.id} job={job} />
               ))}
             </div>
           ) : (
             <div
-              className="border-t border-[#E5E5E5] pt-16 pb-8"
+              className="pt-16 pb-8"
               style={{ maxWidth: "640px" }}
             >
               <h2

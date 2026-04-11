@@ -2,7 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
 import CtaBand from "@/components/CtaBand";
-import FirmCard from "@/components/FirmCard";
+import GridCard from "@/components/GridCard";
+import { MapPin, Users } from "lucide-react";
 import Link from "next/link";
 import { Firm } from "@/types";
 
@@ -114,7 +115,7 @@ export default async function FirmsPage({
       >
         <div className="max-w-[1400px] mx-auto">
           {/* Filter bar */}
-          <form method="GET" className="border-b border-[#E5E5E5] pb-8 mb-2">
+          <form method="GET" className="border-b border-[#E5E5E5] pb-8 mb-6">
             <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 items-end">
               <div className="flex-1 max-w-[280px]">
                 <label
@@ -177,7 +178,7 @@ export default async function FirmsPage({
           </form>
 
           {/* Result count */}
-          <div className="pt-6 pb-2">
+          <div className="mb-6">
             <p
               className="text-[13px] font-medium tracking-wide"
               style={{ color: "#999999" }}
@@ -188,32 +189,58 @@ export default async function FirmsPage({
             </p>
           </div>
 
-          {/* Firm list */}
+          {/* Firm grid */}
           {firmList.length > 0 ? (
-            <div>
-              {firmList.map((firm) => (
-                <FirmCard key={firm.id} firm={firm} />
-              ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+              {firmList.map((firm) => {
+                const initials = firm.name.slice(0, 2).toUpperCase();
+                const meta: { icon: React.ReactNode; text: string }[] = [];
+
+                if (firm.location) {
+                  meta.push({
+                    icon: <MapPin className="h-3 w-3 shrink-0" />,
+                    text: firm.location,
+                  });
+                }
+                if (firm.team_size) {
+                  meta.push({
+                    icon: <Users className="h-3 w-3 shrink-0" />,
+                    text: `${firm.team_size} medewerkers`,
+                  });
+                }
+
+                return (
+                  <GridCard
+                    key={firm.id}
+                    href={`/firms/${firm.slug}`}
+                    logoUrl={firm.logo_url}
+                    logoFallback={
+                      <span className="font-semibold text-sm text-[#587DFE]">
+                        {initials}
+                      </span>
+                    }
+                    title={firm.name}
+                    meta={meta}
+                    pills={firm.practice_areas ?? []}
+                  />
+                );
+              })}
             </div>
           ) : (
-            <div
-              className="py-20 text-center"
-              style={{ borderTop: "1px solid #E5E5E5" }}
-            >
-              <h3
-                className="font-semibold mb-3"
-                style={{
-                  fontSize: "clamp(18px, 1.5vw, 22px)",
-                  letterSpacing: "-0.01em",
-                  color: "#0A0A0A",
-                }}
+            <div className="pt-16 pb-8" style={{ maxWidth: "640px" }}>
+              <h2
+                className="font-bold tracking-[-0.025em] leading-[1.1] text-[#0A0A0A]"
+                style={{ fontSize: "clamp(36px, 4.5vw, 64px)" }}
               >
-                Geen werkgevers gevonden
-              </h3>
+                {hasFilters
+                  ? "Geen werkgevers gevonden"
+                  : "Binnenkort beschikbaar"}
+              </h2>
               <p
-                className="leading-relaxed max-w-md mx-auto"
+                className="mt-6 leading-relaxed"
                 style={{
                   fontSize: "clamp(15px, 1.1vw, 17px)",
+                  lineHeight: 1.65,
                   color: "#6B6B6B",
                 }}
               >

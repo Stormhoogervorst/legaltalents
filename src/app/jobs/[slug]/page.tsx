@@ -84,6 +84,7 @@ function buildJobPostingJsonLd(
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ error?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -115,8 +116,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function JobDetailPage({ params }: Props) {
+export default async function JobDetailPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const { error: errorParam } = await searchParams;
+  const alreadyApplied = errorParam === "already_applied";
   const supabase = await createClient();
 
   const { data: job } = await supabase
@@ -176,6 +179,23 @@ export default async function JobDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingJsonLd) }}
       />
       <NavbarPublic />
+
+      {alreadyApplied && (
+        <div className="bg-amber-50 border-b border-amber-200">
+          <div
+            className="max-w-[1400px] mx-auto flex items-center gap-3 py-4"
+            style={{
+              paddingLeft: "clamp(24px, 5vw, 80px)",
+              paddingRight: "clamp(24px, 5vw, 80px)",
+            }}
+          >
+            <span className="text-amber-600 text-lg shrink-0">⚠</span>
+            <p className="text-[15px] font-medium text-amber-900">
+              Je hebt al gesolliciteerd op deze vacature. We nemen zo snel mogelijk contact met je op.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Back link */}
       <div
@@ -270,7 +290,7 @@ export default async function JobDetailPage({ params }: Props) {
             {/* Left column: details (8/12 ~ 65%) */}
             <div className="lg:col-span-8">
               {/* Meta information */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-6 mb-16">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-6 mb-12">
                 {metaItems.map((item) => (
                   <div key={item.label}>
                     <p className="text-[13px] font-medium tracking-[0.02em] text-[#999999] uppercase mb-1.5">
@@ -281,6 +301,20 @@ export default async function JobDetailPage({ params }: Props) {
                     </p>
                   </div>
                 ))}
+              </div>
+
+              {/* LinkedIn quick-apply CTA */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-[#E5E5E5] bg-slate-50 p-6 mb-12">
+                <p className="text-[15px] font-semibold text-[#0A0A0A]">
+                  {alreadyApplied
+                    ? "Je sollicitatie is ontvangen."
+                    : "Geen zin in gedoe? Solliciteer binnen 1 minuut."}
+                </p>
+                <LinkedInQuickApply
+                  jobId={typedJob.id}
+                  jobSlug={typedJob.slug}
+                  alreadyApplied={alreadyApplied}
+                />
               </div>
 
               {/* Description */}
@@ -302,26 +336,6 @@ export default async function JobDetailPage({ params }: Props) {
                   />
                 </div>
               )}
-
-              {/* LinkedIn quick apply */}
-              <div className="mb-16">
-                <div className="border-t border-[#E5E5E5] pt-12">
-                  <p
-                    className="max-w-[640px] mb-6"
-                    style={{
-                      fontSize: "clamp(15px, 1.1vw, 17px)",
-                      lineHeight: 1.65,
-                      color: "#6B6B6B",
-                    }}
-                  >
-                    Solliciteer in één klik via LinkedIn, of vul het volledige formulier hieronder in.
-                  </p>
-                  <LinkedInQuickApply
-                    jobId={typedJob.id}
-                    jobSlug={typedJob.slug}
-                  />
-                </div>
-              </div>
 
               {/* Application form */}
               <section id="solliciteren">

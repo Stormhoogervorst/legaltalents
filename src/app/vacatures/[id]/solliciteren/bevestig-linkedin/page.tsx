@@ -53,7 +53,7 @@ export default async function BevestigLinkedInPage({
     .eq("applicant_email", email)
     .maybeSingle();
 
-  if (existing) redirect(`/vacatures/${slug}?error=already_applied`);
+  if (existing) redirect(`/jobs/${(job as { slug?: string }).slug ?? slug}?error=already_applied`);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">

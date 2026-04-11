@@ -1,11 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Clock, Building2, ArrowUpRight, Search } from "lucide-react";
+import { MapPin, Search } from "lucide-react";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
 import CtaBand from "@/components/CtaBand";
+import VacatureCarousel from "@/components/VacatureCarousel";
 import { createClient } from "@/lib/supabase/server";
-import { Firm, Job, jobTypeLabels } from "@/types";
+import { Firm, Job } from "@/types";
 
 interface BlogPreview {
   id: string;
@@ -47,9 +48,9 @@ export default async function HomePage() {
     `)
     .eq("status", "active")
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(20);
 
-  const featuredJobs = (topJobs ?? []).map((j) => ({
+  const allJobs = (topJobs ?? []).map((j) => ({
     ...j,
     firms: Array.isArray(j.firms) ? (j.firms[0] ?? null) : (j.firms ?? null),
   })) as Job[];
@@ -97,17 +98,17 @@ export default async function HomePage() {
           {/* Headline */}
           <h1
             style={{
-              fontSize: "clamp(44px, 5.5vw, 76px)",
+              fontSize: "clamp(44px, 5.2vw, 72px)",
               fontWeight: 700,
               lineHeight: 1.05,
               letterSpacing: "-0.03em",
               color: "#0A0A0A",
               marginTop: "24px",
-              maxWidth: "820px",
+              maxWidth: "960px",
             }}
           >
             Vind jouw{" "}
-            <span style={{ color: "#587DFE" }}>stage of baan</span>
+            <span style={{ color: "#587DFE", whiteSpace: "nowrap" }}>stage of baan</span>
             <br />
             in de juridische wereld
           </h1>
@@ -199,114 +200,36 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Top vacatures ─────────────────────────────────────── */}
+      {/* ── Top vacatures carrousel ───────────────────────────── */}
       <section
-        className="pt-16 md:pt-32"
-        style={{ paddingBottom: "clamp(80px, 10vh, 160px)", paddingLeft: "clamp(24px, 5vw, 80px)", paddingRight: "clamp(24px, 5vw, 80px)" }}
+        style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
       >
         <div className="max-w-[1400px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">
-            <div className="lg:sticky lg:top-24">
-              <h2
-                style={{
-                  fontSize: "clamp(32px, 4vw, 56px)",
-                  fontWeight: 700,
-                  lineHeight: 1.1,
-                  letterSpacing: "-0.025em",
-                  color: "#0A0A0A",
-                }}
-              >
-                De nieuwste juridische vacatures
-                <span style={{ color: "#587DFE" }}>.</span>
-              </h2>
-              <p
-                style={{
-                  fontSize: "clamp(15px, 1.1vw, 17px)",
-                  lineHeight: 1.65,
-                  color: "#5A6094",
-                  marginTop: "20px",
-                }}
-              >
-                Ontdek de meest uitdagende posities van dit moment bij top werkgevers.
-              </p>
-              <div className="mt-8 flex flex-row flex-wrap gap-4">
-                <Link href="/jobs" className="btn-primary">
-                  Alle vacatures
-                </Link>
-                <Link
-                  href="/firms"
-                  className="inline-flex items-center justify-center rounded-full border border-[#D1D5E8] bg-white px-6 py-3 text-sm font-semibold text-[#5A6094] transition-colors duration-200 hover:bg-[#F5F7FF] hover:border-[#D1D5E8]"
-                >
-                  Bekijk werkgevers
-                </Link>
-              </div>
-            </div>
-
-            <div>
-              {featuredJobs.length > 0 ? (
-                <div className="border-t border-[#E2E5F0]">
-                  {featuredJobs.map((job) => {
-                    const firmName = job.firms?.name ?? "";
-                    const logoUrl = job.firms?.logo_url ?? null;
-                    return (
-                      <Link
-                        key={job.id}
-                        href={`/jobs/${job.slug}`}
-                        className="group flex gap-5 py-5 border-b border-[#E2E5F0] transition-colors hover:bg-[#F5F7FF] -mx-4 px-4 rounded-none"
-                      >
-                        <div className="w-11 h-11 rounded-[8px] bg-[#F5F7FF] border border-[#E2E5F0] flex items-center justify-center shrink-0 overflow-hidden p-1.5">
-                          {logoUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={logoUrl} alt={firmName} className="w-full h-full object-contain" />
-                          ) : (
-                            <Building2 className="h-4 w-4" style={{ color: "#8B91B8" }} />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3
-                            className="group-hover:text-[#587DFE] transition-colors duration-200"
-                            style={{
-                              fontSize: "clamp(16px, 1.3vw, 20px)",
-                              fontWeight: 600,
-                              lineHeight: 1.3,
-                              letterSpacing: "-0.01em",
-                              color: "#2C337A",
-                            }}
-                          >
-                            {job.title}
-                          </h3>
-                          <div
-                            className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5"
-                            style={{ fontSize: "13px", color: "#8B91B8" }}
-                          >
-                            {firmName && <span>{firmName}</span>}
-                            <span className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {job.location}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {jobTypeLabels[job.type] ?? job.type}
-                            </span>
-                          </div>
-                        </div>
-                        <span
-                          className="hidden sm:inline-flex items-center self-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                          style={{ color: "#587DFE" }}
-                        >
-                          <ArrowUpRight className="w-5 h-5" />
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p style={{ fontSize: "15px", color: "#8B91B8" }}>
-                  Er zijn momenteel geen vacatures beschikbaar.
-                </p>
-              )}
-            </div>
+          <div className="flex flex-col sm:flex-row items-start justify-between gap-6 mb-12 sm:mb-16">
+            <h2
+              style={{
+                fontSize: "clamp(32px, 4vw, 56px)",
+                fontWeight: 700,
+                lineHeight: 1.1,
+                letterSpacing: "-0.025em",
+                color: "#0A0A0A",
+              }}
+            >
+              De nieuwste juridische vacatures
+              <span style={{ color: "#587DFE" }}>.</span>
+            </h2>
+            <Link href="/jobs" className="btn-primary shrink-0">
+              Alle vacatures
+            </Link>
           </div>
+
+          {allJobs.length > 0 ? (
+            <VacatureCarousel jobs={allJobs} />
+          ) : (
+            <p style={{ fontSize: "15px", color: "#8B91B8" }}>
+              Er zijn momenteel geen vacatures beschikbaar.
+            </p>
+          )}
         </div>
       </section>
 
