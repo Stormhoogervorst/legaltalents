@@ -229,81 +229,77 @@ export default function LinkedInQuickApply({
     );
   }
 
-  // Post-OAuth: show LinkedIn URL form
+  // Post-OAuth: show LinkedIn URL + phone form (inside the blue block)
   if (showForm) {
     return (
-      <div className="w-full">
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="linkedin-profile-url" className="sr-only">
-              LinkedIn profiel-URL
-            </label>
-            <input
-              id="linkedin-profile-url"
-              type="url"
-              inputMode="url"
-              value={linkedinUrl}
-              onChange={(e) => {
-                setLinkedinUrl(e.target.value);
-                if (urlError) setUrlError(null);
-              }}
-              placeholder="https://www.linkedin.com/in/jouw-naam"
-              className={`w-full bg-transparent border-0 border-b ${
-                urlError ? "border-red-500" : "border-[#CCCCCC]"
-              } py-3 text-[15px] text-[#0A0A0A] placeholder-[#999999] focus:outline-none focus:border-[#0A0A0A] transition-colors duration-200`}
-            />
-            {urlError && (
-              <p className="mt-2 text-[13px] text-red-500">{urlError}</p>
-            )}
-            <p className="mt-2 text-[13px] text-[#999999]">
-              Ga naar{" "}
-              <a
-                href="https://www.linkedin.com/in/me"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#587DFE] border-b border-[#587DFE] hover:opacity-80 transition-opacity"
-              >
-                linkedin.com/in/me
-              </a>{" "}
-              en kopieer de URL uit je adresbalk.
-            </p>
-          </div>
-
-          <div>
-            <label htmlFor="linkedin-phone" className="sr-only">
-              Telefoonnummer
-            </label>
-            <input
-              id="linkedin-phone"
-              type="tel"
-              value={phone}
-              onChange={(e) => {
-                setPhone(e.target.value);
-                if (phoneError) setPhoneError(null);
-              }}
-              placeholder="Telefoonnummer *"
-              className={`w-full bg-transparent border-0 border-b ${
-                phoneError ? "border-red-500" : "border-[#CCCCCC]"
-              } py-3 text-[15px] text-[#0A0A0A] placeholder-[#999999] focus:outline-none focus:border-[#0A0A0A] transition-colors duration-200`}
-            />
-            {phoneError && (
-              <p className="mt-2 text-[13px] text-red-500">{phoneError}</p>
-            )}
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleSubmitApplication}
-              disabled={loading}
-              className="inline-flex items-center gap-3 rounded-full bg-[#668dff] px-7 py-3.5 text-[15px] font-semibold text-white transition-all duration-200 hover:bg-[#5579e8] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+      <div className="w-full basis-full space-y-5 border-t border-blue-200 pt-6 mt-2">
+        <div>
+          <label htmlFor="linkedin-profile-url" className="sr-only">
+            LinkedIn profiel-URL
+          </label>
+          <input
+            id="linkedin-profile-url"
+            type="url"
+            inputMode="url"
+            value={linkedinUrl}
+            onChange={(e) => {
+              setLinkedinUrl(e.target.value);
+              if (urlError) setUrlError(null);
+            }}
+            placeholder="LinkedIn profiel-URL *"
+            className={`w-full bg-white/70 rounded-lg border ${
+              urlError ? "border-red-400" : "border-blue-200"
+            } px-4 py-3 text-[15px] text-[#0A0A0A] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#587DFE]/30 focus:border-[#587DFE] transition-all duration-200`}
+          />
+          {urlError && (
+            <p className="mt-1.5 text-[13px] text-red-500">{urlError}</p>
+          )}
+          <p className="mt-2 text-[13px] text-[#7B8AB8]">
+            Ga naar{" "}
+            <a
+              href="https://www.linkedin.com/in/me"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#587DFE] border-b border-[#587DFE]/40 hover:border-[#587DFE] transition-colors"
             >
-              {loading && <Loader2 className="h-5 w-5 animate-spin" />}
-              {loading ? "Versturen…" : "Sollicitatie afronden"}
-            </button>
-          </div>
-
-          {error && <p className="text-[13px] text-red-500">{error}</p>}
+              linkedin.com/in/me
+            </a>{" "}
+            en kopieer de URL uit je adresbalk.
+          </p>
         </div>
+
+        <div>
+          <label htmlFor="linkedin-phone" className="sr-only">
+            Telefoonnummer
+          </label>
+          <input
+            id="linkedin-phone"
+            type="tel"
+            value={phone}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              if (phoneError) setPhoneError(null);
+            }}
+            placeholder="Telefoonnummer *"
+            className={`w-full bg-white/70 rounded-lg border ${
+              phoneError ? "border-red-400" : "border-blue-200"
+            } px-4 py-3 text-[15px] text-[#0A0A0A] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#587DFE]/30 focus:border-[#587DFE] transition-all duration-200`}
+          />
+          {phoneError && (
+            <p className="mt-1.5 text-[13px] text-red-500">{phoneError}</p>
+          )}
+        </div>
+
+        <button
+          onClick={handleSubmitApplication}
+          disabled={loading}
+          className="inline-flex items-center gap-3 rounded-full bg-[#668dff] px-7 py-3.5 text-[15px] font-semibold text-white transition-all duration-200 hover:bg-[#5579e8] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+        >
+          {loading && <Loader2 className="h-5 w-5 animate-spin" />}
+          {loading ? "Versturen…" : "Sollicitatie afronden"}
+        </button>
+
+        {error && <p className="text-[13px] text-red-500">{error}</p>}
       </div>
     );
   }

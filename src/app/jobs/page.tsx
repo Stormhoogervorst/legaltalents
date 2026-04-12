@@ -2,7 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
 import VacatureCard from "@/components/VacatureCard";
+import RadiusSelect from "@/components/RadiusSelect";
 import { Job, JobFirmPreview, JOB_TYPE_OPTIONS } from "@/types";
+import { geocodeCity } from "@/lib/geocode";
 
 const PRACTICE_AREAS = [
   "Arbeidsrecht",
@@ -23,6 +25,7 @@ const PRACTICE_AREAS = [
 interface SearchParams {
   q?: string;
   locatie?: string;
+  straal?: string;
   type?: string;
   rechtsgebied?: string;
 }
@@ -43,18 +46,6 @@ export default async function JobsPage({
   const params = await searchParams;
   const supabase = await createClient();
 
-  let query = supabase
-    .from("jobs")
-    .select(
-      `
-      id, firm_id, title, slug, location, type, practice_area,
-      salary_indication, hours_per_week, status, created_at,
-      firms ( name, logo_url, slug )
-    `
-    )
-    .eq("status", "active")
-    .order("created_at", { ascending: false });
-
   const fuzzy = (term: string) => term.trim().replace(/[\s\-]+/g, "%");
 
   const TYPE_ALIASES: Record<string, string[]> = {
@@ -64,26 +55,91 @@ export default async function JobsPage({
     stage: ["stage", "internship", "student", "Studentbaan"],
   };
 
-  if (params.q) {
-    const q = fuzzy(params.q);
-    // Include location so homepage "general" search (first field) finds jobs by city/region.
-    query = query.or(
-      `title.ilike.%${q}%,practice_area.ilike.%${q}%,description.ilike.%${q}%,location.ilike.%${q}%`
-    );
-  }
-  if (params.locatie) {
-    const loc = fuzzy(params.locatie);
-    query = query.ilike("location", `%${loc}%`);
-  }
-  if (params.type) {
-    const aliases = TYPE_ALIASES[params.type] ?? [params.type];
-    query = query.in("type", aliases);
-  }
-  if (params.rechtsgebied) {
-    query = query.ilike("practice_area", `%${params.rechtsgebied}%`);
-  }
+  const radiusKm = parseInt(params.straal ?? "0", 10) || 0;
+  const useGeo = !!(params.locatie && radiusKm > 0);
+  const geo = useGeo ? await geocodeCity(params.locatie!) : null;
 
-  const { data: jobs } = await query;
+  let jobs: Job[] | null = null;
+
+  if (geo && useGeo) {
+    const { data: geoJobs } = await supabase.rpc("get_jobs_in_radius", {
+      lat: geo.lat,
+      lng: geo.lng,
+      radius_km: radiusKm,
+      job_status: "active",
+    });
+
+    const nearbyIds = ((geoJobs ?? []) as { id: string }[]).map((j) => j.id);
+
+    if (nearbyIds.length > 0) {
+      let geoQuery = supabase
+        .from("jobs")
+        .select(
+          `
+          id, firm_id, title, slug, location, type, practice_area,
+          salary_indication, hours_per_week, status, created_at,
+          firms ( name, logo_url, slug )
+        `
+        )
+        .in("id", nearbyIds);
+
+      if (params.q) {
+        const q = fuzzy(params.q);
+        geoQuery = geoQuery.or(
+          `title.ilike.%${q}%,practice_area.ilike.%${q}%,description.ilike.%${q}%,location.ilike.%${q}%`
+        );
+      }
+      if (params.type) {
+        const aliases = TYPE_ALIASES[params.type] ?? [params.type];
+        geoQuery = geoQuery.in("type", aliases);
+      }
+      if (params.rechtsgebied) {
+        geoQuery = geoQuery.ilike("practice_area", `%${params.rechtsgebied}%`);
+      }
+
+      const { data } = await geoQuery;
+      const orderedIds = nearbyIds;
+      const dataMap = new Map((data ?? []).map((j) => [j.id, j]));
+      jobs = orderedIds
+        .map((id) => dataMap.get(id))
+        .filter(Boolean) as typeof data;
+    } else {
+      jobs = [];
+    }
+  } else {
+    let query = supabase
+      .from("jobs")
+      .select(
+        `
+        id, firm_id, title, slug, location, type, practice_area,
+        salary_indication, hours_per_week, status, created_at,
+        firms ( name, logo_url, slug )
+      `
+      )
+      .eq("status", "active")
+      .order("created_at", { ascending: false });
+
+    if (params.q) {
+      const q = fuzzy(params.q);
+      query = query.or(
+        `title.ilike.%${q}%,practice_area.ilike.%${q}%,description.ilike.%${q}%,location.ilike.%${q}%`
+      );
+    }
+    if (params.locatie) {
+      const loc = fuzzy(params.locatie);
+      query = query.ilike("location", `%${loc}%`);
+    }
+    if (params.type) {
+      const aliases = TYPE_ALIASES[params.type] ?? [params.type];
+      query = query.in("type", aliases);
+    }
+    if (params.rechtsgebied) {
+      query = query.ilike("practice_area", `%${params.rechtsgebied}%`);
+    }
+
+    const { data } = await query;
+    jobs = data;
+  }
 
   type JobWithFirm = Omit<Job, "firms"> & { firms: JobFirmPreview | null };
   const jobList = (jobs ?? []).map((j) => ({
@@ -95,7 +151,8 @@ export default async function JobsPage({
     params.q ||
     params.locatie ||
     params.type ||
-    params.rechtsgebied
+    params.rechtsgebied ||
+    (params.straal && params.straal !== "0")
   );
 
   return (
@@ -177,6 +234,19 @@ export default async function JobsPage({
                 defaultValue={params.locatie ?? ""}
                 placeholder="Locatie"
                 className="w-full bg-transparent border-0 border-b border-[#CCCCCC] py-3 text-[15px] text-[#0A0A0A] placeholder-[#999999] focus:outline-none focus:border-[#0A0A0A] transition-colors duration-200"
+              />
+            </div>
+
+            {/* Radius */}
+            <div className="min-w-[100px] max-w-[120px]">
+              <label htmlFor="filter-straal" className="sr-only">
+                Straal
+              </label>
+              <RadiusSelect
+                name="straal"
+                defaultValue={params.straal ?? "0"}
+                locationInputId="filter-locatie"
+                className="w-full bg-transparent border-0 border-b border-[#CCCCCC] py-3 text-[15px] text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] transition-colors duration-200 appearance-none cursor-pointer"
               />
             </div>
 

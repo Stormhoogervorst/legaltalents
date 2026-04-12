@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { geocodeCity } from "@/lib/geocode";
 
 // ── Zod schemas ────────────────────────────────────────────────────────────
 
@@ -86,10 +87,20 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     );
   }
 
-  // Step B+C: IDOR protection — WHERE id = :id AND firm_id = :auth_firm_id
+  const updatePayload: Record<string, unknown> = {
+    ...result.data,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (result.data.location) {
+    const geo = await geocodeCity(result.data.location);
+    updatePayload.latitude = geo?.lat ?? null;
+    updatePayload.longitude = geo?.lng ?? null;
+  }
+
   const { data: updated, error } = await supabase
     .from("jobs")
-    .update({ ...result.data, updated_at: new Date().toISOString() })
+    .update(updatePayload)
     .eq("id", id)
     .eq("firm_id", firm!.id)
     .select("id");

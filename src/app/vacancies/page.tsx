@@ -1,9 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 import Navbar from "@/components/Navbar";
 import VacancyCard from "@/components/VacancyCard";
+import RadiusSelect from "@/components/RadiusSelect";
 import { Vacancy, EmploymentType, ExperienceLevel } from "@/types";
 import { Search, SlidersHorizontal, Wifi } from "lucide-react";
 import { employmentTypeLabels, experienceLevelLabels } from "@/lib/utils";
+import { geocodeCity } from "@/lib/geocode";
 
 interface SearchParams {
   q?: string;
@@ -11,6 +13,7 @@ interface SearchParams {
   level?: ExperienceLevel;
   remote?: string;
   location?: string;
+  radius?: string;
 }
 
 export default async function VacanciesPage({
@@ -21,21 +24,65 @@ export default async function VacanciesPage({
   const params = await searchParams;
   const supabase = await createClient();
 
-  let query = supabase
-    .from("vacancies")
-    .select("*")
-    .eq("status", "open")
-    .order("created_at", { ascending: false });
+  const radiusKm = parseInt(params.radius ?? "0", 10) || 0;
+  const useGeo = !!(params.location && radiusKm > 0);
+  const geo = useGeo ? await geocodeCity(params.location!) : null;
 
-  if (params.q) {
-    query = query.or(`title.ilike.%${params.q}%,company_name.ilike.%${params.q}%,description.ilike.%${params.q}%`);
+  let vacancies: Vacancy[] | null = null;
+
+  if (geo && useGeo) {
+    const { data: geoRows } = await supabase.rpc("get_vacancies_in_radius", {
+      lat: geo.lat,
+      lng: geo.lng,
+      radius_km: radiusKm,
+      vacancy_status: "open",
+    });
+
+    const nearbyIds = ((geoRows ?? []) as { id: string }[]).map((v) => v.id);
+
+    if (nearbyIds.length > 0) {
+      let geoQuery = supabase
+        .from("vacancies")
+        .select("*")
+        .in("id", nearbyIds);
+
+      if (params.q) {
+        geoQuery = geoQuery.or(
+          `title.ilike.%${params.q}%,company_name.ilike.%${params.q}%,description.ilike.%${params.q}%`
+        );
+      }
+      if (params.type) geoQuery = geoQuery.eq("employment_type", params.type);
+      if (params.level) geoQuery = geoQuery.eq("experience_level", params.level);
+      if (params.remote === "true") geoQuery = geoQuery.eq("remote", true);
+
+      const { data } = await geoQuery;
+      const dataMap = new Map((data ?? []).map((v) => [v.id, v]));
+      vacancies = nearbyIds
+        .map((id) => dataMap.get(id))
+        .filter(Boolean) as Vacancy[];
+    } else {
+      vacancies = [];
+    }
+  } else {
+    let query = supabase
+      .from("vacancies")
+      .select("*")
+      .eq("status", "open")
+      .order("created_at", { ascending: false });
+
+    if (params.q) {
+      query = query.or(
+        `title.ilike.%${params.q}%,company_name.ilike.%${params.q}%,description.ilike.%${params.q}%`
+      );
+    }
+    if (params.type) query = query.eq("employment_type", params.type);
+    if (params.level) query = query.eq("experience_level", params.level);
+    if (params.remote === "true") query = query.eq("remote", true);
+    if (params.location) query = query.ilike("location", `%${params.location}%`);
+
+    const { data } = await query;
+    vacancies = data;
   }
-  if (params.type) query = query.eq("employment_type", params.type);
-  if (params.level) query = query.eq("experience_level", params.level);
-  if (params.remote === "true") query = query.eq("remote", true);
-  if (params.location) query = query.ilike("location", `%${params.location}%`);
-
-  const { data: vacancies } = await query;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -96,10 +143,21 @@ export default async function VacanciesPage({
             <div>
               <label className="label">Location</label>
               <input
+                id="filter-location"
                 name="location"
                 defaultValue={params.location ?? ""}
                 placeholder="e.g. Amsterdam"
                 className="input text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="label">Radius</label>
+              <RadiusSelect
+                name="radius"
+                defaultValue={params.radius ?? "0"}
+                locationInputId="filter-location"
+                className="input text-sm cursor-pointer"
               />
             </div>
 

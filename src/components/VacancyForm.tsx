@@ -35,6 +35,24 @@ export default function VacancyForm({ employerId, companyName, vacancy }: Props)
     setLoading(true);
     setError(null);
 
+    let latitude: number | null = null;
+    let longitude: number | null = null;
+
+    if (location.trim()) {
+      try {
+        const geoRes = await fetch(
+          `/api/geocode?q=${encodeURIComponent(location.trim())}`
+        );
+        if (geoRes.ok) {
+          const geo = await geoRes.json();
+          latitude = geo.lat;
+          longitude = geo.lng;
+        }
+      } catch {
+        // geocoding failed — continue without coordinates
+      }
+    }
+
     const payload = {
       employer_id: employerId,
       title,
@@ -48,6 +66,8 @@ export default function VacancyForm({ employerId, companyName, vacancy }: Props)
       description,
       requirements,
       status,
+      latitude,
+      longitude,
     };
 
     if (vacancy) {

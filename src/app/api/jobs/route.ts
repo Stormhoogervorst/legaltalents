@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { geocodeCity } from "@/lib/geocode";
 
 // ── Zod schemas ────────────────────────────────────────────────────────────
 
@@ -87,8 +88,10 @@ export async function POST(request: NextRequest) {
 
   const d = result.data;
 
+  const geo = await geocodeCity(d.location);
+
   const { error: insertError } = await supabase.from("jobs").insert({
-    firm_id: firm.id, // always use server-resolved firm_id — never trust client
+    firm_id: firm.id,
     title: d.title,
     location: d.location,
     type: d.type,
@@ -100,6 +103,8 @@ export async function POST(request: NextRequest) {
     hours_per_week: d.hours_per_week ?? null,
     status: d.status,
     slug: d.slug,
+    latitude: geo?.lat ?? null,
+    longitude: geo?.lng ?? null,
   });
 
   if (insertError) {

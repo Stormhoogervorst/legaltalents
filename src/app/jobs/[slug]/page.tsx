@@ -306,7 +306,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
 
               {/* LinkedIn quick-apply CTA */}
               {linkedInSuccess ? (
-                <div className="flex items-center gap-4 rounded-xl border border-emerald-200 bg-emerald-50 p-6 mb-12">
+                <div className="flex items-center gap-4 bg-emerald-50 p-8 rounded-2xl border border-emerald-200 mb-12">
                   <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
                     <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -322,8 +322,8 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                   </div>
                 </div>
               ) : (
-                <div className="rounded-xl border border-[#E5E5E5] bg-slate-50 p-6 mb-12">
-                  <p className="text-[15px] font-semibold text-[#0A0A0A] mb-4">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between flex-wrap gap-6 bg-[#f0f4ff] p-8 rounded-2xl border border-blue-100 mb-12">
+                  <p className="text-[15px] font-semibold text-[#0A0A0A]">
                     {alreadyApplied
                       ? "Je sollicitatie is ontvangen."
                       : "Geen zin in gedoe? Solliciteer binnen 1 minuut."}

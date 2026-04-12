@@ -52,6 +52,8 @@ export interface Job {
   hours_per_week: number | null;
   status: JobStatus;
   notification_email_override: string | null;
+  latitude: number | null;
+  longitude: number | null;
   created_at: string;
   updated_at: string;
   firms?: JobFirmPreview | null;
@@ -110,6 +112,8 @@ export interface Vacancy {
   description: string;
   requirements: string;
   status: VacancyStatus;
+  latitude: number | null;
+  longitude: number | null;
   created_at: string;
   updated_at: string;
 }
