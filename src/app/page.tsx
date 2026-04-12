@@ -41,11 +41,7 @@ export default async function HomePage() {
 
   const { data: topJobs } = await supabase
     .from("jobs")
-    .select(`
-      id, firm_id, title, slug, location, type, practice_area,
-      salary_indication, hours_per_week, status, created_at,
-      firms ( name, logo_url, slug )
-    `)
+    .select("*, firms ( name, logo_url, slug )")
     .eq("status", "active")
     .order("created_at", { ascending: false })
     .limit(20);

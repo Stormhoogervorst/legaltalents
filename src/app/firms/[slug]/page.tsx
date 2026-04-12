@@ -51,9 +51,7 @@ export default async function FirmPage({ params }: Props) {
 
   const { data: jobs } = await supabase
     .from("jobs")
-    .select(
-      "id, firm_id, title, slug, location, type, practice_area, hours_per_week, status, created_at"
-    )
+    .select("*")
     .eq("firm_id", firmData.id)
     .eq("status", "active")
     .order("created_at", { ascending: false });

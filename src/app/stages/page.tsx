@@ -47,13 +47,7 @@ export default async function StagesPage({
 
   let query = supabase
     .from("jobs")
-    .select(
-      `
-      id, firm_id, title, slug, location, type, practice_area,
-      salary_indication, hours_per_week, status, created_at,
-      firms ( name, logo_url, slug )
-    `
-    )
+    .select("*, firms ( name, logo_url, slug )")
     .eq("status", "active")
     .in("type", STAGE_TYPE_VALUES)
     .order("created_at", { ascending: false });

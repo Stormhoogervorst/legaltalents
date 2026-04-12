@@ -49,13 +49,7 @@ export default async function EventsPage({
 
   let query = supabase
     .from("jobs")
-    .select(
-      `
-      id, firm_id, title, slug, location, type, practice_area,
-      salary_indication, hours_per_week, status, created_at,
-      firms ( name, logo_url, slug )
-    `
-    )
+    .select("*, firms ( name, logo_url, slug )")
     .eq("status", "active")
     .in("type", BUSINESS_COURSE_TYPES)
     .order("created_at", { ascending: false });

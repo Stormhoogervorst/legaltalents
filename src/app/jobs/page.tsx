@@ -74,13 +74,7 @@ export default async function JobsPage({
     if (nearbyIds.length > 0) {
       let geoQuery = supabase
         .from("jobs")
-        .select(
-          `
-          id, firm_id, title, slug, location, type, practice_area,
-          salary_indication, hours_per_week, status, created_at,
-          firms ( name, logo_url, slug )
-        `
-        )
+        .select("*, firms ( name, logo_url, slug )")
         .in("id", nearbyIds);
 
       if (params.q) {
@@ -109,13 +103,7 @@ export default async function JobsPage({
   } else {
     let query = supabase
       .from("jobs")
-      .select(
-        `
-        id, firm_id, title, slug, location, type, practice_area,
-        salary_indication, hours_per_week, status, created_at,
-        firms ( name, logo_url, slug )
-      `
-      )
+      .select("*, firms ( name, logo_url, slug )")
       .eq("status", "active")
       .order("created_at", { ascending: false });
 

@@ -69,14 +69,7 @@ export default async function CityStagesPage({
 
   let query = supabase
     .from("jobs")
-    .select(
-      `
-      id, firm_id, title, slug, location, type, practice_area,
-      salary_indication, start_date, required_education,
-      hours_per_week, status, created_at,
-      firms ( name, logo_url, slug )
-    `
-    )
+    .select("*, firms ( name, logo_url, slug )")
     .eq("status", "active")
     .ilike("location", cityLocationFilter(city))
     .in("type", STAGE_TYPE_VALUES)
