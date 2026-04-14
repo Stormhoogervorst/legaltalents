@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createResend } from "@/lib/resend";
+import { verifyRecaptchaToken } from "@/lib/recaptcha/verify-server";
+import { checkRateLimit, getRequestIp } from "@/lib/security/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +13,7 @@ type RecruitmentLeadPayload = {
   firmName?: string;
   email?: string;
   phone?: string;
+  recaptchaToken?: string;
 };
 
 function clean(value: unknown) {
@@ -18,6 +21,21 @@ function clean(value: unknown) {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = getRequestIp(request.headers);
+  const limit = await checkRateLimit(`recruitment-lead:${ip}`, 5, 10 * 60 * 1000);
+  if (!limit.ok) {
+    return NextResponse.json(
+      {
+        error:
+          "Te veel verzoeken. Wacht even en probeer het daarna opnieuw.",
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(limit.retryAfterSeconds) },
+      }
+    );
+  }
+
   let body: RecruitmentLeadPayload;
 
   try {
@@ -31,6 +49,16 @@ export async function POST(request: NextRequest) {
   const firmName = clean(body.firmName);
   const email = clean(body.email);
   const phone = clean(body.phone);
+
+  if (process.env.RECAPTCHA_SECRET_KEY) {
+    const captcha = await verifyRecaptchaToken(clean(body.recaptchaToken));
+    if (!captcha.ok) {
+      return NextResponse.json(
+        { error: "reCAPTCHA-verificatie mislukt. Probeer opnieuw." },
+        { status: 400 }
+      );
+    }
+  }
 
   if (!firstName || !lastName || !firmName || !email || !phone) {
     return NextResponse.json(

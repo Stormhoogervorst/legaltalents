@@ -6,11 +6,24 @@ import {
   sanitizeLinkedInProfileUrl,
   isValidLinkedInInUrl,
 } from "@/lib/linkedin-profile-url";
+import { verifyRecaptchaToken } from "@/lib/recaptcha/verify-server";
+import { checkRateLimit, getRequestIp } from "@/lib/security/rate-limit";
 
 export async function POST(request: NextRequest) {
   console.log("[linkedin-apply/auto] POST received");
+  const ip = getRequestIp(request.headers);
+  const limit = await checkRateLimit(`linkedin-auto:${ip}`, 8, 10 * 60 * 1000);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "Te veel verzoeken. Probeer het later opnieuw." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(limit.retryAfterSeconds) },
+      }
+    );
+  }
 
-  let body: { jobId?: string; linkedinUrl?: string; phone?: string };
+  let body: { jobId?: string; linkedinUrl?: string; phone?: string; recaptchaToken?: string };
   try {
     body = await request.json();
   } catch {
@@ -20,6 +33,16 @@ export async function POST(request: NextRequest) {
   const jobId = body.jobId?.trim();
   const rawLinkedinUrl = body.linkedinUrl?.trim() ?? "";
   const phone = body.phone?.trim() ?? "";
+
+  if (process.env.RECAPTCHA_SECRET_KEY) {
+    const captcha = await verifyRecaptchaToken(body.recaptchaToken?.trim() ?? "");
+    if (!captcha.ok) {
+      return NextResponse.json(
+        { error: "reCAPTCHA-verificatie mislukt. Probeer opnieuw." },
+        { status: 400 }
+      );
+    }
+  }
 
   if (!jobId) {
     console.log("[linkedin-apply/auto] Missing jobId");

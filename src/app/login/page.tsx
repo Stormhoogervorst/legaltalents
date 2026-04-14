@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import { verifyRecaptchaAction } from "@/app/actions/recaptcha";
+import { RecaptchaCheckbox } from "@/components/recaptcha/RecaptchaCheckbox";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
 
 type View = "login" | "forgot";
@@ -21,11 +24,29 @@ export default function LoginPage() {
   const [resetSent, setResetSent] = useState(false);
 
   const supabase = createClient();
+  const { widgetKey: recaptchaWidgetKey, token: recaptchaToken, setToken: setRecaptchaToken, reset: resetRecaptcha, siteKeyConfigured } =
+    useRecaptcha();
+  const recaptchaRequired = siteKeyConfigured;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (recaptchaRequired) {
+      if (!recaptchaToken) {
+        setError("Voltooi de reCAPTCHA-verificatie.");
+        setLoading(false);
+        return;
+      }
+      const captcha = await verifyRecaptchaAction(recaptchaToken);
+      if (!captcha.ok) {
+        setError(captcha.error);
+        resetRecaptcha();
+        setLoading(false);
+        return;
+      }
+    }
 
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
@@ -38,6 +59,7 @@ export default function LoginPage() {
           ? "E-mailadres of wachtwoord is onjuist."
           : signInError.message
       );
+      resetRecaptcha();
       setLoading(false);
     } else {
       router.push("/portal");
@@ -50,12 +72,28 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
+    if (recaptchaRequired) {
+      if (!recaptchaToken) {
+        setError("Voltooi de reCAPTCHA-verificatie.");
+        setLoading(false);
+        return;
+      }
+      const captcha = await verifyRecaptchaAction(recaptchaToken);
+      if (!captcha.ok) {
+        setError(captcha.error);
+        resetRecaptcha();
+        setLoading(false);
+        return;
+      }
+    }
+
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${location.origin}/api/auth/callback?next=/portal/settings`,
     });
 
     if (resetError) {
       setError(resetError.message);
+      resetRecaptcha();
       setLoading(false);
     } else {
       setResetSent(true);
@@ -114,7 +152,7 @@ export default function LoginPage() {
                   </label>
                   <button
                     type="button"
-                    onClick={() => { setView("forgot"); setError(null); }}
+                    onClick={() => { setView("forgot"); setError(null); resetRecaptcha(); }}
                     className="text-xs text-primary hover:underline font-medium"
                   >
                     Wachtwoord vergeten?
@@ -146,6 +184,12 @@ export default function LoginPage() {
                   {error}
                 </div>
               )}
+
+              <RecaptchaCheckbox
+                widgetKey={recaptchaWidgetKey}
+                onChange={setRecaptchaToken}
+                className="flex justify-center"
+              />
 
               <button
                 type="submit"
@@ -182,6 +226,12 @@ export default function LoginPage() {
                 </div>
               )}
 
+              <RecaptchaCheckbox
+                widgetKey={recaptchaWidgetKey}
+                onChange={setRecaptchaToken}
+                className="flex justify-center"
+              />
+
               <button
                 type="submit"
                 disabled={loading}
@@ -193,7 +243,7 @@ export default function LoginPage() {
 
               <button
                 type="button"
-                onClick={() => { setView("login"); setError(null); }}
+                onClick={() => { setView("login"); setError(null); resetRecaptcha(); }}
                 className="btn-secondary w-full"
               >
                 ← Terug naar inloggen
@@ -214,7 +264,7 @@ export default function LoginPage() {
               </p>
               <button
                 type="button"
-                onClick={() => { setView("login"); setResetSent(false); setError(null); }}
+                onClick={() => { setView("login"); setResetSent(false); setError(null); resetRecaptcha(); }}
                 className="mt-6 text-sm text-primary hover:underline font-medium"
               >
                 ← Terug naar inloggen

@@ -70,7 +70,7 @@ LANGUAGE sql STABLE
 AS $$
   SELECT *
   FROM public.vacancies v
-  WHERE v.status = vacancy_status
+  WHERE v.status::text = vacancy_status
     AND v.latitude IS NOT NULL
     AND v.longitude IS NOT NULL
     AND (

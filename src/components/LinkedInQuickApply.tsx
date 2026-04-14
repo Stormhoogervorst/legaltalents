@@ -8,6 +8,8 @@ import {
   sanitizeLinkedInProfileUrl,
   isValidLinkedInInUrl,
 } from "@/lib/linkedin-profile-url";
+import { RecaptchaCheckbox } from "@/components/recaptcha/RecaptchaCheckbox";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 const PENDING_APPLY_KEY = "pending_linkedin_apply";
 
@@ -41,6 +43,14 @@ export default function LinkedInQuickApply({
   });
 
   const hasCheckedAuth = useRef(false);
+  const {
+    widgetKey: recaptchaWidgetKey,
+    token: recaptchaToken,
+    setToken: setRecaptchaToken,
+    reset: resetRecaptcha,
+    siteKeyConfigured,
+  } = useRecaptcha();
+  const recaptchaRequired = siteKeyConfigured;
 
   // After OAuth return: detect pending apply + logged-in user → show form
   useEffect(() => {
@@ -153,6 +163,10 @@ export default function LinkedInQuickApply({
     }
 
     setLinkedinUrl(cleanUrl);
+    if (recaptchaRequired && !recaptchaToken) {
+      setError("Voltooi de reCAPTCHA-verificatie.");
+      return;
+    }
     setLoading(true);
     console.log("[LinkedInQuickApply] Submitting with cleanUrl:", cleanUrl, "phone:", trimmedPhone);
 
@@ -160,7 +174,12 @@ export default function LinkedInQuickApply({
       const res = await fetch("/api/auth/linkedin-apply/auto", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobId, linkedinUrl: cleanUrl, phone: trimmedPhone }),
+        body: JSON.stringify({
+          jobId,
+          linkedinUrl: cleanUrl,
+          phone: trimmedPhone,
+          recaptchaToken: recaptchaToken ?? undefined,
+        }),
       });
 
       const data = await res.json();
@@ -175,6 +194,7 @@ export default function LinkedInQuickApply({
 
       if (!res.ok || !data.success) {
         setError(data.error ?? "Er is iets misgegaan bij het opslaan.");
+        resetRecaptcha();
         setLoading(false);
         return;
       }
@@ -186,6 +206,7 @@ export default function LinkedInQuickApply({
     } catch (err) {
       console.error("[LinkedInQuickApply] Submit error:", err);
       setError("Geen verbinding. Probeer het opnieuw.");
+      resetRecaptcha();
       setLoading(false);
     }
   }
@@ -289,6 +310,12 @@ export default function LinkedInQuickApply({
             <p className="mt-1.5 text-[13px] text-red-500">{phoneError}</p>
           )}
         </div>
+
+        <RecaptchaCheckbox
+          widgetKey={recaptchaWidgetKey}
+          onChange={setRecaptchaToken}
+          className="flex justify-center"
+        />
 
         <button
           onClick={handleSubmitApplication}

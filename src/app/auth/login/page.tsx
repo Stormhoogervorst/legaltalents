@@ -4,6 +4,9 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { verifyRecaptchaAction } from "@/app/actions/recaptcha";
+import { RecaptchaCheckbox } from "@/components/recaptcha/RecaptchaCheckbox";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { Briefcase, Eye, EyeOff, Loader2 } from "lucide-react";
 
 function LoginForm() {
@@ -18,16 +21,36 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
 
   const supabase = createClient();
+  const { widgetKey: recaptchaWidgetKey, token: recaptchaToken, setToken: setRecaptchaToken, reset: resetRecaptcha, siteKeyConfigured } =
+    useRecaptcha();
+
+  const recaptchaRequired = siteKeyConfigured;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
+    if (recaptchaRequired) {
+      if (!recaptchaToken) {
+        setError("Please complete the reCAPTCHA verification.");
+        setLoading(false);
+        return;
+      }
+      const captcha = await verifyRecaptchaAction(recaptchaToken);
+      if (!captcha.ok) {
+        setError(captcha.error);
+        resetRecaptcha();
+        setLoading(false);
+        return;
+      }
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       setError(error.message);
+      resetRecaptcha();
       setLoading(false);
     } else {
       router.push(redirectTo);
@@ -78,6 +101,12 @@ function LoginForm() {
             {error}
           </div>
         )}
+
+        <RecaptchaCheckbox
+          widgetKey={recaptchaWidgetKey}
+          onChange={setRecaptchaToken}
+          className="flex justify-center"
+        />
 
         <button type="submit" disabled={loading} className="btn-primary w-full">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}

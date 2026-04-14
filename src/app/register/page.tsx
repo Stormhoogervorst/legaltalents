@@ -4,6 +4,9 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import { verifyRecaptchaAction } from "@/app/actions/recaptcha";
+import { RecaptchaCheckbox } from "@/components/recaptcha/RecaptchaCheckbox";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
 
 function RegisterContent() {
@@ -19,11 +22,29 @@ function RegisterContent() {
   const [success, setSuccess] = useState(false);
 
   const supabase = createClient();
+  const { widgetKey: recaptchaWidgetKey, token: recaptchaToken, setToken: setRecaptchaToken, reset: resetRecaptcha, siteKeyConfigured } =
+    useRecaptcha();
+  const recaptchaRequired = siteKeyConfigured;
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (recaptchaRequired) {
+      if (!recaptchaToken) {
+        setError("Voltooi de reCAPTCHA-verificatie.");
+        setLoading(false);
+        return;
+      }
+      const captcha = await verifyRecaptchaAction(recaptchaToken);
+      if (!captcha.ok) {
+        setError(captcha.error);
+        resetRecaptcha();
+        setLoading(false);
+        return;
+      }
+    }
 
     const fullName = `${firstName} ${lastName}`;
 
@@ -55,6 +76,7 @@ function RegisterContent() {
           ? "Er bestaat al een account met dit e-mailadres."
           : signUpError.message
       );
+      resetRecaptcha();
       setLoading(false);
       return;
     }
@@ -259,6 +281,12 @@ function RegisterContent() {
                 {error}
               </div>
             )}
+
+            <RecaptchaCheckbox
+              widgetKey={recaptchaWidgetKey}
+              onChange={setRecaptchaToken}
+              className="flex justify-center"
+            />
 
             <button
               type="submit"

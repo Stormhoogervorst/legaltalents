@@ -5,6 +5,8 @@ import Link from "next/link";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
 import { useState, FormEvent, useRef, useEffect } from "react";
+import { RecaptchaCheckbox } from "@/components/recaptcha/RecaptchaCheckbox";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 const benefits = [
   {
@@ -103,10 +105,26 @@ function FadeIn({
 export default function RecruitmentPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const {
+    widgetKey: recaptchaWidgetKey,
+    token: recaptchaToken,
+    setToken: setRecaptchaToken,
+    reset: resetRecaptcha,
+    siteKeyConfigured,
+  } = useRecaptcha();
+  const recaptchaRequired = siteKeyConfigured;
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitting(true);
+    setSubmitError(null);
+
+    if (recaptchaRequired && !recaptchaToken) {
+      setSubmitError("Voltooi de reCAPTCHA-verificatie.");
+      setSubmitting(false);
+      return;
+    }
 
     const form = e.currentTarget;
     const data = {
@@ -116,17 +134,27 @@ export default function RecruitmentPage() {
       firmName: (form.elements.namedItem("firmName") as HTMLInputElement).value,
       email: (form.elements.namedItem("email") as HTMLInputElement).value,
       phone: (form.elements.namedItem("phone") as HTMLInputElement).value,
+      recaptchaToken: recaptchaToken ?? undefined,
     };
 
     try {
-      await fetch("/api/recruitment-lead", {
+      const res = await fetch("/api/recruitment-lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+
+      const json = await res.json().catch(() => ({} as { success?: boolean; error?: string }));
+      if (!res.ok || !json.success) {
+        setSubmitError(json.error ?? "Versturen is mislukt. Probeer het opnieuw.");
+        resetRecaptcha();
+        return;
+      }
+
       setSubmitted(true);
     } catch {
-      setSubmitted(true);
+      setSubmitError("Geen verbinding. Probeer het opnieuw.");
+      resetRecaptcha();
     } finally {
       setSubmitting(false);
     }
@@ -704,6 +732,15 @@ export default function RecruitmentPage() {
                     </Link>
                     .
                   </p>
+
+                  <RecaptchaCheckbox
+                    widgetKey={recaptchaWidgetKey}
+                    onChange={setRecaptchaToken}
+                    className="pt-8 flex justify-start"
+                  />
+                  {submitError && (
+                    <p className="mt-3 text-[13px] text-red-500">{submitError}</p>
+                  )}
 
                   <div className="pt-4">
                     <button

@@ -6,6 +6,8 @@ import {
   sanitizeLinkedInProfileUrl,
   isValidLinkedInInUrl,
 } from "@/lib/linkedin-profile-url";
+import { RecaptchaCheckbox } from "@/components/recaptcha/RecaptchaCheckbox";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 interface Props {
   jobId: string;
@@ -47,6 +49,14 @@ export default function LinkedInConfirmForm({
   const [submitted, setSubmitted] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const {
+    widgetKey: recaptchaWidgetKey,
+    token: recaptchaToken,
+    setToken: setRecaptchaToken,
+    reset: resetRecaptcha,
+    siteKeyConfigured,
+  } = useRecaptcha();
+  const recaptchaRequired = siteKeyConfigured;
 
   const hasFieldErrors = !!(errors.linkedinUrl || errors.phone || errors.cv);
 
@@ -104,6 +114,10 @@ export default function LinkedInConfirmForm({
 
     setLinkedinUrl(cleaned);
     setPhone(phone.trim());
+    if (recaptchaRequired && !recaptchaToken) {
+      setServerError("Voltooi de reCAPTCHA-verificatie.");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -112,6 +126,9 @@ export default function LinkedInConfirmForm({
       formData.append("linkedinUrl", cleaned);
       formData.append("phone", phone.trim());
       formData.append("cv", cvFile!);
+      if (recaptchaToken) {
+        formData.append("recaptchaToken", recaptchaToken);
+      }
 
       const res = await fetch("/api/auth/linkedin-apply/confirm", {
         method: "POST",
@@ -122,6 +139,7 @@ export default function LinkedInConfirmForm({
 
       if (!res.ok || !data.success) {
         setServerError(data.error ?? "Er is iets misgegaan.");
+        resetRecaptcha();
         setLoading(false);
         return;
       }
@@ -129,6 +147,7 @@ export default function LinkedInConfirmForm({
       setSuccess(true);
     } catch {
       setServerError("Geen verbinding. Probeer het opnieuw.");
+      resetRecaptcha();
     } finally {
       setLoading(false);
     }
@@ -361,6 +380,11 @@ export default function LinkedInConfirmForm({
           }`}
           aria-live="polite"
         >
+          <RecaptchaCheckbox
+            widgetKey={recaptchaWidgetKey}
+            onChange={setRecaptchaToken}
+            className="flex justify-center pb-4"
+          />
           {serverError && (
             <p className="text-[14px] text-red-600">{serverError}</p>
           )}
