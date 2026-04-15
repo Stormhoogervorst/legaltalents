@@ -146,6 +146,17 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Index link */}
+          <div className="mt-10 pt-8 border-t border-[#2E3247] flex items-center justify-center">
+            <Link
+              href="/juridische-vacatures-index"
+              title="Compleet overzicht van alle juridische vacatures per functie, rechtsgebied en stad"
+              className="text-sm text-slate-400 hover:text-[#668dff] transition-colors duration-200"
+            >
+              Vacature Index
+            </Link>
+          </div>
+
           {/* Large brand text */}
           <div className="mt-14 pt-10 border-t border-[#2E3247]">
             <div className="flex items-center gap-6">

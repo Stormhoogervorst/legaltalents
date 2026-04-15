@@ -31,26 +31,43 @@ const PRACTICE_AREAS = [
 
 const STAGE_TYPE_VALUES = ["stage", "internship", "student", "Studentbaan"];
 
+interface SearchParams {
+  rechtsgebied?: string;
+}
+
 export async function generateStaticParams() {
   return CITIES.map((city) => ({ city }));
 }
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ city: string }>;
+  searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   const { city } = await params;
+  const sp = await searchParams;
   const name = cityDisplayName(city);
+  const area = sp.rechtsgebied;
+  const titlePrefix = area ? `${area} Stages ${name}` : `Juridische Stages ${name}`;
   return {
-    title: `Juridische Stages ${name} | Legal Talents`,
-    description: `Op zoek naar een juridische stage in ${name}? Bekijk het meest complete overzicht van stages bij advocatenkantoren en juridische organisaties.`,
-    keywords: ["juridische stages", "stages", name, `juridische stages ${name}`, `stages ${name}`, "advocatuur", `advocatuur ${name}`, "Legal Talents"],
+    title: `${titlePrefix} | Legal Talents`,
+    description: area
+      ? `Op zoek naar een ${area.toLowerCase()} stage in ${name}? Bekijk het meest complete overzicht van stages bij advocatenkantoren en juridische organisaties.`
+      : `Op zoek naar een juridische stage in ${name}? Bekijk het meest complete overzicht van stages bij advocatenkantoren en juridische organisaties.`,
+    keywords: [
+      "juridische stages",
+      "stages",
+      name,
+      `juridische stages ${name}`,
+      `stages ${name}`,
+      "advocatuur",
+      `advocatuur ${name}`,
+      ...(area ? [area.toLowerCase(), `${area.toLowerCase()} stages`, `${area.toLowerCase()} ${name}`] : []),
+      "Legal Talents",
+    ],
   };
-}
-
-interface SearchParams {
-  rechtsgebied?: string;
 }
 
 export default async function CityStagesPage({
@@ -88,11 +105,14 @@ export default async function CityStagesPage({
   })) as JobWithFirm[];
 
   const hasFilters = !!sp.rechtsgebied;
+  const headingText = sp.rechtsgebied
+    ? `${sp.rechtsgebied} Stages ${name}`
+    : `Juridische Stages ${name}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: `Juridische Stages ${name}`,
+    name: headingText,
     numberOfItems: jobList.length,
     itemListElement: jobList.map((job, i) => ({
       "@type": "ListItem",
@@ -125,7 +145,7 @@ export default async function CityStagesPage({
             className="font-bold tracking-[-0.03em] leading-[1.05] text-[#0A0A0A]"
             style={{ fontSize: "clamp(48px, 6vw, 80px)" }}
           >
-            Juridische Stages {name}
+            {headingText}
           </h1>
           <p
             className="mt-6 leading-relaxed max-w-[640px]"
@@ -135,7 +155,9 @@ export default async function CityStagesPage({
               color: "#6B6B6B",
             }}
           >
-            Ontdek alle actuele juridische stages bij werkgevers in {name}.
+            {sp.rechtsgebied
+              ? `Bekijk alle actuele ${sp.rechtsgebied.toLowerCase()} stages bij werkgevers in ${name}.`
+              : `Ontdek alle actuele juridische stages bij werkgevers in ${name}.`}
           </p>
         </div>
       </section>

@@ -35,27 +35,65 @@ const TYPE_ALIASES: Record<string, string[]> = {
   stage: ["stage", "internship", "student", "Studentbaan"],
 };
 
+interface SearchParams {
+  type?: string;
+  rechtsgebied?: string;
+  functie?: string;
+}
+
 export async function generateStaticParams() {
   return CITIES.map((city) => ({ id: city }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
-  const { id: city } = await params;
-  const name = cityDisplayName(city);
-  return {
-    title: `Juridische Vacatures ${name} | Legal Talents`,
-    description: `Bekijk alle actuele juridische vacatures in ${name}. Vind je nieuwe uitdaging bij topwerkgevers in de juridische sector.`,
-    keywords: ["juridische vacatures", "vacatures", name, `juridische vacatures ${name}`, `vacatures ${name}`, "advocatuur", `advocatuur ${name}`, "Legal Talents"],
-  };
+function buildFilterLabel(sp: SearchParams): string | null {
+  const parts: string[] = [];
+  if (sp.functie) parts.push(sp.functie);
+  if (sp.rechtsgebied) parts.push(sp.rechtsgebied);
+  return parts.length > 0 ? parts.join(" — ") : null;
 }
 
-interface SearchParams {
-  type?: string;
-  rechtsgebied?: string;
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<SearchParams>;
+}): Promise<Metadata> {
+  const { id: city } = await params;
+  const sp = await searchParams;
+  const name = cityDisplayName(city);
+  const filterLabel = buildFilterLabel(sp);
+
+  const title = filterLabel
+    ? `${filterLabel} Vacatures in ${name} | Legal Talents`
+    : `Juridische Vacatures in ${name} | Legal Talents`;
+
+  const descFilter = sp.rechtsgebied
+    ? `in het ${sp.rechtsgebied.toLowerCase()}`
+    : sp.functie
+      ? `als ${sp.functie.toLowerCase()}`
+      : "in de juridische sector";
+
+  const description = filterLabel
+    ? `Op zoek naar een baan ${descFilter} in ${name}? Bekijk alle actuele vacatures bij topkantoren op Legal Talents.`
+    : `Bekijk alle actuele juridische vacatures in ${name}. Vind je nieuwe uitdaging bij topwerkgevers in de juridische sector.`;
+
+  return {
+    title,
+    description,
+    keywords: [
+      "juridische vacatures",
+      "vacatures",
+      name,
+      `juridische vacatures ${name}`,
+      `vacatures ${name}`,
+      "advocatuur",
+      `advocatuur ${name}`,
+      ...(sp.rechtsgebied ? [sp.rechtsgebied.toLowerCase(), `${sp.rechtsgebied.toLowerCase()} vacatures`, `${sp.rechtsgebied.toLowerCase()} ${name}`] : []),
+      ...(sp.functie ? [sp.functie.toLowerCase(), `${sp.functie.toLowerCase()} vacatures`, `${sp.functie.toLowerCase()} ${name}`] : []),
+      "Legal Talents",
+    ],
+  };
 }
 
 export default async function CityJobsPage({
@@ -86,6 +124,9 @@ export default async function CityJobsPage({
   if (sp.rechtsgebied) {
     query = query.ilike("practice_area", `%${sp.rechtsgebied}%`);
   }
+  if (sp.functie) {
+    query = query.ilike("title", `%${sp.functie}%`);
+  }
 
   const { data: jobs } = await query;
 
@@ -95,12 +136,21 @@ export default async function CityJobsPage({
     firms: Array.isArray(j.firms) ? (j.firms[0] ?? null) : (j.firms ?? null),
   })) as JobWithFirm[];
 
-  const hasFilters = !!(sp.type || sp.rechtsgebied);
+  const hasFilters = !!(sp.type || sp.rechtsgebied || sp.functie);
+  const filterLabel = buildFilterLabel(sp);
+
+  const headingText = filterLabel
+    ? `Juridische vacatures: ${filterLabel} in ${name}`
+    : `Juridische Vacatures ${name}`;
+
+  const subtitleText = filterLabel
+    ? `Bekijk alle actuele ${filterLabel.toLowerCase()} vacatures bij juridische werkgevers in ${name}.`
+    : `Ontdek alle actuele juridische mogelijkheden bij juridische werkgevers in ${name}.`;
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: `Juridische Vacatures ${name}`,
+    name: headingText,
     numberOfItems: jobList.length,
     itemListElement: jobList.map((job, i) => ({
       "@type": "ListItem",
@@ -133,7 +183,7 @@ export default async function CityJobsPage({
             className="font-bold tracking-[-0.03em] leading-[1.05] text-[#0A0A0A]"
             style={{ fontSize: "clamp(48px, 6vw, 80px)" }}
           >
-            Juridische Vacatures {name}
+            {headingText}
           </h1>
           <p
             className="mt-6 leading-relaxed max-w-[640px]"
@@ -143,8 +193,7 @@ export default async function CityJobsPage({
               color: "#6B6B6B",
             }}
           >
-            Ontdek alle actuele juridische mogelijkheden bij juridische werkgevers
-            in {name}.
+            {subtitleText}
           </p>
         </div>
       </section>
@@ -201,6 +250,11 @@ export default async function CityJobsPage({
                 ))}
               </select>
             </div>
+
+            {/* Functie (hidden — preserved when arriving from index) */}
+            {sp.functie && (
+              <input type="hidden" name="functie" value={sp.functie} />
+            )}
 
             {/* Actions */}
             <div className="flex items-center gap-6 pb-1">

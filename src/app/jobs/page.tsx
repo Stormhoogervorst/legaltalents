@@ -28,6 +28,7 @@ interface SearchParams {
   straal?: string;
   type?: string;
   rechtsgebied?: string;
+  functie?: string;
 }
 
 export const revalidate = 0;
@@ -90,6 +91,9 @@ export default async function JobsPage({
       if (params.rechtsgebied) {
         geoQuery = geoQuery.ilike("practice_area", `%${params.rechtsgebied}%`);
       }
+      if (params.functie) {
+        geoQuery = geoQuery.ilike("title", `%${params.functie}%`);
+      }
 
       const { data } = await geoQuery;
       const orderedIds = nearbyIds;
@@ -124,6 +128,9 @@ export default async function JobsPage({
     if (params.rechtsgebied) {
       query = query.ilike("practice_area", `%${params.rechtsgebied}%`);
     }
+    if (params.functie) {
+      query = query.ilike("title", `%${params.functie}%`);
+    }
 
     const { data } = await query;
     jobs = data;
@@ -140,8 +147,22 @@ export default async function JobsPage({
     params.locatie ||
     params.type ||
     params.rechtsgebied ||
+    params.functie ||
     (params.straal && params.straal !== "0")
   );
+
+  const filterParts: string[] = [];
+  if (params.functie) filterParts.push(params.functie);
+  if (params.rechtsgebied) filterParts.push(params.rechtsgebied);
+  const filterLabel = filterParts.length > 0 ? filterParts.join(" — ") : null;
+
+  const headingText = filterLabel
+    ? `${filterLabel} vacatures`
+    : "Alle vacatures";
+
+  const subtitleText = filterLabel
+    ? `Bekijk alle actuele ${filterLabel.toLowerCase()} vacatures bij juridische werkgevers in Nederland.`
+    : "Stages, studentbanen en startersfuncties bij de beste juridische werkgevers in Nederland.";
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -162,7 +183,7 @@ export default async function JobsPage({
             className="font-bold tracking-[-0.03em] leading-[1.05] text-[#0A0A0A]"
             style={{ fontSize: "clamp(48px, 6vw, 80px)" }}
           >
-            Alle vacatures
+            {headingText}
           </h1>
           <p
             className="mt-6 leading-relaxed max-w-[640px]"
@@ -172,8 +193,7 @@ export default async function JobsPage({
               color: "#6B6B6B",
             }}
           >
-            Stages, studentbanen en startersfuncties bij de beste juridische
-            werkgevers in Nederland.
+            {subtitleText}
           </p>
         </div>
       </section>
