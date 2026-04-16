@@ -105,7 +105,7 @@ function LoginForm() {
         <RecaptchaCheckbox
           widgetKey={recaptchaWidgetKey}
           onChange={setRecaptchaToken}
-          className="flex justify-center"
+          className="flex justify-start mb-4"
         />
 
         <button type="submit" disabled={loading} className="btn-primary w-full">

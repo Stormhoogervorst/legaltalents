@@ -736,7 +736,7 @@ export default function RecruitmentPage() {
                   <RecaptchaCheckbox
                     widgetKey={recaptchaWidgetKey}
                     onChange={setRecaptchaToken}
-                    className="pt-8 flex justify-start"
+                    className="flex justify-start mb-4"
                   />
                   {submitError && (
                     <p className="mt-3 text-[13px] text-red-500">{submitError}</p>

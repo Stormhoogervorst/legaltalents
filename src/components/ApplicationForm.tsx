@@ -387,7 +387,7 @@ export default function ApplicationForm({ jobId, jobTitle, firmName }: Props) {
       <RecaptchaCheckbox
         widgetKey={recaptchaWidgetKey}
         onChange={setRecaptchaToken}
-        className="flex justify-center pt-2"
+        className="flex justify-start mb-4"
       />
 
       {/* Submit */}

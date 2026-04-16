@@ -285,7 +285,7 @@ function RegisterContent() {
             <RecaptchaCheckbox
               widgetKey={recaptchaWidgetKey}
               onChange={setRecaptchaToken}
-              className="flex justify-center"
+              className="flex justify-start mb-4"
             />
 
             <button

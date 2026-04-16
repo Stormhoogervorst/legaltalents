@@ -383,7 +383,7 @@ export default function LinkedInConfirmForm({
           <RecaptchaCheckbox
             widgetKey={recaptchaWidgetKey}
             onChange={setRecaptchaToken}
-            className="flex justify-center pb-4"
+            className="flex justify-start mb-4"
           />
           {serverError && (
             <p className="text-[14px] text-red-600">{serverError}</p>

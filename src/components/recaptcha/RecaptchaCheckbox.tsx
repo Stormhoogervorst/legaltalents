@@ -34,6 +34,7 @@ export function RecaptchaCheckbox({ widgetKey, onChange, className }: Props) {
       <ReCAPTCHA
         key={widgetKey}
         sitekey={siteKey}
+        size="compact"
         onChange={onChange}
         onExpired={() => onChange(null)}
         onErrored={() => onChange(null)}
