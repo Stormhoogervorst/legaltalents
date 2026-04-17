@@ -69,9 +69,13 @@ export default function NavbarPublic({
           : "text-[#5A6094] hover:text-[#2C337A]",
     );
 
-  const menuIconClass = isHeroTop
-    ? "text-white/80 hover:text-white"
-    : "text-[#5A6094] hover:text-[#2C337A]";
+  // When the mobile menu is open we render the light liquid-glass panel, so
+  // the close icon must be dark to stay visible on that lighter surface.
+  const menuIconClass = menuOpen
+    ? "text-[#2C337A] hover:text-[#1E2560]"
+    : isHeroTop
+      ? "text-white/80 hover:text-white"
+      : "text-[#5A6094] hover:text-[#2C337A]";
 
   return (
     <nav
@@ -162,60 +166,43 @@ export default function NavbarPublic({
 
       {menuOpen && (
         <div
-          className={cn(
-            "md:hidden border-t py-5",
-            isHeroTop
-              ? "border-white/15 bg-[#2C337A]/95 backdrop-blur-sm"
-              : "border-[#E2E5F0] bg-white",
-          )}
+          className="md:hidden border-t border-white/30 bg-white/70 backdrop-blur-lg backdrop-saturate-150 shadow-[0_8px_24px_-12px_rgba(44,51,122,0.18)]"
           style={{
             paddingLeft: "clamp(24px, 5vw, 80px)",
             paddingRight: "clamp(24px, 5vw, 80px)",
+            paddingTop: "12px",
+            paddingBottom: "20px",
+            WebkitBackdropFilter: "blur(16px) saturate(150%)",
           }}
         >
-          <div className="max-w-[1400px] mx-auto flex flex-col gap-5 items-start">
-            <Link
-              href="/jobs"
-              className={cn(linkClass("vacatures"), "block w-fit py-1 text-base")}
-              onClick={() => setMenuOpen(false)}
-              title="Juridische Vacatures"
-            >
-              Vacatures
-            </Link>
-            <Link
-              href="/stages"
-              className={cn(linkClass("stages"), "block w-fit py-1 text-base")}
-              onClick={() => setMenuOpen(false)}
-              title="Juridische Stages"
-            >
-              Stages
-            </Link>
-            <Link
-              href="/firms"
-              className={cn(linkClass("werkgevers"), "block w-fit py-1 text-base")}
-              onClick={() => setMenuOpen(false)}
-            >
-              Werkgevers
-            </Link>
-            <Link
-              href="/kennisbank"
-              className={cn(linkClass("kennisbank"), "block w-fit py-1 text-base")}
-              onClick={() => setMenuOpen(false)}
-            >
-              Kennisbank
-            </Link>
-            <Link
-              href="/recruitment"
-              className={cn(linkClass("recruitment"), "block w-fit py-1 text-base")}
-              onClick={() => setMenuOpen(false)}
-            >
-              Recruitment
-            </Link>
-            <div className={cn("pt-3 mt-1 border-t", isHeroTop ? "border-white/15" : "border-[#E2E5F0]")}>
+          <div className="max-w-[1400px] mx-auto flex flex-col items-stretch">
+            {[
+              { href: "/jobs", key: "vacatures" as const, label: "Vacatures", title: "Juridische Vacatures" },
+              { href: "/stages", key: "stages" as const, label: "Stages", title: "Juridische Stages" },
+              { href: "/firms", key: "werkgevers" as const, label: "Werkgevers" },
+              { href: "/kennisbank", key: "kennisbank" as const, label: "Kennisbank" },
+              { href: "/recruitment", key: "recruitment" as const, label: "Recruitment" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                title={item.title}
+                onClick={() => setMenuOpen(false)}
+                className={cn(
+                  "block w-full py-4 text-[16px] font-medium border-b border-white/30 transition-colors duration-200",
+                  active[item.key]
+                    ? "text-[#2C337A]"
+                    : "text-[#2C337A]/85 hover:text-[#2C337A]",
+                )}
+              >
+                {item.label}
+              </Link>
+            ))}
+            <div className="pt-5">
               <Link
                 href="/register"
-                className="inline-flex items-center rounded-full bg-[#587DFE] px-5 py-2.5 text-[15px] font-medium text-white"
                 onClick={() => setMenuOpen(false)}
+                className="btn-primary w-full justify-center text-[15px] py-3 shadow-[0_10px_24px_-8px_rgba(88,125,254,0.55)]"
               >
                 Werkgever aanmelden
               </Link>

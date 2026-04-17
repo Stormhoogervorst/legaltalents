@@ -198,7 +198,10 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
         </div>
       )}
 
-      {/* Hero — mesh-gradient header that fades seamlessly to white */}
+      {/* Hero — mesh-gradient header that fades seamlessly to white.
+          IMPORTANT: padding + max-w structure MUST mirror the body section
+          below exactly, so the hero content aligns on the same vertical
+          axis as the CTA + `Over de functie` column. */}
       <div className="-mt-[4.25rem]">
         <section
           className="relative isolate overflow-hidden"
@@ -210,6 +213,9 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
               #A8B6FF 62%,
               #C9D4FF 82%,
               #FFFFFF 100%)`,
+            paddingLeft: "clamp(24px, 5vw, 80px)",
+            paddingRight: "clamp(24px, 5vw, 80px)",
+            paddingTop: "calc(4.25rem + clamp(32px, 4vh, 56px))",
           }}
         >
           {/* Layered radial gradients — soft "liquid" purple → blue wash */}
@@ -250,54 +256,52 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
           />
 
           <div
-            className="max-w-[1400px] mx-auto relative"
-            style={{
-              padding:
-                "calc(4.25rem + clamp(32px, 4vh, 56px)) clamp(24px, 5vw, 80px) clamp(80px, 12vh, 160px)",
-            }}
+            className="max-w-[1400px] mx-auto relative pb-[clamp(40px,6vh,80px)] md:pb-[clamp(80px,12vh,160px)]"
           >
-            {/* Breadcrumb / back link */}
-            <Link
-              href="/jobs"
-              className="inline-flex items-center gap-2 text-[14px] font-medium text-white/80 hover:text-white transition-colors duration-200"
-              style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
-            >
-              ← Alle vacatures
-            </Link>
-
-            <div className="mt-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-10">
-              {/* Firm logo */}
-              {firm && (
+            {/* Grid mirrors the body layout below so hero content aligns
+                exactly with the `Over de functie` column (lg:col-span-8). */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-16">
+              <div className="lg:col-span-8 flex flex-col items-start text-left">
+                {/* Breadcrumb / back link — above the logo, left-aligned */}
                 <Link
-                  href={firm.slug ? `/firms/${firm.slug}` : "#"}
-                  className="w-16 h-16 md:w-20 md:h-20 rounded-[4px] flex items-center justify-center shrink-0 overflow-hidden transition-opacity duration-200 hover:opacity-90"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.9)",
-                    backdropFilter: "blur(6px)",
-                    WebkitBackdropFilter: "blur(6px)",
-                    boxShadow:
-                      "0 8px 24px -12px rgba(20, 24, 80, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.4) inset",
-                  }}
+                  href="/jobs"
+                  className="inline-flex items-center gap-2 text-[14px] font-medium text-white/80 hover:text-white transition-colors duration-200"
+                  style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
                 >
-                  {firm.logo_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={firm.logo_url}
-                      alt={firm.name}
-                      className="w-12 h-12 md:w-14 md:h-14 object-contain"
-                    />
-                  ) : (
-                    <span className="text-[15px] font-semibold text-[#2C337A]">
-                      {firm.name?.slice(0, 2).toUpperCase() ?? "??"}
-                    </span>
-                  )}
+                  ← Alle vacatures
                 </Link>
-              )}
 
-              <div className="flex-1 min-w-0">
+                {/* Firm logo — directly above title, left edge matches title */}
+                {firm && (
+                  <Link
+                    href={firm.slug ? `/firms/${firm.slug}` : "#"}
+                    className="mt-8 w-16 h-16 md:w-20 md:h-20 rounded-[4px] flex items-center justify-center shrink-0 overflow-hidden transition-opacity duration-200 hover:opacity-90"
+                    style={{
+                      background: "rgba(255, 255, 255, 0.9)",
+                      backdropFilter: "blur(6px)",
+                      WebkitBackdropFilter: "blur(6px)",
+                      boxShadow:
+                        "0 8px 24px -12px rgba(20, 24, 80, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.4) inset",
+                    }}
+                  >
+                    {firm.logo_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={firm.logo_url}
+                        alt={firm.name}
+                        className="w-12 h-12 md:w-14 md:h-14 object-contain"
+                      />
+                    ) : (
+                      <span className="text-[15px] font-semibold text-[#2C337A]">
+                        {firm.name?.slice(0, 2).toUpperCase() ?? "??"}
+                      </span>
+                    )}
+                  </Link>
+                )}
+
                 {/* Title */}
                 <h1
-                  className="font-bold tracking-[-0.03em] leading-[1.05]"
+                  className="mt-6 font-bold tracking-[-0.03em] leading-[1.05] text-left"
                   style={{
                     fontSize: "clamp(36px, 4.8vw, 68px)",
                     color: "#FFFFFF",
@@ -307,21 +311,17 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                   {typedJob.title}
                 </h1>
 
-                {/* Firm name + date */}
+                {/* Firm name + date — dark text for contrast on lighter gradient */}
                 <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2">
                   {firm?.name && (
                     <Link
                       href={firm.slug ? `/firms/${firm.slug}` : "#"}
-                      className="text-[15px] font-semibold text-white border-b border-white/40 hover:border-white transition-colors duration-200 pb-0.5"
-                      style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
+                      className="text-[15px] font-semibold text-[#0A0A0A] border-b border-[#0A0A0A]/30 hover:border-[#587DFE] hover:text-[#587DFE] transition-colors duration-200 pb-0.5"
                     >
                       {firm.name}
                     </Link>
                   )}
-                  <span
-                    className="text-[14px] text-white/80"
-                    style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
-                  >
+                  <span className="text-[14px] text-[#6B6B6B]">
                     Geplaatst {postedDate}
                   </span>
                 </div>
@@ -454,7 +454,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                     Over de functie
                   </h2>
                   <div
-                    className="max-w-[640px] text-[#6B6B6B] [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-2 [&_p]:mb-4 [&_strong]:font-semibold [&_strong]:text-[#0A0A0A] [&_h3]:font-bold [&_h3]:text-[#0A0A0A] [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-lg [&_h2]:font-bold [&_h2]:text-[#0A0A0A] [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:text-xl [&_a]:text-[#587DFE] [&_a]:border-b [&_a]:border-[#587DFE] [&_a]:hover:opacity-80"
+                    className="w-full text-[#6B6B6B] [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-2 [&_p]:mb-4 [&_strong]:font-semibold [&_strong]:text-[#0A0A0A] [&_h3]:font-bold [&_h3]:text-[#0A0A0A] [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-lg [&_h2]:font-bold [&_h2]:text-[#0A0A0A] [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:text-xl [&_a]:text-[#587DFE] [&_a]:border-b [&_a]:border-[#587DFE] [&_a]:hover:opacity-80"
                     style={{
                       fontSize: "clamp(15px, 1.1vw, 17px)",
                       lineHeight: 1.65,
@@ -486,7 +486,27 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
             <aside className="lg:col-span-4">
               <div className="lg:sticky lg:top-24">
                 {firm && (
-                  <div>
+                  <div className="relative isolate overflow-hidden bg-slate-50 rounded-2xl p-6 md:bg-transparent md:rounded-none md:p-0 md:overflow-visible">
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 -z-10 md:hidden"
+                      style={{
+                        background: `
+                          radial-gradient(60% 55% at 15% 10%,
+                            rgba(168, 198, 255, 0.45) 0%,
+                            rgba(168, 198, 255, 0) 70%),
+                          radial-gradient(55% 60% at 95% 20%,
+                            rgba(200, 218, 255, 0.55) 0%,
+                            rgba(200, 218, 255, 0) 65%),
+                          radial-gradient(60% 65% at 80% 100%,
+                            rgba(180, 210, 255, 0.40) 0%,
+                            rgba(180, 210, 255, 0) 70%),
+                          radial-gradient(45% 55% at 10% 90%,
+                            rgba(215, 228, 255, 0.50) 0%,
+                            rgba(215, 228, 255, 0) 70%)
+                        `,
+                      }}
+                    />
                     <div className="flex items-center gap-4 mb-6">
                       <div className="w-12 h-12 rounded-[4px] bg-[#F5F5F5] flex items-center justify-center shrink-0 overflow-hidden">
                         {firm.logo_url ? (

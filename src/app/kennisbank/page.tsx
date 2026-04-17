@@ -170,10 +170,11 @@ export default async function KennisbankPage() {
           />
 
           <div
-            className="max-w-[1400px] mx-auto relative"
+            className="max-w-[1400px] mx-auto relative pb-[clamp(40px,5vh,70px)] md:pb-[clamp(80px,10vh,140px)]"
             style={{
-              padding:
-                "calc(4.25rem + clamp(60px, 8vh, 120px)) clamp(24px, 5vw, 80px) clamp(80px, 10vh, 140px)",
+              paddingTop: "calc(4.25rem + clamp(60px, 8vh, 120px))",
+              paddingLeft: "clamp(24px, 5vw, 80px)",
+              paddingRight: "clamp(24px, 5vw, 80px)",
             }}
           >
             <span
@@ -221,12 +222,12 @@ export default async function KennisbankPage() {
         </section>
       </div>
 
-      {/* Blog grid */}
+      {/* Blog grid — tighter gap under hero fade on mobile; md+ keeps previous rhythm */}
       <section
+        className="pt-8 md:pt-16"
         style={{
           paddingLeft: "clamp(24px, 5vw, 80px)",
           paddingRight: "clamp(24px, 5vw, 80px)",
-          paddingTop: "clamp(40px, 5vh, 64px)",
           paddingBottom: "clamp(80px, 10vh, 140px)",
         }}
       >

@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import CtaBand from "@/components/CtaBand";
 import HeroSection from "@/components/HeroSection";
 import VacatureCarousel from "@/components/VacatureCarousel";
+import VacatureListMobile from "@/components/VacatureListMobile";
 import { createClient } from "@/lib/supabase/server";
 import { Firm, Job } from "@/types";
 
@@ -82,7 +83,35 @@ export default async function HomePage() {
         style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
       >
         <div className="max-w-[1400px] mx-auto">
-          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-12 sm:mb-16">
+          {/* Mobiel: titel + punt over volledige breedte, punt rechts = rechterrand kaarten */}
+          <div className="md:hidden flex items-baseline justify-between mb-8">
+            <h2
+              className="whitespace-nowrap"
+              style={{
+                fontSize: "clamp(30px, 9.5vw, 42px)",
+                fontWeight: 700,
+                lineHeight: 1.05,
+                letterSpacing: "-0.025em",
+                color: "#0A0A0A",
+              }}
+            >
+              Nieuwste vacatures
+            </h2>
+            <span
+              aria-hidden="true"
+              style={{
+                fontSize: "clamp(30px, 9.5vw, 42px)",
+                fontWeight: 700,
+                lineHeight: 1.05,
+                color: "#587DFE",
+              }}
+            >
+              .
+            </span>
+          </div>
+
+          {/* Desktop: titel + knop naast elkaar */}
+          <div className="hidden md:flex items-end justify-between gap-6 mb-16">
             <h2
               style={{
                 fontSize: "clamp(32px, 4vw, 56px)",
@@ -95,13 +124,29 @@ export default async function HomePage() {
               De nieuwste juridische vacatures
               <span style={{ color: "#587DFE" }}>.</span>
             </h2>
-            <Link href="/jobs" className="btn-primary shrink-0 sm:mb-1">
+            <Link href="/jobs" className="btn-primary shrink-0 mb-1">
               Alle vacatures
             </Link>
           </div>
 
           {allJobs.length > 0 ? (
-            <VacatureCarousel jobs={allJobs} />
+            <>
+              {/* Mobile: compact vertical list (max 5) */}
+              <div className="md:hidden">
+                <VacatureListMobile jobs={allJobs} limit={5} />
+                <Link
+                  href="/jobs"
+                  className="btn-primary mt-6 w-full justify-center inline-flex"
+                >
+                  Alle vacatures
+                </Link>
+              </div>
+
+              {/* Desktop / tablet: existing carousel */}
+              <div className="hidden md:block">
+                <VacatureCarousel jobs={allJobs} />
+              </div>
+            </>
           ) : (
             <p style={{ fontSize: "15px", color: "#8B91B8" }}>
               Er zijn momenteel geen vacatures beschikbaar.
@@ -121,7 +166,26 @@ export default async function HomePage() {
         }}
       >
         <div className="max-w-[1400px] mx-auto">
-          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-12 sm:mb-16">
+
+          {/* ── Mobile header (left-aligned, natural wrap) ── */}
+          <div className="md:hidden mb-8">
+            <h2
+              className="text-left"
+              style={{
+                fontSize: "clamp(30px, 9.5vw, 42px)",
+                fontWeight: 700,
+                lineHeight: 1.05,
+                letterSpacing: "-0.025em",
+                color: "#0A0A0A",
+              }}
+            >
+              Uitgelichte werkgevers
+              <span style={{ color: "#587DFE" }}>.</span>
+            </h2>
+          </div>
+
+          {/* ── Desktop header (title + button side by side) ── */}
+          <div className="hidden md:flex items-end justify-between gap-6 mb-16">
             <h2
               style={{
                 fontSize: "clamp(32px, 4vw, 56px)",
@@ -134,12 +198,97 @@ export default async function HomePage() {
               Uitgelichte werkgevers
               <span style={{ color: "#587DFE" }}>.</span>
             </h2>
-            <Link href="/firms" className="btn-primary shrink-0 sm:mb-1">
+            <Link href="/firms" className="btn-primary shrink-0 mb-1">
               Alle werkgevers
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          {/* ── Mobile: vertical list with roomier cards ── */}
+          <div className="md:hidden">
+            <ul className="flex flex-col gap-3">
+              {featuredFirms.map((firm) => (
+                <li key={firm.id}>
+                  <Link
+                    href={`/firms/${firm.slug}`}
+                    className="flex items-center gap-4 rounded-[16px] px-4 py-5 transition-all duration-200 active:scale-[0.99]"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(135deg, rgba(88,125,254,0.10) 0%, rgba(88,125,254,0.04) 45%, rgba(255,255,255,0.85) 100%)",
+                      backgroundColor: "#F5F7FF",
+                    }}
+                  >
+                    {/* Logo */}
+                    <div className="w-14 h-14 rounded-[12px] bg-white border border-[#E2E5F0] flex items-center justify-center overflow-hidden p-2 shrink-0">
+                      {firm.logo_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={firm.logo_url}
+                          alt={firm.name}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <span style={{ fontSize: "14px", fontWeight: 700, color: "#2C337A" }}>
+                          {firm.name.slice(0, 2).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <h3
+                        className="font-semibold leading-snug line-clamp-1"
+                        style={{
+                          fontSize: "16px",
+                          letterSpacing: "-0.01em",
+                          color: "#2C337A",
+                        }}
+                      >
+                        {firm.name}
+                      </h3>
+
+                      {firm.location && (
+                        <div
+                          className="flex items-center gap-1 mt-1.5"
+                          style={{ fontSize: "13px", color: "#8B91B8" }}
+                        >
+                          <MapPin className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate">
+                            {firm.location}
+                            {firm.team_size && (
+                              <><span className="mx-1">·</span>{firm.team_size} mw.</>
+                            )}
+                          </span>
+                        </div>
+                      )}
+
+                      {firm.practice_areas && firm.practice_areas.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {firm.practice_areas.slice(0, 2).map((area) => (
+                            <span
+                              key={area}
+                              className="bg-[#2C337A] text-white text-[11px] font-semibold px-2.5 py-1 rounded-full leading-none"
+                            >
+                              {area}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href="/firms"
+              className="btn-primary mt-6 w-full justify-center inline-flex"
+            >
+              Alle werkgevers
+            </Link>
+          </div>
+
+          {/* ── Desktop: existing grid ── */}
+          <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {featuredFirms.map((firm) => (
               <Link
                 key={firm.id}
@@ -203,6 +352,7 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
+
         </div>
       </section>
 
@@ -322,8 +472,8 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right column — image with floating pills */}
-            <div className="relative lg:overflow-visible overflow-hidden h-full">
+            {/* Right column — image with floating pills (hidden on mobile) */}
+            <div className="hidden md:block relative lg:overflow-visible overflow-hidden h-full">
               <div className="relative rounded-[16px] overflow-hidden h-full min-h-[400px]">
                 <Image
                   src="/foto 4.jpg"
@@ -410,7 +560,7 @@ export default async function HomePage() {
                   padding: 0,
                 }}
               >
-                Artikelen &amp; inzichten
+                Artikelen<br className="md:hidden" />&amp; inzichten
                 <span style={{ color: "#587DFE" }}>.</span>
               </h2>
               <Link

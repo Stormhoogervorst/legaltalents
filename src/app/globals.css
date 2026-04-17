@@ -55,16 +55,93 @@
 }
 
 @layer components {
+  /* Shared base for mesh-gradient buttons: soft silk-like multi-radial wash
+     that shifts subtly on hover. `background-size` > 100% enables the
+     position animation; individual classes override colors + shadows. */
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .btn-dark {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-medium transition-all duration-300 hover:scale-[1.03] focus:outline-none focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-[initial];
+    background-repeat: no-repeat;
+    background-size: 200% 200%;
+    background-position: 0% 0%;
+  }
+
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .btn-danger:hover,
+  .btn-dark:hover {
+    background-position: 100% 100%;
+  }
+
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-[#587DFE] px-5 py-2.5 text-[14px] font-medium text-white transition-all duration-200 hover:scale-[1.03] hover:bg-[#4A6CE6] focus:outline-none focus:ring-2 focus:ring-[#587DFE]/40 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+    @apply text-white focus:ring-2 focus:ring-[#587DFE]/40;
+    background-color: #587DFE;
+    background-image:
+      radial-gradient(70% 85% at 12% 18%, rgba(138, 122, 254, 0.55) 0%, rgba(138, 122, 254, 0) 62%),
+      radial-gradient(75% 90% at 92% 8%, rgba(122, 155, 255, 0.50) 0%, rgba(122, 155, 255, 0) 65%),
+      radial-gradient(85% 90% at 80% 110%, rgba(74, 108, 230, 0.70) 0%, rgba(74, 108, 230, 0) 70%),
+      radial-gradient(55% 70% at 25% 95%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 70%);
+    box-shadow:
+      0 4px 12px -4px rgba(88, 125, 254, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+
+  .btn-primary:hover {
+    box-shadow:
+      0 10px 24px -6px rgba(88, 125, 254, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.24);
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-[14px] font-medium text-[#2C337A] ring-1 ring-inset ring-[#E2E5F0] transition-all duration-200 hover:scale-[1.03] hover:bg-[#F5F7FF] focus:outline-none focus:ring-2 focus:ring-[#587DFE]/40 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+    @apply text-[#2C337A] ring-1 ring-inset ring-[#E2E5F0] focus:ring-2 focus:ring-[#587DFE]/40;
+    background-color: #FFFFFF;
+    background-image:
+      radial-gradient(75% 90% at 92% 8%, rgba(88, 125, 254, 0.10) 0%, rgba(88, 125, 254, 0) 65%),
+      radial-gradient(65% 80% at 8% 100%, rgba(138, 122, 254, 0.06) 0%, rgba(138, 122, 254, 0) 70%);
+  }
+
+  .btn-secondary:hover {
+    background-image:
+      radial-gradient(75% 90% at 92% 8%, rgba(88, 125, 254, 0.16) 0%, rgba(88, 125, 254, 0) 65%),
+      radial-gradient(65% 80% at 8% 100%, rgba(138, 122, 254, 0.10) 0%, rgba(138, 122, 254, 0) 70%);
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-red-500 px-5 py-2.5 text-[14px] font-medium text-white transition-all duration-200 hover:scale-[1.03] hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400/40 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+    @apply text-white focus:ring-2 focus:ring-red-400/40;
+    background-color: #EF4444;
+    background-image:
+      radial-gradient(70% 80% at 15% 18%, rgba(255, 180, 180, 0.40) 0%, rgba(255, 180, 180, 0) 65%),
+      radial-gradient(80% 90% at 95% 100%, rgba(185, 28, 28, 0.55) 0%, rgba(185, 28, 28, 0) 70%),
+      radial-gradient(55% 70% at 25% 95%, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 70%);
+    box-shadow:
+      0 4px 12px -4px rgba(239, 68, 68, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+
+  .btn-danger:hover {
+    box-shadow:
+      0 10px 24px -6px rgba(239, 68, 68, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  }
+
+  .btn-dark {
+    @apply text-white focus:ring-2 focus:ring-white/40;
+    background-color: #0F172A;
+    background-image:
+      radial-gradient(70% 80% at 18% 10%, rgba(88, 125, 254, 0.38) 0%, rgba(88, 125, 254, 0) 65%),
+      radial-gradient(70% 80% at 92% 100%, rgba(138, 122, 254, 0.28) 0%, rgba(138, 122, 254, 0) 70%),
+      radial-gradient(55% 70% at 50% 50%, rgba(59, 76, 167, 0.18) 0%, rgba(59, 76, 167, 0) 70%);
+    box-shadow:
+      0 12px 28px -10px rgba(10, 15, 61, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .btn-dark:hover {
+    box-shadow:
+      0 18px 36px -12px rgba(10, 15, 61, 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
   }
 
   .input {
