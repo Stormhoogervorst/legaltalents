@@ -259,17 +259,17 @@ export default function LinkedInQuickApply({
           {urlError && (
             <p className="mt-1.5 text-[13px] text-red-500">{urlError}</p>
           )}
-          <p className="mt-2 text-[13px] text-[#7B8AB8]">
+          <p className="mt-2 text-[13px] text-white">
             Ga naar{" "}
             <a
               href="https://www.linkedin.com/in/me"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#587DFE] border-b border-[#587DFE]/40 hover:border-[#587DFE] transition-colors"
+              className="text-white border-b border-white/50 hover:border-white transition-colors"
             >
               linkedin.com/in/me
             </a>{" "}
-            en kopieer de URL uit je adresbalk.
+            en kopieer je profiel URL
           </p>
         </div>
 
