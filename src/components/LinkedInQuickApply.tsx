@@ -313,11 +313,11 @@ export default function LinkedInQuickApply({
 
   // Default: LinkedIn OAuth button
   return (
-    <div className="shrink-0">
+    <div className="w-full md:w-auto md:shrink-0 box-border">
       <button
         onClick={handleStartOAuth}
         disabled={loading}
-        className="inline-flex items-center gap-3 rounded-full bg-slate-900 px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_28px_-10px_rgba(10,15,61,0.55)] ring-1 ring-white/10 transition-all duration-200 hover:bg-slate-800 hover:shadow-[0_18px_36px_-12px_rgba(10,15,61,0.65)] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+        className="flex w-full md:w-auto justify-center items-center gap-3 rounded-full bg-slate-900 px-6 sm:px-7 py-3.5 text-sm sm:text-[15px] font-semibold text-white shadow-[0_12px_28px_-10px_rgba(10,15,61,0.55)] ring-1 ring-white/10 transition-all duration-200 hover:bg-slate-800 hover:shadow-[0_18px_36px_-12px_rgba(10,15,61,0.65)] md:hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? (
           <Loader2 className="h-5 w-5 animate-spin" />
@@ -330,12 +330,21 @@ export default function LinkedInQuickApply({
             <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
           </svg>
         )}
-        {loading
-          ? "Verbinden met LinkedIn…"
-          : "Solliciteer direct met LinkedIn"}
+        {loading ? (
+          "Verbinden met LinkedIn…"
+        ) : (
+          <>
+            <span className="sm:hidden">Solliciteer met LinkedIn</span>
+            <span className="hidden sm:inline">Solliciteer direct met LinkedIn</span>
+          </>
+        )}
       </button>
 
-      {error && <p className="mt-2 text-[13px] text-red-500">{error}</p>}
+      {error && (
+        <p className="mt-2 text-center md:text-left text-[13px] text-red-500">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
