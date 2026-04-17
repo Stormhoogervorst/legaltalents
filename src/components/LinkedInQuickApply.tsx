@@ -235,6 +235,7 @@ export default function LinkedInQuickApply({
       <div className="shrink-0">
         <button
           disabled
+          aria-disabled="true"
           className="inline-flex items-center gap-3 rounded-full bg-[#E5E5E5] px-7 py-3.5 text-[15px] font-semibold text-[#999999] cursor-not-allowed whitespace-nowrap"
         >
           <svg
@@ -244,7 +245,7 @@ export default function LinkedInQuickApply({
           >
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
           </svg>
-          Sollicitatie reeds ontvangen
+          Al gesolliciteerd
         </button>
       </div>
     );

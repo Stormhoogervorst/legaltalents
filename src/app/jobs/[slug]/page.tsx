@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
 import ApplicationForm from "@/components/ApplicationForm";
+import ApplicationStatusToast from "@/components/ApplicationStatusToast";
 import LinkedInQuickApply from "@/components/LinkedInQuickApply";
 import { Job, Firm, jobTypeLabels } from "@/types";
 import { Metadata } from "next";
@@ -181,22 +182,10 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
       />
       <NavbarPublic variant="hero" />
 
-      {alreadyApplied && (
-        <div className="bg-amber-50 border-b border-amber-200">
-          <div
-            className="max-w-[1400px] mx-auto flex items-center gap-3 py-4"
-            style={{
-              paddingLeft: "clamp(24px, 5vw, 80px)",
-              paddingRight: "clamp(24px, 5vw, 80px)",
-            }}
-          >
-            <span className="text-amber-600 text-lg shrink-0">⚠</span>
-            <p className="text-[15px] font-medium text-amber-900">
-              Je hebt al gesolliciteerd op deze vacature. We nemen zo snel mogelijk contact met je op.
-            </p>
-          </div>
-        </div>
-      )}
+      <ApplicationStatusToast
+        alreadyApplied={alreadyApplied}
+        success={linkedInSuccess}
+      />
 
       {/* Hero — mesh-gradient header that fades seamlessly to white.
           IMPORTANT: padding + max-w structure MUST mirror the body section
@@ -359,90 +348,72 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
               </div>
 
               {/* LinkedIn quick-apply CTA */}
-              {linkedInSuccess ? (
-                <div className="flex items-center gap-4 bg-emerald-50 p-8 rounded-2xl border border-emerald-200 mb-12">
-                  <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
-                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-[15px] font-semibold text-emerald-800">
-                      Bedankt! Je sollicitatie via LinkedIn is succesvol ontvangen.
-                    </p>
-                    <p className="text-[13px] text-emerald-600 mt-1">
-                      De werkgever neemt zo snel mogelijk contact met je op.
-                    </p>
-                  </div>
-                </div>
-              ) : (
+              <div
+                className="relative isolate overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between flex-wrap gap-6 p-8 md:p-10 rounded-2xl mb-12"
+                style={{
+                  background: `linear-gradient(135deg,
+                    #4B3BD6 0%,
+                    #4A5DE8 20%,
+                    #3E8BF5 45%,
+                    #22C6E0 75%,
+                    #7FE6F0 100%)`,
+                  boxShadow:
+                    "0 24px 48px -20px rgba(20, 24, 80, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.12) inset",
+                }}
+              >
+                {/* Layered radial mesh — vibrant purple → blue → cyan wash */}
                 <div
-                  className="relative isolate overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between flex-wrap gap-6 p-8 md:p-10 rounded-2xl mb-12"
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0"
                   style={{
-                    background: `linear-gradient(135deg,
-                      #4B3BD6 0%,
-                      #4A5DE8 20%,
-                      #3E8BF5 45%,
-                      #22C6E0 75%,
-                      #7FE6F0 100%)`,
-                    boxShadow:
-                      "0 24px 48px -20px rgba(20, 24, 80, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.12) inset",
+                    background: `
+                      radial-gradient(55% 70% at 8% 0%,
+                        rgba(215, 168, 255, 0.85) 0%,
+                        rgba(215, 168, 255, 0) 60%),
+                      radial-gradient(60% 80% at 95% 10%,
+                        rgba(42, 20, 230, 0.70) 0%,
+                        rgba(59, 44, 220, 0) 55%),
+                      radial-gradient(50% 65% at 75% 100%,
+                        rgba(64, 232, 255, 0.75) 0%,
+                        rgba(64, 232, 255, 0) 60%),
+                      radial-gradient(45% 55% at 0% 90%,
+                        rgba(178, 140, 255, 0.55) 0%,
+                        rgba(178, 140, 255, 0) 60%),
+                      radial-gradient(38% 50% at 45% 40%,
+                        rgba(255, 255, 255, 0.28) 0%,
+                        rgba(255, 255, 255, 0) 65%)
+                    `,
                   }}
-                >
-                  {/* Layered radial mesh — vibrant purple → blue → cyan wash */}
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute inset-0"
-                    style={{
-                      background: `
-                        radial-gradient(55% 70% at 8% 0%,
-                          rgba(215, 168, 255, 0.85) 0%,
-                          rgba(215, 168, 255, 0) 60%),
-                        radial-gradient(60% 80% at 95% 10%,
-                          rgba(42, 20, 230, 0.70) 0%,
-                          rgba(59, 44, 220, 0) 55%),
-                        radial-gradient(50% 65% at 75% 100%,
-                          rgba(64, 232, 255, 0.75) 0%,
-                          rgba(64, 232, 255, 0) 60%),
-                        radial-gradient(45% 55% at 0% 90%,
-                          rgba(178, 140, 255, 0.55) 0%,
-                          rgba(178, 140, 255, 0) 60%),
-                        radial-gradient(38% 50% at 45% 40%,
-                          rgba(255, 255, 255, 0.28) 0%,
-                          rgba(255, 255, 255, 0) 65%)
-                      `,
-                    }}
-                  />
+                />
 
-                  <div className="relative flex-1 min-w-0">
-                    <h3
-                      className="text-white font-bold tracking-[-0.02em] leading-[1.1]"
-                      style={{
-                        fontSize: "clamp(22px, 2.2vw, 30px)",
-                        textShadow: "0 1px 20px rgba(20, 24, 80, 0.28)",
-                      }}
-                    >
-                      Solliciteer nu
-                    </h3>
-                    <p
-                      className="mt-2 text-white/95 font-medium"
-                      style={{
-                        fontSize: "clamp(14px, 1vw, 15px)",
-                        textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)",
-                      }}
-                    >
-                      Geen zin in gedoe? Solliciteer binnen 1 minuut met je LinkedIn-profiel — geen CV nodig.
-                    </p>
-                  </div>
-                  <div className="relative shrink-0">
-                    <LinkedInQuickApply
-                      jobId={typedJob.id}
-                      jobSlug={typedJob.slug}
-                      alreadyApplied={alreadyApplied}
-                    />
-                  </div>
+                <div className="relative flex-1 min-w-0">
+                  <h3
+                    className="text-white font-bold tracking-[-0.02em] leading-[1.1]"
+                    style={{
+                      fontSize: "clamp(22px, 2.2vw, 30px)",
+                      textShadow: "0 1px 20px rgba(20, 24, 80, 0.28)",
+                    }}
+                  >
+                    Solliciteer nu
+                  </h3>
+                  <p
+                    className="mt-2 text-white/95 font-medium"
+                    style={{
+                      fontSize: "clamp(14px, 1vw, 15px)",
+                      textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)",
+                    }}
+                  >
+                    Geen zin in gedoe? Solliciteer binnen 1 minuut met je LinkedIn-profiel — geen CV nodig.
+                  </p>
                 </div>
-              )}
+                <div className="relative shrink-0">
+                  <LinkedInQuickApply
+                    jobId={typedJob.id}
+                    jobSlug={typedJob.slug}
+                    alreadyApplied={alreadyApplied}
+                  />
+                </div>
+              </div>
 
               {/* Description */}
               {typedJob.description && (
