@@ -83,10 +83,10 @@ export default async function HomePage() {
         style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
       >
         <div className="max-w-[1400px] mx-auto">
-          {/* Mobiel: titel + punt over volledige breedte, punt rechts = rechterrand kaarten */}
-          <div className="md:hidden flex items-baseline justify-between mb-8">
+          {/* Mobiel: titel over twee regels, dot in brand-kleur naast "vacatures" */}
+          <div className="md:hidden mb-10">
             <h2
-              className="whitespace-nowrap"
+              className="text-left"
               style={{
                 fontSize: "clamp(30px, 9.5vw, 42px)",
                 fontWeight: 700,
@@ -95,19 +95,10 @@ export default async function HomePage() {
                 color: "#0A0A0A",
               }}
             >
-              Nieuwste vacatures
+              Nieuwste<br className="block md:hidden" />
+              vacatures
+              <span style={{ color: "#587DFE" }}>.</span>
             </h2>
-            <span
-              aria-hidden="true"
-              style={{
-                fontSize: "clamp(30px, 9.5vw, 42px)",
-                fontWeight: 700,
-                lineHeight: 1.05,
-                color: "#587DFE",
-              }}
-            >
-              .
-            </span>
           </div>
 
           {/* Desktop: titel + knop naast elkaar */}

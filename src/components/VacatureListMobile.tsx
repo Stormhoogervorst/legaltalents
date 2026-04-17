@@ -31,7 +31,7 @@ export default function VacatureListMobile({ jobs, limit = 5 }: Props) {
   if (items.length === 0) return null;
 
   return (
-    <ul className="flex flex-col gap-2.5">
+    <ul className="flex flex-col gap-4">
       {items.map((job) => {
         const firmName = job.firms?.name ?? "";
         const logoUrl = job.firms?.logo_url ?? null;
@@ -42,7 +42,7 @@ export default function VacatureListMobile({ jobs, limit = 5 }: Props) {
           <li key={job.id}>
             <Link
               href={`/jobs/${job.slug}`}
-              className="flex gap-3 rounded-[14px] p-3 transition-all duration-200 active:scale-[0.99]"
+              className="flex gap-4 rounded-[16px] p-5 transition-all duration-200 active:scale-[0.99]"
               style={{
                 backgroundImage:
                   "linear-gradient(135deg, rgba(88,125,254,0.10) 0%, rgba(88,125,254,0.04) 45%, rgba(255,255,255,0.85) 100%)",
@@ -50,7 +50,7 @@ export default function VacatureListMobile({ jobs, limit = 5 }: Props) {
               }}
             >
               {/* Logo */}
-              <div className="w-12 h-12 rounded-[10px] bg-white border border-[#E2E5F0] flex items-center justify-center overflow-hidden p-1.5 shrink-0">
+              <div className="w-14 h-14 rounded-[12px] bg-white border border-[#E2E5F0] flex items-center justify-center overflow-hidden p-2 shrink-0">
                 {logoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -68,7 +68,7 @@ export default function VacatureListMobile({ jobs, limit = 5 }: Props) {
                 <h3
                   className="font-semibold leading-snug line-clamp-1"
                   style={{
-                    fontSize: "15px",
+                    fontSize: "16px",
                     letterSpacing: "-0.01em",
                     color: "#2C337A",
                   }}
@@ -77,18 +77,18 @@ export default function VacatureListMobile({ jobs, limit = 5 }: Props) {
                 </h3>
 
                 <div
-                  className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1"
-                  style={{ fontSize: "12px", color: "#8B91B8" }}
+                  className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2"
+                  style={{ fontSize: "13px", color: "#8B91B8" }}
                 >
                   {firmName && (
                     <span className="flex items-center gap-1 min-w-0">
-                      <Building2 className="h-3 w-3 shrink-0" />
+                      <Building2 className="h-3.5 w-3.5 shrink-0" />
                       <span className="truncate">{firmName}</span>
                     </span>
                   )}
                   {typeLabel && (
                     <span className="flex items-center gap-1">
-                      <Briefcase className="h-3 w-3 shrink-0" />
+                      <Briefcase className="h-3.5 w-3.5 shrink-0" />
                       <span>{typeLabel}</span>
                     </span>
                   )}
@@ -96,15 +96,15 @@ export default function VacatureListMobile({ jobs, limit = 5 }: Props) {
 
                 {job.location && (
                   <div
-                    className="flex items-center gap-1 mt-0.5"
-                    style={{ fontSize: "12px", color: "#8B91B8" }}
+                    className="flex items-center gap-1 mt-1"
+                    style={{ fontSize: "13px", color: "#8B91B8" }}
                   >
-                    <MapPin className="h-3 w-3 shrink-0" />
+                    <MapPin className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{job.location}</span>
                   </div>
                 )}
 
-                <div className="flex items-center justify-between gap-2 mt-1">
+                <div className="flex items-center justify-between gap-2 mt-3">
                   {relative && (
                     <span
                       style={{
@@ -117,7 +117,7 @@ export default function VacatureListMobile({ jobs, limit = 5 }: Props) {
                     </span>
                   )}
                   {job.practice_area && (
-                    <span className="bg-[#2C337A] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full leading-none truncate max-w-[55%]">
+                    <span className="bg-[#2C337A] text-white text-[11px] font-semibold px-2.5 py-1 rounded-full leading-none truncate max-w-[55%]">
                       {job.practice_area}
                     </span>
                   )}
