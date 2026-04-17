@@ -315,19 +315,21 @@ export default function LinkedInQuickApply({
         <RecaptchaCheckbox
           widgetKey={recaptchaWidgetKey}
           onChange={setRecaptchaToken}
-          className="flex justify-start mb-4"
+          className="flex justify-center mb-4"
         />
 
-        <button
-          onClick={handleSubmitApplication}
-          disabled={loading}
-          className="inline-flex items-center gap-3 rounded-full bg-slate-900 px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_28px_-10px_rgba(10,15,61,0.55)] ring-1 ring-white/10 transition-all duration-200 hover:bg-slate-800 hover:shadow-[0_18px_36px_-12px_rgba(10,15,61,0.65)] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-        >
-          {loading && <Loader2 className="h-5 w-5 animate-spin" />}
-          {loading ? "Versturen…" : "Sollicitatie afronden"}
-        </button>
+        <div className="flex justify-center">
+          <button
+            onClick={handleSubmitApplication}
+            disabled={loading}
+            className="inline-flex items-center gap-3 rounded-full bg-slate-900 px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_28px_-10px_rgba(10,15,61,0.55)] ring-1 ring-white/10 transition-all duration-200 hover:bg-slate-800 hover:shadow-[0_18px_36px_-12px_rgba(10,15,61,0.65)] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+          >
+            {loading && <Loader2 className="h-5 w-5 animate-spin" />}
+            {loading ? "Versturen…" : "Sollicitatie afronden"}
+          </button>
+        </div>
 
-        {error && <p className="text-[13px] text-red-500">{error}</p>}
+        {error && <p className="text-center text-[13px] text-red-500">{error}</p>}
       </div>
     );
   }

@@ -31,12 +31,11 @@ export function RecaptchaCheckbox({ widgetKey, onChange, className }: Props) {
 
   // Google's reCAPTCHA v2 "normal" widget renders a fixed 304px-wide iframe.
   // On narrow mobile screens (e.g. inside a card with padding) this exceeds
-  // the available inner width. We wrap it in a `w-full overflow-hidden` flex
-  // container so it always respects its parent's horizontal padding and
-  // stays left-aligned with surrounding inputs instead of bleeding into the
-  // right gutter.
+  // the available inner width. We wrap it in a `w-full overflow-hidden flex`
+  // container so it always respects its parent's horizontal padding. The
+  // caller controls alignment via `className` (e.g. `justify-center`).
   return (
-    <div className={`w-full overflow-hidden flex justify-start ${className ?? ""}`}>
+    <div className={`w-full overflow-hidden flex ${className ?? ""}`}>
       <ReCAPTCHA
         key={widgetKey}
         sitekey={siteKey}
