@@ -8,8 +8,6 @@ import {
   sanitizeLinkedInProfileUrl,
   isValidLinkedInInUrl,
 } from "@/lib/linkedin-profile-url";
-import { RecaptchaCheckbox } from "@/components/recaptcha/RecaptchaCheckbox";
-import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 const PENDING_APPLY_KEY = "pending_linkedin_apply";
 
@@ -43,14 +41,6 @@ export default function LinkedInQuickApply({
   });
 
   const hasCheckedAuth = useRef(false);
-  const {
-    widgetKey: recaptchaWidgetKey,
-    token: recaptchaToken,
-    setToken: setRecaptchaToken,
-    reset: resetRecaptcha,
-    siteKeyConfigured,
-  } = useRecaptcha();
-  const recaptchaRequired = siteKeyConfigured;
 
   // After OAuth return: detect pending apply + logged-in user → show form
   useEffect(() => {
@@ -163,10 +153,6 @@ export default function LinkedInQuickApply({
     }
 
     setLinkedinUrl(cleanUrl);
-    if (recaptchaRequired && !recaptchaToken) {
-      setError("Voltooi de reCAPTCHA-verificatie.");
-      return;
-    }
     setLoading(true);
     console.log("[LinkedInQuickApply] Submitting with cleanUrl:", cleanUrl, "phone:", trimmedPhone);
 
@@ -178,7 +164,6 @@ export default function LinkedInQuickApply({
           jobId,
           linkedinUrl: cleanUrl,
           phone: trimmedPhone,
-          recaptchaToken: recaptchaToken ?? undefined,
         }),
       });
 
@@ -194,7 +179,6 @@ export default function LinkedInQuickApply({
 
       if (!res.ok || !data.success) {
         setError(data.error ?? "Er is iets misgegaan bij het opslaan.");
-        resetRecaptcha();
         setLoading(false);
         return;
       }
@@ -206,7 +190,6 @@ export default function LinkedInQuickApply({
     } catch (err) {
       console.error("[LinkedInQuickApply] Submit error:", err);
       setError("Geen verbinding. Probeer het opnieuw.");
-      resetRecaptcha();
       setLoading(false);
     }
   }
@@ -254,8 +237,8 @@ export default function LinkedInQuickApply({
   // Post-OAuth: show LinkedIn URL + phone form (inside the blue block)
   if (showForm) {
     return (
-      <div className="w-full basis-full space-y-5 border-t border-blue-200 pt-6 mt-2">
-        <div>
+      <div className="w-full basis-full box-border space-y-5 border-t border-blue-200 pt-6 mt-2">
+        <div className="w-full">
           <label htmlFor="linkedin-profile-url" className="sr-only">
             LinkedIn profiel-URL
           </label>
@@ -290,7 +273,7 @@ export default function LinkedInQuickApply({
           </p>
         </div>
 
-        <div>
+        <div className="w-full">
           <label htmlFor="linkedin-phone" className="sr-only">
             Telefoonnummer
           </label>
@@ -311,12 +294,6 @@ export default function LinkedInQuickApply({
             <p className="mt-1.5 text-[13px] text-red-500">{phoneError}</p>
           )}
         </div>
-
-        <RecaptchaCheckbox
-          widgetKey={recaptchaWidgetKey}
-          onChange={setRecaptchaToken}
-          className="flex justify-center mb-4"
-        />
 
         <div className="flex justify-center">
           <button
