@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -31,13 +31,36 @@ export default function NavbarPublic({
   variant = "default",
 }: NavbarPublicProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
   const pathname = usePathname();
   const active = useNavActive(pathname);
 
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  // Track whether the user has scrolled past the hero area so the liquid-glass
+  // navbar can swap to a readable light appearance over white page content.
+  useEffect(() => {
+    if (variant !== "hero") return;
+    const onScroll = () => setScrolled(window.scrollY > 80);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [variant]);
+
+  // Guard scroll-dependent state with hasMounted so the first client render
+  // exactly matches the server-rendered HTML and avoids hydration errors.
+  const effectiveScrolled = hasMounted && scrolled;
+
+  // "Transparent over hero" state: hero variant AND still near the top.
+  const isHeroTop = variant === "hero" && !effectiveScrolled;
+
   const linkClass = (key: keyof ReturnType<typeof useNavActive>) =>
     cn(
-      "inline-flex items-center text-[14px] font-medium transition-colors duration-200",
-      variant === "hero"
+      "inline-flex items-center text-[14px] font-medium transition-colors duration-300",
+      isHeroTop
         ? active[key]
           ? "text-white"
           : "text-white/70 hover:text-white"
@@ -46,21 +69,31 @@ export default function NavbarPublic({
           : "text-[#5A6094] hover:text-[#2C337A]",
     );
 
-  const menuIconClass =
-    variant === "hero"
-      ? "text-white/80 hover:text-white"
-      : "text-[#5A6094] hover:text-[#2C337A]";
+  const menuIconClass = isHeroTop
+    ? "text-white/80 hover:text-white"
+    : "text-[#5A6094] hover:text-[#2C337A]";
 
   return (
     <nav
       className={cn(
-        "sticky top-0 z-50",
+        "sticky top-0 z-50 transition-[background-color,border-color,box-shadow] duration-300",
         variant === "hero"
-          ? "bg-transparent"
+          ? effectiveScrolled
+            ? "bg-white/80 backdrop-blur-[14px] backdrop-saturate-150 border-b border-[#E2E5F0]/70 shadow-[0_1px_0_0_rgba(44,51,122,0.04)]"
+            : "bg-white/10 backdrop-blur-[12px] backdrop-saturate-150 border-b border-white/10 shadow-[0_1px_0_0_rgba(255,255,255,0.08)_inset]"
           : variant === "overlay"
             ? "bg-white/90 backdrop-blur-sm border-b border-[#E2E5F0]"
             : "bg-white border-b border-[#E2E5F0]",
       )}
+      style={
+        variant === "hero"
+          ? {
+              WebkitBackdropFilter: effectiveScrolled
+                ? "blur(14px) saturate(150%)"
+                : "blur(12px) saturate(150%)",
+            }
+          : undefined
+      }
     >
       <div
         style={{
@@ -105,10 +138,10 @@ export default function NavbarPublic({
               <Link
                 href="/register"
                 className={cn(
-                  "hidden md:inline-flex items-center rounded-full px-5 py-2 text-[14px] font-medium transition-all duration-200 hover:scale-[1.03]",
-                  variant === "hero"
-                    ? "bg-white text-[#2C337A]"
-                    : "bg-[#587DFE] text-white",
+                  "hidden md:inline-flex items-center rounded-full px-5 py-2 text-[14px] font-medium transition-[background-color,color,transform] duration-300 hover:scale-[1.03]",
+                  isHeroTop
+                    ? "bg-white text-[#2C337A] hover:bg-white/90"
+                    : "bg-[#587DFE] text-white hover:bg-[#4A6CE6]",
                 )}
               >
                 Werkgever aanmelden
@@ -131,7 +164,7 @@ export default function NavbarPublic({
         <div
           className={cn(
             "md:hidden border-t py-5",
-            variant === "hero"
+            isHeroTop
               ? "border-white/15 bg-[#2C337A]/95 backdrop-blur-sm"
               : "border-[#E2E5F0] bg-white",
           )}
@@ -178,7 +211,7 @@ export default function NavbarPublic({
             >
               Recruitment
             </Link>
-            <div className={cn("pt-3 mt-1 border-t", variant === "hero" ? "border-white/15" : "border-[#E2E5F0]")}>
+            <div className={cn("pt-3 mt-1 border-t", isHeroTop ? "border-white/15" : "border-[#E2E5F0]")}>
               <Link
                 href="/register"
                 className="inline-flex items-center rounded-full bg-[#587DFE] px-5 py-2.5 text-[15px] font-medium text-white"

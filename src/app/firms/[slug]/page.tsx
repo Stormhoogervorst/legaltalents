@@ -65,174 +65,157 @@ export default async function FirmPage({ params }: Props) {
   const jobList = (jobs ?? []) as Job[];
   const initials = firmData.name.slice(0, 2).toUpperCase();
 
+  // Subtitle bits for the hero — location and (optionally) practice areas
+  const subtitleParts: string[] = [];
+  if (firmData.location) subtitleParts.push(firmData.location);
+  if (firmData.practice_areas && firmData.practice_areas.length > 0) {
+    subtitleParts.push(firmData.practice_areas.slice(0, 3).join(", "));
+  }
+
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <NavbarPublic />
+    <div className="relative min-h-screen flex flex-col bg-white">
+      <NavbarPublic variant="hero" />
 
-      {/* Back link */}
-      <div
-        style={{
-          paddingLeft: "clamp(24px, 5vw, 80px)",
-          paddingRight: "clamp(24px, 5vw, 80px)",
-          paddingTop: "40px",
-        }}
-      >
-        <div className="max-w-[1400px] mx-auto">
-          <Link
-            href="/firms"
-            className="inline-flex items-center gap-1 text-[13px] font-medium tracking-wide transition-colors duration-200 hover:opacity-70"
-            style={{ color: "#999999" }}
+      {/* Hero — mesh-gradient header that fades seamlessly to white */}
+      <div className="-mt-[4.25rem]">
+        <section
+          className="relative isolate overflow-hidden"
+          style={{
+            background: `linear-gradient(135deg,
+              #4B3BD6 0%,
+              #5668E8 22%,
+              #7A8BF5 42%,
+              #A8B6FF 62%,
+              #C9D4FF 82%,
+              #FFFFFF 100%)`,
+          }}
+        >
+          {/* Layered radial gradients — soft "liquid" purple → blue wash */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `
+                radial-gradient(60% 55% at 50% 40%,
+                  rgba(178, 140, 255, 0.65) 0%,
+                  rgba(140, 120, 255, 0.30) 35%,
+                  rgba(120, 150, 255, 0) 70%),
+                radial-gradient(50% 60% at 50% 60%,
+                  rgba(255, 255, 255, 0.45) 0%,
+                  rgba(255, 255, 255, 0) 60%),
+                radial-gradient(55% 70% at 96% 6%,
+                  rgba(42, 20, 230, 0.80) 0%,
+                  rgba(59, 44, 220, 0.35) 22%,
+                  rgba(88, 125, 254, 0) 60%),
+                radial-gradient(32% 38% at 2% 0%,
+                  rgba(215, 168, 255, 0.85) 0%,
+                  rgba(215, 168, 255, 0) 65%),
+                radial-gradient(38% 45% at 10% 55%,
+                  rgba(255, 255, 255, 0.55) 0%,
+                  rgba(255, 255, 255, 0) 65%)
+              `,
+            }}
+          />
+
+          {/* Seamless fade to pure white at the bottom */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-48 md:h-64"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 55%, #FFFFFF 100%)",
+            }}
+          />
+
+          <div
+            className="max-w-[1400px] mx-auto relative"
+            style={{
+              padding:
+                "calc(4.25rem + clamp(32px, 4vh, 56px)) clamp(24px, 5vw, 80px) clamp(80px, 12vh, 160px)",
+            }}
           >
-            ← Alle werkgevers
-          </Link>
-        </div>
-      </div>
+            {/* Breadcrumb / back link */}
+            <Link
+              href="/firms"
+              className="inline-flex items-center gap-2 text-[14px] font-medium text-white/80 hover:text-white transition-colors duration-200"
+              style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
+            >
+              ← Alle werkgevers
+            </Link>
 
-      {/* Firm header — split layout */}
-      <section
-        style={{
-          paddingTop: "clamp(40px, 5vh, 60px)",
-          paddingBottom: "clamp(60px, 8vh, 100px)",
-          paddingLeft: "clamp(24px, 5vw, 80px)",
-          paddingRight: "clamp(24px, 5vw, 80px)",
-        }}
-      >
-        <div className="max-w-[1400px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-            {/* Left column — firm identity */}
-            <div className="lg:col-span-5">
-              <div className="flex items-start gap-5 mb-6">
-                <div className="w-16 h-16 rounded-[4px] bg-[#F5F5F5] flex items-center justify-center shrink-0 overflow-hidden">
-                  {firmData.logo_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={firmData.logo_url}
-                      alt={firmData.name}
-                      className="w-full h-full object-contain p-2.5"
-                    />
-                  ) : (
-                    <span
-                      className="font-bold text-xl"
-                      style={{ color: "#587DFE" }}
-                    >
-                      {initials}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center h-16">
-                  <h1
-                    className="font-bold"
-                    style={{
-                      fontSize: "clamp(28px, 3vw, 40px)",
-                      lineHeight: 1.1,
-                      letterSpacing: "-0.025em",
-                      color: "#0A0A0A",
-                    }}
-                  >
-                    {firmData.name}
-                  </h1>
-                </div>
+            <div className="mt-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-10">
+              {/* Firm logo — liquid glass */}
+              <div
+                className="w-16 h-16 md:w-20 md:h-20 rounded-[4px] flex items-center justify-center shrink-0 overflow-hidden"
+                style={{
+                  background: "rgba(255, 255, 255, 0.9)",
+                  backdropFilter: "blur(6px)",
+                  WebkitBackdropFilter: "blur(6px)",
+                  boxShadow:
+                    "0 8px 24px -12px rgba(20, 24, 80, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.4) inset",
+                }}
+              >
+                {firmData.logo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={firmData.logo_url}
+                    alt={firmData.name}
+                    className="w-12 h-12 md:w-14 md:h-14 object-contain"
+                  />
+                ) : (
+                  <span className="text-[15px] font-semibold text-[#2C337A]">
+                    {initials}
+                  </span>
+                )}
               </div>
 
-              {/* Meta info */}
-              <div className="space-y-4 mt-8">
-                {firmData.location && (
-                  <div className="border-b border-[#E5E5E5] pb-4">
-                    <p
-                      className="text-[13px] font-medium uppercase tracking-[0.02em] mb-1"
-                      style={{ color: "#999999" }}
-                    >
-                      Locatie
-                    </p>
-                    <p
-                      className="text-[15px]"
-                      style={{ color: "#0A0A0A" }}
-                    >
-                      {firmData.location}
-                    </p>
+              <div className="flex-1 min-w-0">
+                {/* Firm name */}
+                <h1
+                  className="font-bold tracking-[-0.03em] leading-[1.05]"
+                  style={{
+                    fontSize: "clamp(36px, 4.8vw, 68px)",
+                    color: "#FFFFFF",
+                    textShadow: "0 1px 24px rgba(20, 24, 80, 0.25)",
+                  }}
+                >
+                  {firmData.name}
+                </h1>
+
+                {/* Subtitle — location · practice areas */}
+                {subtitleParts.length > 0 && (
+                  <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2">
+                    {subtitleParts.map((part, idx) => (
+                      <span
+                        key={`${part}-${idx}`}
+                        className="inline-flex items-center gap-3 text-[15px] font-medium text-white/90"
+                        style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
+                      >
+                        {idx > 0 && <span className="text-white/50">·</span>}
+                        {part}
+                      </span>
+                    ))}
                   </div>
                 )}
-
-                {firmData.team_size && (
-                  <div className="border-b border-[#E5E5E5] pb-4">
-                    <p
-                      className="text-[13px] font-medium uppercase tracking-[0.02em] mb-1"
-                      style={{ color: "#999999" }}
-                    >
-                      Teamgrootte
-                    </p>
-                    <p
-                      className="text-[15px]"
-                      style={{ color: "#0A0A0A" }}
-                    >
-                      {firmData.team_size} medewerkers
-                    </p>
-                  </div>
-                )}
-
-                {firmData.salary_indication && (
-                  <div className="border-b border-[#E5E5E5] pb-4">
-                    <p
-                      className="text-[13px] font-medium uppercase tracking-[0.02em] mb-1"
-                      style={{ color: "#999999" }}
-                    >
-                      Salarisindicatie
-                    </p>
-                    <p
-                      className="text-[15px]"
-                      style={{ color: "#0A0A0A" }}
-                    >
-                      {firmData.salary_indication}
-                    </p>
-                  </div>
-                )}
-
-                {firmData.practice_areas && firmData.practice_areas.length > 0 && (
-                  <div className="border-b border-[#E5E5E5] pb-4">
-                    <p
-                      className="text-[13px] font-medium uppercase tracking-[0.02em] mb-1"
-                      style={{ color: "#999999" }}
-                    >
-                      Rechtsgebieden
-                    </p>
-                    <p
-                      className="text-[15px] leading-relaxed"
-                      style={{ color: "#0A0A0A" }}
-                    >
-                      {firmData.practice_areas.join(", ")}
-                    </p>
-                  </div>
-                )}
-
-                {/* Links */}
-                <div className="flex flex-wrap gap-6 pt-2">
-                  {firmData.website_url && (
-                    <a
-                      href={firmData.website_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-primary"
-                    >
-                      Website
-                    </a>
-                  )}
-                  {firmData.linkedin_url && (
-                    <a
-                      href={firmData.linkedin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-primary"
-                    >
-                      LinkedIn
-                    </a>
-                  )}
-                </div>
               </div>
             </div>
+          </div>
+        </section>
+      </div>
 
-            {/* Right column — about / description */}
-            <div className="lg:col-span-7">
+      {/* Main content: description + meta sidebar on clean white */}
+      <section
+        className="bg-white"
+        style={{
+          paddingLeft: "clamp(24px, 5vw, 80px)",
+          paddingRight: "clamp(24px, 5vw, 80px)",
+          paddingBottom: "clamp(60px, 8vh, 100px)",
+        }}
+      >
+        <div className="max-w-[1400px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-16 gap-y-16">
+            {/* Left column — description */}
+            <div className="lg:col-span-8">
               {firmData.description && (
                 <div className="mb-16">
                   <h2
@@ -287,6 +270,95 @@ export default async function FirmPage({ params }: Props) {
                 </div>
               )}
             </div>
+
+            {/* Right column — meta sidebar */}
+            <aside className="lg:col-span-4">
+              <div className="lg:sticky lg:top-24 space-y-4">
+                {firmData.location && (
+                  <div className="border-b border-[#E5E5E5] pb-4">
+                    <p
+                      className="text-[13px] font-medium uppercase tracking-[0.02em] mb-1"
+                      style={{ color: "#999999" }}
+                    >
+                      Locatie
+                    </p>
+                    <p className="text-[15px]" style={{ color: "#0A0A0A" }}>
+                      {firmData.location}
+                    </p>
+                  </div>
+                )}
+
+                {firmData.team_size && (
+                  <div className="border-b border-[#E5E5E5] pb-4">
+                    <p
+                      className="text-[13px] font-medium uppercase tracking-[0.02em] mb-1"
+                      style={{ color: "#999999" }}
+                    >
+                      Teamgrootte
+                    </p>
+                    <p className="text-[15px]" style={{ color: "#0A0A0A" }}>
+                      {firmData.team_size} medewerkers
+                    </p>
+                  </div>
+                )}
+
+                {firmData.salary_indication && (
+                  <div className="border-b border-[#E5E5E5] pb-4">
+                    <p
+                      className="text-[13px] font-medium uppercase tracking-[0.02em] mb-1"
+                      style={{ color: "#999999" }}
+                    >
+                      Salarisindicatie
+                    </p>
+                    <p className="text-[15px]" style={{ color: "#0A0A0A" }}>
+                      {firmData.salary_indication}
+                    </p>
+                  </div>
+                )}
+
+                {firmData.practice_areas && firmData.practice_areas.length > 0 && (
+                  <div className="border-b border-[#E5E5E5] pb-4">
+                    <p
+                      className="text-[13px] font-medium uppercase tracking-[0.02em] mb-1"
+                      style={{ color: "#999999" }}
+                    >
+                      Rechtsgebieden
+                    </p>
+                    <p
+                      className="text-[15px] leading-relaxed"
+                      style={{ color: "#0A0A0A" }}
+                    >
+                      {firmData.practice_areas.join(", ")}
+                    </p>
+                  </div>
+                )}
+
+                {(firmData.website_url || firmData.linkedin_url) && (
+                  <div className="flex flex-wrap gap-3 pt-2">
+                    {firmData.website_url && (
+                      <a
+                        href={firmData.website_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-primary"
+                      >
+                        Website
+                      </a>
+                    )}
+                    {firmData.linkedin_url && (
+                      <a
+                        href={firmData.linkedin_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-primary"
+                      >
+                        LinkedIn
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            </aside>
           </div>
         </div>
       </section>
@@ -294,11 +366,10 @@ export default async function FirmPage({ params }: Props) {
       {/* Vacancies section */}
       <section
         style={{
-          paddingTop: "clamp(60px, 8vh, 100px)",
+          paddingTop: "clamp(40px, 6vh, 80px)",
           paddingBottom: "clamp(100px, 12vh, 180px)",
           paddingLeft: "clamp(24px, 5vw, 80px)",
           paddingRight: "clamp(24px, 5vw, 80px)",
-          borderTop: "1px solid #E5E5E5",
         }}
       >
         <div className="max-w-[1400px] mx-auto">
@@ -335,7 +406,7 @@ export default async function FirmPage({ params }: Props) {
               ))}
             </div>
           ) : (
-            <div className="mt-10 pt-10 border-t border-[#E5E5E5]">
+            <div className="mt-10">
               <p
                 className="leading-relaxed"
                 style={{

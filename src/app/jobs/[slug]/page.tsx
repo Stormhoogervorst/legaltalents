@@ -174,12 +174,12 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
   if (typedJob.hours_per_week) metaItems.push({ label: "Uren per week", value: `${typedJob.hours_per_week}` });
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="relative min-h-screen flex flex-col bg-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingJsonLd) }}
       />
-      <NavbarPublic />
+      <NavbarPublic variant="hero" />
 
       {alreadyApplied && (
         <div className="bg-amber-50 border-b border-amber-200">
@@ -198,86 +198,142 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
         </div>
       )}
 
-      {/* Back link */}
-      <div
-        style={{
-          paddingLeft: "clamp(24px, 5vw, 80px)",
-          paddingRight: "clamp(24px, 5vw, 80px)",
-          paddingTop: "32px",
-        }}
-      >
-        <div className="max-w-[1400px] mx-auto">
-          <Link
-            href="/jobs"
-            className="inline-flex items-center gap-2 text-[14px] text-[#999999] hover:text-[#0A0A0A] transition-colors duration-200"
+      {/* Hero — mesh-gradient header that fades seamlessly to white */}
+      <div className="-mt-[4.25rem]">
+        <section
+          className="relative isolate overflow-hidden"
+          style={{
+            background: `linear-gradient(135deg,
+              #4B3BD6 0%,
+              #5668E8 22%,
+              #7A8BF5 42%,
+              #A8B6FF 62%,
+              #C9D4FF 82%,
+              #FFFFFF 100%)`,
+          }}
+        >
+          {/* Layered radial gradients — soft "liquid" purple → blue wash */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `
+                radial-gradient(60% 55% at 50% 40%,
+                  rgba(178, 140, 255, 0.65) 0%,
+                  rgba(140, 120, 255, 0.30) 35%,
+                  rgba(120, 150, 255, 0) 70%),
+                radial-gradient(50% 60% at 50% 60%,
+                  rgba(255, 255, 255, 0.45) 0%,
+                  rgba(255, 255, 255, 0) 60%),
+                radial-gradient(55% 70% at 96% 6%,
+                  rgba(42, 20, 230, 0.80) 0%,
+                  rgba(59, 44, 220, 0.35) 22%,
+                  rgba(88, 125, 254, 0) 60%),
+                radial-gradient(32% 38% at 2% 0%,
+                  rgba(215, 168, 255, 0.85) 0%,
+                  rgba(215, 168, 255, 0) 65%),
+                radial-gradient(38% 45% at 10% 55%,
+                  rgba(255, 255, 255, 0.55) 0%,
+                  rgba(255, 255, 255, 0) 65%)
+              `,
+            }}
+          />
+
+          {/* Seamless fade to pure white at the bottom */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-48 md:h-64"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 55%, #FFFFFF 100%)",
+            }}
+          />
+
+          <div
+            className="max-w-[1400px] mx-auto relative"
+            style={{
+              padding:
+                "calc(4.25rem + clamp(32px, 4vh, 56px)) clamp(24px, 5vw, 80px) clamp(80px, 12vh, 160px)",
+            }}
           >
-            ← Alle vacatures
-          </Link>
-        </div>
-      </div>
+            {/* Breadcrumb / back link */}
+            <Link
+              href="/jobs"
+              className="inline-flex items-center gap-2 text-[14px] font-medium text-white/80 hover:text-white transition-colors duration-200"
+              style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
+            >
+              ← Alle vacatures
+            </Link>
 
-      {/* Hero header */}
-      <section
-        style={{
-          paddingLeft: "clamp(24px, 5vw, 80px)",
-          paddingRight: "clamp(24px, 5vw, 80px)",
-          paddingTop: "clamp(40px, 5vh, 64px)",
-          paddingBottom: "clamp(40px, 5vh, 64px)",
-        }}
-      >
-        <div className="max-w-[1400px] mx-auto">
-          <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-10">
-            {/* Firm logo */}
-            {firm && (
-              <Link
-                href={firm.slug ? `/firms/${firm.slug}` : "#"}
-                className="w-16 h-16 md:w-20 md:h-20 rounded-[4px] bg-[#F5F5F5] flex items-center justify-center shrink-0 overflow-hidden transition-opacity duration-200 hover:opacity-80"
-              >
-                {firm.logo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={firm.logo_url}
-                    alt={firm.name}
-                    className="w-12 h-12 md:w-14 md:h-14 object-contain"
-                  />
-                ) : (
-                  <span className="text-[15px] font-semibold text-[#999999]">
-                    {firm.name?.slice(0, 2).toUpperCase() ?? "??"}
-                  </span>
-                )}
-              </Link>
-            )}
+            <div className="mt-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-10">
+              {/* Firm logo */}
+              {firm && (
+                <Link
+                  href={firm.slug ? `/firms/${firm.slug}` : "#"}
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-[4px] flex items-center justify-center shrink-0 overflow-hidden transition-opacity duration-200 hover:opacity-90"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.9)",
+                    backdropFilter: "blur(6px)",
+                    WebkitBackdropFilter: "blur(6px)",
+                    boxShadow:
+                      "0 8px 24px -12px rgba(20, 24, 80, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.4) inset",
+                  }}
+                >
+                  {firm.logo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={firm.logo_url}
+                      alt={firm.name}
+                      className="w-12 h-12 md:w-14 md:h-14 object-contain"
+                    />
+                  ) : (
+                    <span className="text-[15px] font-semibold text-[#2C337A]">
+                      {firm.name?.slice(0, 2).toUpperCase() ?? "??"}
+                    </span>
+                  )}
+                </Link>
+              )}
 
-            <div className="flex-1 min-w-0">
-              {/* Title */}
-              <h1
-                className="font-bold tracking-[-0.025em] leading-[1.1] text-[#0A0A0A]"
-                style={{ fontSize: "clamp(36px, 4.5vw, 64px)" }}
-              >
-                {typedJob.title}
-              </h1>
+              <div className="flex-1 min-w-0">
+                {/* Title */}
+                <h1
+                  className="font-bold tracking-[-0.03em] leading-[1.05]"
+                  style={{
+                    fontSize: "clamp(36px, 4.8vw, 68px)",
+                    color: "#FFFFFF",
+                    textShadow: "0 1px 24px rgba(20, 24, 80, 0.25)",
+                  }}
+                >
+                  {typedJob.title}
+                </h1>
 
-              {/* Firm name + date */}
-              <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">
-                {firm?.name && (
-                  <Link
-                    href={firm.slug ? `/firms/${firm.slug}` : "#"}
-                    className="text-[15px] font-medium text-[#0A0A0A] border-b border-[#E5E5E5] hover:border-[#587DFE] transition-colors duration-200 pb-0.5"
+                {/* Firm name + date */}
+                <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2">
+                  {firm?.name && (
+                    <Link
+                      href={firm.slug ? `/firms/${firm.slug}` : "#"}
+                      className="text-[15px] font-semibold text-white border-b border-white/40 hover:border-white transition-colors duration-200 pb-0.5"
+                      style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
+                    >
+                      {firm.name}
+                    </Link>
+                  )}
+                  <span
+                    className="text-[14px] text-white/80"
+                    style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
                   >
-                    {firm.name}
-                  </Link>
-                )}
-                <span className="text-[14px] text-[#999999]">
-                  Geplaatst {postedDate}
-                </span>
+                    Geplaatst {postedDate}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* Main content: asymmetric split */}
       <section
+        className="bg-white"
         style={{
           paddingLeft: "clamp(24px, 5vw, 80px)",
           paddingRight: "clamp(24px, 5vw, 80px)",
@@ -285,9 +341,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
         }}
       >
         <div className="max-w-[1400px] mx-auto">
-          <div className="border-t border-[#E5E5E5]" />
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-16 gap-y-16 pt-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-16 gap-y-16">
             {/* Left column: details (8/12 ~ 65%) */}
             <div className="lg:col-span-8">
               {/* Meta information */}
@@ -322,17 +376,71 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between flex-wrap gap-6 bg-[#f0f4ff] p-8 rounded-2xl border border-blue-100 mb-12">
-                  <p className="text-[15px] font-semibold text-[#0A0A0A]">
-                    {alreadyApplied
-                      ? "Je sollicitatie is ontvangen."
-                      : "Geen zin in gedoe? Solliciteer binnen 1 minuut."}
-                  </p>
-                  <LinkedInQuickApply
-                    jobId={typedJob.id}
-                    jobSlug={typedJob.slug}
-                    alreadyApplied={alreadyApplied}
+                <div
+                  className="relative isolate overflow-hidden flex flex-col md:flex-row md:items-center md:justify-between flex-wrap gap-6 p-8 md:p-10 rounded-2xl mb-12"
+                  style={{
+                    background: `linear-gradient(135deg,
+                      #4B3BD6 0%,
+                      #4A5DE8 20%,
+                      #3E8BF5 45%,
+                      #22C6E0 75%,
+                      #7FE6F0 100%)`,
+                    boxShadow:
+                      "0 24px 48px -20px rgba(20, 24, 80, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.12) inset",
+                  }}
+                >
+                  {/* Layered radial mesh — vibrant purple → blue → cyan wash */}
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      background: `
+                        radial-gradient(55% 70% at 8% 0%,
+                          rgba(215, 168, 255, 0.85) 0%,
+                          rgba(215, 168, 255, 0) 60%),
+                        radial-gradient(60% 80% at 95% 10%,
+                          rgba(42, 20, 230, 0.70) 0%,
+                          rgba(59, 44, 220, 0) 55%),
+                        radial-gradient(50% 65% at 75% 100%,
+                          rgba(64, 232, 255, 0.75) 0%,
+                          rgba(64, 232, 255, 0) 60%),
+                        radial-gradient(45% 55% at 0% 90%,
+                          rgba(178, 140, 255, 0.55) 0%,
+                          rgba(178, 140, 255, 0) 60%),
+                        radial-gradient(38% 50% at 45% 40%,
+                          rgba(255, 255, 255, 0.28) 0%,
+                          rgba(255, 255, 255, 0) 65%)
+                      `,
+                    }}
                   />
+
+                  <div className="relative flex-1 min-w-0">
+                    <h3
+                      className="text-white font-bold tracking-[-0.02em] leading-[1.1]"
+                      style={{
+                        fontSize: "clamp(22px, 2.2vw, 30px)",
+                        textShadow: "0 1px 20px rgba(20, 24, 80, 0.28)",
+                      }}
+                    >
+                      Solliciteer nu
+                    </h3>
+                    <p
+                      className="mt-2 text-white/95 font-medium"
+                      style={{
+                        fontSize: "clamp(14px, 1vw, 15px)",
+                        textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)",
+                      }}
+                    >
+                      Geen zin in gedoe? Solliciteer binnen 1 minuut met je LinkedIn-profiel — geen CV nodig.
+                    </p>
+                  </div>
+                  <div className="relative shrink-0">
+                    <LinkedInQuickApply
+                      jobId={typedJob.id}
+                      jobSlug={typedJob.slug}
+                      alreadyApplied={alreadyApplied}
+                    />
+                  </div>
                 </div>
               )}
 

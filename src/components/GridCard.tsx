@@ -29,7 +29,12 @@ export default function GridCard({
   return (
     <Link
       href={href}
-      className="group flex flex-col h-full bg-[#F5F7FF] rounded-[16px] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(88,125,254,0.12)]"
+      className="group flex flex-col h-full rounded-[16px] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(88,125,254,0.12)]"
+      style={{
+        backgroundImage:
+          "linear-gradient(135deg, rgba(88,125,254,0.10) 0%, rgba(88,125,254,0.04) 45%, rgba(255,255,255,0.85) 100%)",
+        backgroundColor: "#F5F7FF",
+      }}
     >
       {/* Logo + top-right label */}
       <div className="flex items-start justify-between mb-5">
@@ -96,7 +101,7 @@ export default function GridCard({
           {pills.map((pill) => (
             <span
               key={pill}
-              className="bg-[#668dff] text-white text-[12px] font-semibold px-3 py-1 rounded-full"
+              className="bg-[#2C337A] text-white text-[12px] font-semibold px-3 py-1 rounded-full"
             >
               {pill}
             </span>

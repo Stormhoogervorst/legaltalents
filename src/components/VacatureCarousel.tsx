@@ -22,21 +22,36 @@ export default function VacatureCarousel({ jobs }: Props) {
   if (displayJobs.length === 0) return null;
 
   return (
-    <Swiper
-      modules={[Autoplay]}
-      autoplay={{ delay: 3000, disableOnInteraction: false, pauseOnMouseEnter: true }}
-      loop={true}
-      breakpoints={{
-        0:    { slidesPerView: 1, spaceBetween: 24 },
-        640:  { slidesPerView: 2, spaceBetween: 24 },
-        1024: { slidesPerView: 3, spaceBetween: 32 },
+    // Wrapper clips only horizontally so hover shadow/scale on cards can
+    // render fully above and below without being cut off. Vertical padding
+    // (compensated by negative margin) reserves room for the shadow.
+    <div
+      style={{
+        overflowX: "clip",
+        overflowY: "visible",
+        paddingTop: 24,
+        paddingBottom: 24,
+        marginTop: -24,
+        marginBottom: -24,
       }}
     >
-      {displayJobs.map((job) => (
-        <SwiperSlide key={job.id} style={{ height: "auto" }}>
-          <VacatureCard job={job} />
-        </SwiperSlide>
-      ))}
-    </Swiper>
+      <Swiper
+        modules={[Autoplay]}
+        autoplay={{ delay: 3000, disableOnInteraction: false, pauseOnMouseEnter: true }}
+        loop={true}
+        breakpoints={{
+          0:    { slidesPerView: 1, spaceBetween: 24 },
+          640:  { slidesPerView: 2, spaceBetween: 24 },
+          1024: { slidesPerView: 3, spaceBetween: 32 },
+        }}
+        className="!overflow-visible"
+      >
+        {displayJobs.map((job) => (
+          <SwiperSlide key={job.id} style={{ height: "auto" }}>
+            <VacatureCard job={job} />
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </div>
   );
 }

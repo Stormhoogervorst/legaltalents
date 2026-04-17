@@ -125,82 +125,141 @@ export default async function BlogArticlePage({ params }: Props) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="relative min-h-screen flex flex-col bg-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
-      <NavbarPublic />
+      <NavbarPublic variant="hero" />
 
-      {/* Article header */}
-      <section
-        style={{
-          paddingLeft: "clamp(24px, 5vw, 80px)",
-          paddingRight: "clamp(24px, 5vw, 80px)",
-          paddingTop: "clamp(40px, 5vh, 60px)",
-        }}
-      >
-        <div className="max-w-[1400px] mx-auto">
-          {/* Breadcrumb */}
-          <Link
-            href="/kennisbank"
-            className="inline-flex items-center gap-1 text-[14px] font-medium text-[#999] hover:text-[#0A0A0A] transition-colors duration-200 group"
-          >
-            <span className="group-hover:-translate-x-0.5 transition-transform duration-200">
-              ←
-            </span>
-            Kennisbank
-          </Link>
-
-          <div className="mt-8 mb-6 flex items-center gap-3">
-            <span className="text-[13px] font-medium tracking-[0.02em] text-[#999]">
-              {categoryLabels[blog.category] ?? blog.category}
-            </span>
-            <span className="text-[#E5E5E5]">·</span>
-            <time className="text-[13px] font-medium text-[#999]">
-              {new Date(blog.created_at).toLocaleDateString("nl-NL", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </time>
-          </div>
-
-          <h1
-            className="font-bold text-[#0A0A0A] leading-[1.1] max-w-[900px]"
+      {/* Hero — vivid mesh gradient header for the article, fading to white */}
+      <div className="-mt-[4.25rem]">
+        <section
+          className="relative isolate overflow-hidden"
+          style={{
+            background: `linear-gradient(135deg,
+              #4B3BD6 0%,
+              #5668E8 22%,
+              #7A8BF5 42%,
+              #A8B6FF 62%,
+              #C9D4FF 82%,
+              #FFFFFF 100%)`,
+          }}
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
             style={{
-              fontSize: "clamp(32px, 4.5vw, 56px)",
-              letterSpacing: "-0.025em",
+              background: `
+                radial-gradient(60% 55% at 50% 40%,
+                  rgba(178, 140, 255, 0.65) 0%,
+                  rgba(140, 120, 255, 0.30) 35%,
+                  rgba(120, 150, 255, 0) 70%),
+                radial-gradient(50% 60% at 50% 60%,
+                  rgba(255, 255, 255, 0.45) 0%,
+                  rgba(255, 255, 255, 0) 60%),
+                radial-gradient(55% 70% at 96% 6%,
+                  rgba(42, 20, 230, 0.80) 0%,
+                  rgba(59, 44, 220, 0.35) 22%,
+                  rgba(88, 125, 254, 0) 60%),
+                radial-gradient(32% 38% at 2% 0%,
+                  rgba(215, 168, 255, 0.85) 0%,
+                  rgba(215, 168, 255, 0) 65%),
+                radial-gradient(38% 45% at 10% 55%,
+                  rgba(255, 255, 255, 0.55) 0%,
+                  rgba(255, 255, 255, 0) 65%)
+              `,
+            }}
+          />
+
+          {/* Seamless fade to pure white at the bottom */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-40 md:h-56"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 55%, #FFFFFF 100%)",
+            }}
+          />
+
+          <div
+            className="max-w-[1400px] mx-auto relative"
+            style={{
+              padding:
+                "calc(4.25rem + clamp(48px, 6vh, 96px)) clamp(24px, 5vw, 80px) clamp(72px, 9vh, 120px)",
             }}
           >
-            {blog.title}
-          </h1>
+            {/* Breadcrumb */}
+            <Link
+              href="/kennisbank"
+              className="inline-flex items-center gap-1.5 text-[14px] font-medium text-white/85 hover:text-white transition-colors duration-200 group"
+              style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.25)" }}
+            >
+              <span className="group-hover:-translate-x-0.5 transition-transform duration-200">
+                ←
+              </span>
+              Kennisbank
+            </Link>
 
-          {firm && (
-            <div className="mt-6 flex items-center gap-3">
-              {firm.logo_url && (
-                <div className="w-8 h-8 rounded-[8px] bg-[#F5F5F5] flex items-center justify-center overflow-hidden shrink-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={firm.logo_url}
-                    alt={firm.name}
-                    className="w-full h-full object-contain p-0.5"
-                  />
-                </div>
-              )}
-              <Link
-                href={`/firms/${firm.slug}`}
-                className="text-[14px] font-medium text-[#6B6B6B] hover:text-[#0A0A0A] transition-colors duration-200"
+            <div className="mt-8 mb-6 flex items-center gap-3">
+              <span
+                className="text-[13px] font-medium tracking-[0.02em] text-white/80"
+                style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
               >
-                {firm.name}
-                {firm.location && (
-                  <span className="text-[#999]"> · {firm.location}</span>
-                )}
-              </Link>
+                {categoryLabels[blog.category] ?? blog.category}
+              </span>
+              <span className="text-white/40">·</span>
+              <time
+                className="text-[13px] font-medium text-white/80"
+                style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
+              >
+                {new Date(blog.created_at).toLocaleDateString("nl-NL", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </time>
             </div>
-          )}
-        </div>
-      </section>
+
+            <h1
+              className="font-bold leading-[1.05] max-w-[960px]"
+              style={{
+                fontSize: "clamp(36px, 5vw, 64px)",
+                letterSpacing: "-0.03em",
+                color: "#FFFFFF",
+                textShadow: "0 1px 24px rgba(20, 24, 80, 0.25)",
+              }}
+            >
+              {blog.title}
+            </h1>
+
+            {firm && (
+              <div className="mt-8 flex items-center gap-3">
+                {firm.logo_url && (
+                  <div className="w-9 h-9 rounded-[10px] bg-white/15 backdrop-blur-[6px] border border-white/25 flex items-center justify-center overflow-hidden shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={firm.logo_url}
+                      alt={firm.name}
+                      className="w-full h-full object-contain p-1"
+                    />
+                  </div>
+                )}
+                <Link
+                  href={`/firms/${firm.slug}`}
+                  className="text-[14px] font-medium text-white/90 hover:text-white transition-colors duration-200"
+                  style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
+                >
+                  {firm.name}
+                  {firm.location && (
+                    <span className="text-white/65"> · {firm.location}</span>
+                  )}
+                </Link>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
 
       {/* Featured image */}
       {blog.image_url && (
@@ -208,16 +267,16 @@ export default async function BlogArticlePage({ params }: Props) {
           style={{
             paddingLeft: "clamp(24px, 5vw, 80px)",
             paddingRight: "clamp(24px, 5vw, 80px)",
-            paddingTop: "clamp(32px, 4vh, 48px)",
+            paddingTop: "clamp(16px, 2vh, 32px)",
           }}
         >
           <div className="max-w-[1400px] mx-auto">
-            <div className="relative aspect-[21/9] w-full rounded-[4px] overflow-hidden bg-[#F5F5F5]">
+            <div className="relative aspect-[21/9] w-full rounded-[16px] overflow-hidden bg-[#F5F5F5]">
               <Image
                 src={blog.image_url}
                 alt={blog.title}
                 fill
-                className="object-cover saturate-[0.85]"
+                className="object-cover saturate-[0.95]"
                 sizes="(max-width: 768px) 100vw, 1400px"
                 priority
               />
@@ -249,7 +308,7 @@ export default async function BlogArticlePage({ params }: Props) {
                   prose-li:text-[#6B6B6B] prose-li:text-[16px] prose-li:leading-[1.65]
                   prose-strong:text-[#0A0A0A] prose-strong:font-semibold
                   prose-blockquote:border-l-[#587DFE] prose-blockquote:border-l-2 prose-blockquote:pl-6 prose-blockquote:text-[#0A0A0A] prose-blockquote:font-semibold prose-blockquote:text-[20px] prose-blockquote:leading-[1.4] prose-blockquote:not-italic
-                  prose-img:rounded-[4px]
+                  prose-img:rounded-[12px]
                   prose-hr:border-[#E5E5E5]"
                 dangerouslySetInnerHTML={{ __html: blog.content }}
               />
@@ -263,9 +322,16 @@ export default async function BlogArticlePage({ params }: Props) {
                     Over de werkgever
                   </p>
 
-                  <div className="border-t border-[#E5E5E5] pt-5">
+                  <div
+                    className="rounded-[16px] p-6"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(135deg, rgba(88,125,254,0.10) 0%, rgba(88,125,254,0.04) 45%, rgba(255,255,255,0.85) 100%)",
+                      backgroundColor: "#F5F7FF",
+                    }}
+                  >
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-[8px] bg-[#F5F5F5] flex items-center justify-center shrink-0 overflow-hidden">
+                      <div className="w-10 h-10 rounded-[10px] bg-white border border-[#E2E5F0] flex items-center justify-center shrink-0 overflow-hidden">
                         {firm.logo_url ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
@@ -280,11 +346,11 @@ export default async function BlogArticlePage({ params }: Props) {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[15px] font-semibold text-[#0A0A0A] truncate">
+                        <p className="text-[15px] font-semibold text-[#2C337A] truncate">
                           {firm.name}
                         </p>
                         {firm.location && (
-                          <p className="text-[13px] text-[#999]">
+                          <p className="text-[13px] text-[#8B91B8]">
                             {firm.location}
                           </p>
                         )}
@@ -292,7 +358,7 @@ export default async function BlogArticlePage({ params }: Props) {
                     </div>
 
                     {firm.description && (
-                      <p className="text-[14px] text-[#6B6B6B] leading-[1.65] mb-5 line-clamp-4">
+                      <p className="text-[14px] text-[#5A6094] leading-[1.65] mb-5 line-clamp-4">
                         {firm.description}
                       </p>
                     )}

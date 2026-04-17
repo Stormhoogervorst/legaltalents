@@ -320,7 +320,7 @@ export default function LinkedInQuickApply({
         <button
           onClick={handleSubmitApplication}
           disabled={loading}
-          className="inline-flex items-center gap-3 rounded-full bg-[#668dff] px-7 py-3.5 text-[15px] font-semibold text-white transition-all duration-200 hover:bg-[#5579e8] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+          className="inline-flex items-center gap-3 rounded-full bg-slate-900 px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_28px_-10px_rgba(10,15,61,0.55)] ring-1 ring-white/10 transition-all duration-200 hover:bg-slate-800 hover:shadow-[0_18px_36px_-12px_rgba(10,15,61,0.65)] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
         >
           {loading && <Loader2 className="h-5 w-5 animate-spin" />}
           {loading ? "Versturen…" : "Sollicitatie afronden"}
@@ -337,7 +337,7 @@ export default function LinkedInQuickApply({
       <button
         onClick={handleStartOAuth}
         disabled={loading}
-        className="inline-flex items-center gap-3 rounded-full bg-[#668dff] px-7 py-3.5 text-[15px] font-semibold text-white transition-all duration-200 hover:bg-[#5579e8] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+        className="inline-flex items-center gap-3 rounded-full bg-slate-900 px-7 py-3.5 text-[15px] font-semibold text-white shadow-[0_12px_28px_-10px_rgba(10,15,61,0.55)] ring-1 ring-white/10 transition-all duration-200 hover:bg-slate-800 hover:shadow-[0_18px_36px_-12px_rgba(10,15,61,0.65)] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
       >
         {loading ? (
           <Loader2 className="h-5 w-5 animate-spin" />

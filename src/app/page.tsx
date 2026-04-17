@@ -1,9 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Search } from "lucide-react";
+import { MapPin } from "lucide-react";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
 import CtaBand from "@/components/CtaBand";
+import HeroSection from "@/components/HeroSection";
 import VacatureCarousel from "@/components/VacatureCarousel";
 import { createClient } from "@/lib/supabase/server";
 import { Firm, Job } from "@/types";
@@ -68,145 +69,25 @@ export default async function HomePage() {
 
   return (
     <div className="relative min-h-screen flex flex-col bg-white">
-      <NavbarPublic />
+      <NavbarPublic variant="hero" />
 
       {/* ── Hero ──────────────────────────────────────────────── */}
-      <section className="bg-white relative overflow-visible pb-10 md:pb-20">
-        <div
-          className="max-w-[1400px] mx-auto"
-          style={{ padding: "clamp(60px, 8vh, 120px) clamp(24px, 5vw, 80px) 0" }}
-        >
-          {/* Badge */}
-          <span
-            className="inline-flex items-center gap-2 rounded-full bg-[#E9EEFF]"
-            style={{
-              padding: "7px 16px",
-              fontSize: "13px",
-              fontWeight: 500,
-              letterSpacing: "0.02em",
-              color: "#587DFE",
-            }}
-          >
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#587DFE] opacity-80" />
-            #1 Juridisch Carrièreplatform
-          </span>
-
-          {/* Headline */}
-          <h1
-            style={{
-              fontSize: "clamp(44px, 5.2vw, 72px)",
-              fontWeight: 700,
-              lineHeight: 1.05,
-              letterSpacing: "-0.03em",
-              color: "#0A0A0A",
-              marginTop: "24px",
-              maxWidth: "960px",
-            }}
-          >
-            Vind jouw{" "}
-            <span style={{ color: "#587DFE", whiteSpace: "nowrap" }}>stage of baan</span>
-            <br />
-            in de juridische wereld
-          </h1>
-
-          {/* Subheadline */}
-          <p
-            style={{
-              fontSize: "clamp(15px, 1.1vw, 17px)",
-              lineHeight: 1.65,
-              color: "#5A6094",
-              maxWidth: "520px",
-              marginTop: "24px",
-            }}
-          >
-            Ontdek stages en vacatures bij de beste juridische werkgevers van
-            Nederland. Het platform voor studenten en young professionals.
-          </p>
-
-          {/* Composite pill search bar */}
-          <form
-            action="/jobs"
-            method="GET"
-            className="mt-8"
-            style={{ maxWidth: "580px" }}
-          >
-            <div
-              className="flex items-center bg-[#EEF1FF] rounded-full"
-              style={{
-                padding: "6px 6px 6px 22px",
-              }}
-            >
-              <Search
-                className="h-[18px] w-[18px] shrink-0"
-                style={{ color: "#8B91B8" }}
-              />
-              <input
-                name="q"
-                type="text"
-                placeholder="Functie of rechtsgebied..."
-                className="flex-1 min-w-0 bg-transparent border-none outline-none focus:outline-none"
-                style={{
-                  padding: "10px 14px",
-                  fontSize: "15px",
-                  color: "#2C337A",
-                }}
-              />
-              <button
-                type="submit"
-                className="shrink-0 rounded-full inline-flex items-center justify-center font-semibold text-white transition-all duration-200 hover:bg-[#4A6CE6] hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-[#587DFE]/40 focus:ring-offset-2"
-                style={{
-                  padding: "12px 26px",
-                  fontSize: "14px",
-                  background: "#587DFE",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Zoeken
-              </button>
-            </div>
-          </form>
-
-        </div>
-
-        {/* Image strip */}
-        <div className="mt-12 sm:mt-16 w-full overflow-x-hidden relative z-10">
-          <div className="flex items-end justify-center gap-3 md:gap-5 -mx-8">
-            <div className="shrink-0 hidden lg:block w-[160px] h-[160px] rounded-full bg-[#BDD0FF]" />
-            <div className="shrink-0 w-[110px] h-[110px] sm:w-[140px] sm:h-[140px] rounded-full overflow-hidden relative">
-              <Image src="/foto 1.jpg" alt="" fill className="object-cover" sizes="140px" />
-            </div>
-            <div className="shrink-0 w-[80px] h-[140px] sm:w-[100px] sm:h-[180px] rounded-full overflow-hidden relative">
-              <Image src="/foto 4.jpg" alt="" fill className="object-cover" sizes="100px" />
-            </div>
-            <div className="shrink-0 hidden md:block w-[80px] h-[80px] rounded-full bg-[#587DFE]" />
-            <div className="shrink-0 w-[130px] h-[130px] sm:w-[170px] sm:h-[170px] rounded-full overflow-hidden relative">
-              <Image src="/foto 2.jpg" alt="" fill className="object-cover" sizes="170px" priority />
-            </div>
-            <div className="shrink-0 hidden md:flex w-[70px] h-[150px] sm:w-[90px] sm:h-[180px] rounded-full overflow-hidden bg-[#587DFE] items-end justify-center">
-              <div className="w-[70px] h-[70px] sm:w-[90px] sm:h-[90px] rounded-full bg-[#8CA6FE]" />
-            </div>
-            <div className="shrink-0 w-[80px] h-[140px] sm:w-[100px] sm:h-[180px] rounded-full overflow-hidden relative">
-              <Image src="/foto 5.jpg" alt="" fill className="object-cover" sizes="100px" />
-            </div>
-            <div className="shrink-0 w-[110px] h-[110px] sm:w-[140px] sm:h-[140px] rounded-full overflow-hidden relative">
-              <Image src="/foto-3.jpg" alt="" fill className="object-cover" sizes="140px" />
-            </div>
-            <div className="shrink-0 hidden lg:block w-[160px] h-[160px] rounded-full bg-[#8CA6FE]" />
-          </div>
-        </div>
-      </section>
+      {/* Negative margin pulls the hero gradient up behind the liquid-glass navbar */}
+      <div className="-mt-[4.25rem]">
+        <HeroSection />
+      </div>
 
       {/* ── Top vacatures carrousel ───────────────────────────── */}
       <section
         style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
       >
         <div className="max-w-[1400px] mx-auto">
-          <div className="flex flex-col sm:flex-row items-start justify-between gap-6 mb-12 sm:mb-16">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-12 sm:mb-16">
             <h2
               style={{
                 fontSize: "clamp(32px, 4vw, 56px)",
                 fontWeight: 700,
-                lineHeight: 1.1,
+                lineHeight: 1,
                 letterSpacing: "-0.025em",
                 color: "#0A0A0A",
               }}
@@ -214,7 +95,7 @@ export default async function HomePage() {
               De nieuwste juridische vacatures
               <span style={{ color: "#587DFE" }}>.</span>
             </h2>
-            <Link href="/jobs" className="btn-primary shrink-0">
+            <Link href="/jobs" className="btn-primary shrink-0 sm:mb-1">
               Alle vacatures
             </Link>
           </div>
@@ -232,15 +113,20 @@ export default async function HomePage() {
       {/* ── Werkgevers grid ───────────────────────────────────── */}
       <section
         className="bg-white"
-        style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
+        style={{
+          paddingTop: "clamp(40px, 5vh, 80px)",
+          paddingBottom: "clamp(80px, 10vh, 160px)",
+          paddingLeft: "clamp(24px, 5vw, 80px)",
+          paddingRight: "clamp(24px, 5vw, 80px)",
+        }}
       >
         <div className="max-w-[1400px] mx-auto">
-          <div className="flex flex-col sm:flex-row items-start justify-between gap-6 mb-12 sm:mb-16">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-12 sm:mb-16">
             <h2
               style={{
                 fontSize: "clamp(32px, 4vw, 56px)",
                 fontWeight: 700,
-                lineHeight: 1.1,
+                lineHeight: 1,
                 letterSpacing: "-0.025em",
                 color: "#0A0A0A",
               }}
@@ -248,7 +134,7 @@ export default async function HomePage() {
               Uitgelichte werkgevers
               <span style={{ color: "#587DFE" }}>.</span>
             </h2>
-            <Link href="/firms" className="btn-primary shrink-0">
+            <Link href="/firms" className="btn-primary shrink-0 sm:mb-1">
               Alle werkgevers
             </Link>
           </div>
@@ -258,9 +144,14 @@ export default async function HomePage() {
               <Link
                 key={firm.id}
                 href={`/firms/${firm.slug}`}
-                className="group bg-[#F5F7FF] rounded-[8px] p-6 transition-all duration-300 hover:-translate-y-1"
+                className="group rounded-[16px] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(88,125,254,0.12)]"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(135deg, rgba(88,125,254,0.10) 0%, rgba(88,125,254,0.04) 45%, rgba(255,255,255,0.85) 100%)",
+                  backgroundColor: "#F5F7FF",
+                }}
               >
-                <div className="w-14 h-14 rounded-[8px] bg-white border border-[#E2E5F0] flex items-center justify-center mb-5 overflow-hidden p-2">
+                <div className="w-14 h-14 rounded-[10px] bg-white border border-[#E2E5F0] flex items-center justify-center mb-5 overflow-hidden p-2">
                   {firm.logo_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={firm.logo_url} alt={firm.name} className="w-full h-full object-contain" />
@@ -302,7 +193,7 @@ export default async function HomePage() {
                     {firm.practice_areas.slice(0, 2).map((area) => (
                       <span
                         key={area}
-                        className="bg-[#668dff] text-white text-[12px] font-semibold px-3 py-1 rounded-full"
+                        className="bg-[#2C337A] text-white text-[12px] font-semibold px-3 py-1 rounded-full"
                       >
                         {area}
                       </span>
@@ -317,10 +208,44 @@ export default async function HomePage() {
 
       {/* ── Voor werkgevers ───────────────────────────────────── */}
       <section
-        className="bg-[#F5F7FF]"
+        className="relative isolate overflow-hidden"
         style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
       >
-        <div className="max-w-[1400px] mx-auto">
+        {/* Pure CSS mesh gradient — overlapping radial layers in soft blue/purple tones */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 pointer-events-none"
+          style={{
+            backgroundColor: "#EEF1FF",
+            backgroundImage: `
+              radial-gradient(55% 60% at 8% 18%,
+                rgba(88, 125, 254, 0.85) 0%,
+                rgba(88, 125, 254, 0.35) 35%,
+                rgba(88, 125, 254, 0) 70%),
+              radial-gradient(50% 55% at 92% 28%,
+                rgba(178, 140, 255, 0.90) 0%,
+                rgba(178, 140, 255, 0.35) 40%,
+                rgba(178, 140, 255, 0) 72%),
+              radial-gradient(65% 60% at 50% 55%,
+                rgba(120, 150, 255, 0.75) 0%,
+                rgba(120, 150, 255, 0.25) 45%,
+                rgba(120, 150, 255, 0) 72%),
+              radial-gradient(45% 55% at 14% 88%,
+                rgba(215, 168, 255, 0.85) 0%,
+                rgba(215, 168, 255, 0.30) 40%,
+                rgba(215, 168, 255, 0) 70%),
+              radial-gradient(55% 55% at 90% 92%,
+                rgba(75, 59, 214, 0.70) 0%,
+                rgba(75, 59, 214, 0.25) 40%,
+                rgba(75, 59, 214, 0) 72%)
+            `,
+            WebkitMaskImage:
+              "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%)",
+            maskImage:
+              "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%)",
+          }}
+        />
+        <div className="max-w-[1400px] mx-auto relative">
           <div
             className="grid grid-cols-1 lg:grid-cols-2 items-stretch gap-12 lg:gap-20"
           >
@@ -472,20 +397,26 @@ export default async function HomePage() {
           style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
         >
           <div className="max-w-[1400px] mx-auto">
-            <div className="flex flex-col sm:flex-row items-start justify-between gap-6 mb-12 sm:mb-16">
+            <div className="flex flex-row items-end justify-between gap-6 mb-12 sm:mb-16">
               <h2
+                className="leading-none m-0 p-0"
                 style={{
                   fontSize: "clamp(32px, 4vw, 56px)",
                   fontWeight: 700,
-                  lineHeight: 1.1,
+                  lineHeight: 1,
                   letterSpacing: "-0.025em",
                   color: "#0A0A0A",
+                  margin: 0,
+                  padding: 0,
                 }}
               >
                 Artikelen &amp; inzichten
                 <span style={{ color: "#587DFE" }}>.</span>
               </h2>
-              <Link href="/kennisbank" className="btn-primary shrink-0">
+              <Link
+                href="/kennisbank"
+                className="btn-primary shrink-0 -translate-y-[8px]"
+              >
                 Alle artikelen
               </Link>
             </div>
