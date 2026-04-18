@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { Sparkles, Infinity as InfinityIcon, Inbox, Target } from "lucide-react";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
 
@@ -23,18 +23,22 @@ const STEPS = [
 
 const FEATURES = [
   {
+    icon: Sparkles,
     label: "Gratis profiel",
     desc: "Maak direct een werkgeversprofiel aan — zonder kosten, zonder verplichtingen.",
   },
   {
+    icon: InfinityIcon,
     label: "Onbeperkt plaatsen",
     desc: "Publiceer zoveel vacatures en stages als u wilt, altijd gratis.",
   },
   {
+    icon: Inbox,
     label: "Direct ontvangen",
     desc: "Sollicitaties recht in uw inbox. Bekijk kandidaten overzichtelijk in uw dashboard.",
   },
   {
+    icon: Target,
     label: "Juridische niche",
     desc: "Bereik 100% juridische professionals — studenten én young professionals.",
   },
@@ -48,160 +52,308 @@ export const metadata = {
 
 export default function VoorWerkgeversPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <NavbarPublic />
+    <div className="relative min-h-screen flex flex-col bg-white overflow-x-hidden">
+      <NavbarPublic variant="hero" />
 
       {/* ── Hero ──────────────────────────────────────────────── */}
-      <section className="bg-white overflow-hidden">
-        <div
-          className="max-w-[1400px] mx-auto"
-          style={{ padding: "clamp(60px, 8vh, 120px) clamp(24px, 5vw, 80px) clamp(60px, 8vh, 120px)" }}
+      {/* Negative margin pulls the hero gradient up behind the liquid-glass navbar */}
+      <div className="-mt-[4.25rem]">
+        <section
+          className="relative isolate overflow-hidden w-full"
+          style={{
+            background: `linear-gradient(135deg,
+              #4B3BD6 0%,
+              #5668E8 22%,
+              #7A8BF5 42%,
+              #A8B6FF 62%,
+              #C9D4FF 82%,
+              #FFFFFF 100%)`,
+          }}
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-            <div>
-              <span
-                className="inline-block rounded-full bg-[#E9EEFF]"
+          {/* Layered radial gradients — soft "liquid" purple → blue → white wash */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `
+                radial-gradient(60% 55% at 50% 40%,
+                  rgba(178, 140, 255, 0.65) 0%,
+                  rgba(140, 120, 255, 0.30) 35%,
+                  rgba(120, 150, 255, 0) 70%),
+                radial-gradient(50% 60% at 50% 60%,
+                  rgba(255, 255, 255, 0.45) 0%,
+                  rgba(255, 255, 255, 0) 60%),
+                radial-gradient(55% 70% at 96% 6%,
+                  rgba(42, 20, 230, 0.80) 0%,
+                  rgba(59, 44, 220, 0.35) 22%,
+                  rgba(88, 125, 254, 0) 60%),
+                radial-gradient(32% 38% at 2% 0%,
+                  rgba(215, 168, 255, 0.85) 0%,
+                  rgba(215, 168, 255, 0) 65%),
+                radial-gradient(38% 45% at 10% 55%,
+                  rgba(255, 255, 255, 0.55) 0%,
+                  rgba(255, 255, 255, 0) 65%)
+              `,
+            }}
+          />
+
+          {/* Seamless fade to pure white at the bottom */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-48 md:h-64"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 55%, #FFFFFF 100%)",
+            }}
+          />
+
+          <div
+            className="max-w-[1400px] mx-auto relative w-full"
+            style={{
+              padding:
+                "calc(4.25rem + clamp(60px, 8vh, 120px)) clamp(24px, 5vw, 80px) clamp(80px, 12vh, 160px)",
+            }}
+          >
+            <span
+              className="inline-flex items-center gap-2 rounded-full backdrop-blur-[6px]"
+              style={{
+                padding: "7px 16px",
+                fontSize: "13px",
+                fontWeight: 500,
+                letterSpacing: "0.02em",
+                color: "#FFFFFF",
+                background: "rgba(255, 255, 255, 0.18)",
+                border: "1px solid rgba(255, 255, 255, 0.28)",
+              }}
+            >
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-white" />
+              VOOR WERKGEVERS
+            </span>
+
+            <h1
+              className="text-left"
+              style={{
+                fontSize: "clamp(44px, 5.2vw, 72px)",
+                fontWeight: 700,
+                lineHeight: 1.05,
+                letterSpacing: "-0.03em",
+                color: "#FFFFFF",
+                marginTop: "24px",
+                maxWidth: "960px",
+                textShadow: "0 1px 24px rgba(20, 24, 80, 0.25)",
+              }}
+            >
+              Vind juridisch talent,
+              <br className="hidden sm:block" />
+              zonder opstartkosten
+            </h1>
+
+            <p
+              className="text-left"
+              style={{
+                fontSize: "clamp(15px, 1.1vw, 17px)",
+                lineHeight: 1.65,
+                color: "#FFFFFF",
+                opacity: 0.95,
+                maxWidth: "560px",
+                marginTop: "24px",
+                textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)",
+              }}
+            >
+              Het nicheplatform voor advocatenkantoren. Plaats eenvoudig uw
+              vacatures, beheer uw dashboard en bereik uitsluitend juridische
+              professionals.
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <Link href="/register" className="btn-primary">
+                Gratis account aanmaken
+              </Link>
+              <Link
+                href="#hoe-het-werkt"
+                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-medium transition-all duration-200 hover:bg-white/15 hover:scale-[1.03]"
                 style={{
-                  padding: "6px 16px",
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  letterSpacing: "0.02em",
-                  color: "#587DFE",
+                  fontSize: "14px",
+                  color: "#FFFFFF",
+                  border: "1px solid rgba(255, 255, 255, 0.55)",
+                  backdropFilter: "blur(6px)",
+                  WebkitBackdropFilter: "blur(6px)",
                 }}
               >
-                VOOR WERKGEVERS
-              </span>
-
-              <h1
-                style={{
-                  fontSize: "clamp(44px, 5.5vw, 76px)",
-                  fontWeight: 700,
-                  lineHeight: 1.05,
-                  letterSpacing: "-0.03em",
-                  color: "#0A0A0A",
-                  marginTop: "24px",
-                  maxWidth: "640px",
-                }}
-              >
-                Vind juridisch talent, zonder opstartkosten
-                <span style={{ color: "#587DFE" }}>.</span>
-              </h1>
-
-              <p
-                style={{
-                  fontSize: "clamp(15px, 1.1vw, 17px)",
-                  lineHeight: 1.65,
-                  color: "#5A6094",
-                  maxWidth: "520px",
-                  marginTop: "24px",
-                }}
-              >
-                Het nicheplatform voor advocatenkantoren. Plaats eenvoudig uw
-                vacatures, beheer uw dashboard en bereik uitsluitend juridische
-                professionals.
-              </p>
-
-              <div className="mt-8 flex flex-wrap items-center gap-5">
-                <Link href="/register" className="btn-primary">
-                  Gratis account aanmaken
-                </Link>
-                <Link href="#hoe-het-werkt" className="btn-secondary">
-                  Hoe het werkt
-                </Link>
-              </div>
-            </div>
-
-            <div className="hidden lg:block">
-              <div className="relative w-full aspect-[4/3] overflow-hidden rounded-[8px]">
-                <Image
-                  src="/foto 2.jpg"
-                  alt="Juridische professionals"
-                  fill
-                  className="object-cover"
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-              </div>
+                Hoe het werkt
+              </Link>
             </div>
           </div>
-        </div>
-
-      </section>
+        </section>
+      </div>
 
       {/* ── Voordelen ──────────────────────────────────────────── */}
       <section
-        style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
+        className="w-full"
+        style={{ padding: "clamp(60px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
       >
-        <div className="max-w-[1400px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-20">
-            <div>
-              <span
-                className="inline-block rounded-full bg-[#E9EEFF]"
-                style={{
-                  padding: "6px 16px",
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  letterSpacing: "0.02em",
-                  color: "#587DFE",
-                }}
-              >
-                VOORDELEN
-              </span>
-              <h2
-                style={{
-                  fontSize: "clamp(32px, 4vw, 56px)",
-                  fontWeight: 700,
-                  lineHeight: 1.1,
-                  letterSpacing: "-0.025em",
-                  color: "#0A0A0A",
-                  marginTop: "20px",
-                }}
-              >
-                Bereik juridisch talent gemakkelijk online
-                <span style={{ color: "#587DFE" }}>.</span>
-              </h2>
-              <p
-                style={{
-                  fontSize: "clamp(15px, 1.1vw, 17px)",
-                  lineHeight: 1.65,
-                  color: "#5A6094",
-                  maxWidth: "480px",
-                  marginTop: "20px",
-                }}
-              >
-                Plaats uw werkgeversprofiel en vacatures op Legal Talents en
-                ontvang sollicitaties van studenten en young professionals die
-                doelgericht zoeken binnen de juridische markt.
-              </p>
-              <div className="mt-8">
-                <Link href="/register" className="btn-primary">
-                  Gratis account aanmaken
-                </Link>
-              </div>
-            </div>
+        <div className="max-w-[1400px] mx-auto w-full">
+          {/* Heading block */}
+          <div className="max-w-3xl">
+            <h2
+              className="text-left"
+              style={{
+                fontSize: "clamp(32px, 4vw, 56px)",
+                fontWeight: 700,
+                lineHeight: 1.1,
+                letterSpacing: "-0.025em",
+                color: "#0A0A0A",
+              }}
+            >
+              Bereik juridisch talent gemakkelijk online
+              <span style={{ color: "#587DFE" }}>.</span>
+            </h2>
+            <p
+              className="text-left"
+              style={{
+                fontSize: "clamp(15px, 1.1vw, 17px)",
+                lineHeight: 1.65,
+                color: "#5A6094",
+                maxWidth: "600px",
+                marginTop: "24px",
+              }}
+            >
+              Maak eenvoudig een werkgeversprofiel aan en plaats je vacatures
+              online. Sollicitaties komen direct binnen via de mail en in het
+              dashboard. Zo houd je makkelijk overzicht.
+            </p>
+          </div>
 
-            <div className="flex flex-col gap-5">
-              {FEATURES.map((feature) => (
+          {/* Feature cards: vertical list on mobile → 2-col on md → 4-col on lg */}
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+            {FEATURES.map((feature) => {
+              const Icon = feature.icon;
+              return (
                 <div
                   key={feature.label}
-                  className="flex items-start gap-4"
+                  className="w-full rounded-2xl bg-white/80 shadow-sm ring-1 ring-[#E2E5F0] p-6 sm:p-8 backdrop-blur-[2px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(88,125,254,0.12)]"
                 >
-                  <div className="w-7 h-7 rounded-full bg-[#587DFE] flex items-center justify-center shrink-0 mt-0.5">
-                    <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
-                      <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                  <div
+                    className="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, rgba(88,125,254,0.15) 0%, rgba(138,122,254,0.10) 100%)",
+                      color: "#587DFE",
+                    }}
+                  >
+                    <Icon className="w-5 h-5" strokeWidth={2} />
                   </div>
-                  <div>
-                    <h3 style={{ fontSize: "18px", fontWeight: 600, color: "#2C337A" }}>
-                      {feature.label}
-                    </h3>
-                    <p style={{ fontSize: "15px", lineHeight: 1.6, color: "#5A6094", marginTop: "4px" }}>
-                      {feature.desc}
-                    </p>
-                  </div>
+                  <h3
+                    style={{
+                      fontSize: "18px",
+                      fontWeight: 600,
+                      letterSpacing: "-0.01em",
+                      color: "#2C337A",
+                    }}
+                  >
+                    {feature.label}
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: "15px",
+                      lineHeight: 1.6,
+                      color: "#5A6094",
+                      marginTop: "8px",
+                    }}
+                  >
+                    {feature.desc}
+                  </p>
                 </div>
-              ))}
-            </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-12">
+            <Link href="/register" className="btn-primary">
+              Gratis account aanmaken
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Quote sectie ──────────────────────────────────────── */}
+      <section
+        className="relative isolate overflow-hidden w-full"
+        style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
+      >
+        {/* Pure CSS mesh gradient — overlapping radial layers in soft blue/purple tones, faded into white */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 pointer-events-none"
+          style={{
+            backgroundColor: "#EEF1FF",
+            backgroundImage: `
+              radial-gradient(55% 60% at 8% 18%,
+                rgba(88, 125, 254, 0.85) 0%,
+                rgba(88, 125, 254, 0.35) 35%,
+                rgba(88, 125, 254, 0) 70%),
+              radial-gradient(50% 55% at 92% 28%,
+                rgba(178, 140, 255, 0.90) 0%,
+                rgba(178, 140, 255, 0.35) 40%,
+                rgba(178, 140, 255, 0) 72%),
+              radial-gradient(65% 60% at 50% 55%,
+                rgba(120, 150, 255, 0.75) 0%,
+                rgba(120, 150, 255, 0.25) 45%,
+                rgba(120, 150, 255, 0) 72%),
+              radial-gradient(45% 55% at 14% 88%,
+                rgba(215, 168, 255, 0.85) 0%,
+                rgba(215, 168, 255, 0.30) 40%,
+                rgba(215, 168, 255, 0) 70%),
+              radial-gradient(55% 55% at 90% 92%,
+                rgba(75, 59, 214, 0.70) 0%,
+                rgba(75, 59, 214, 0.25) 40%,
+                rgba(75, 59, 214, 0) 72%)
+            `,
+            WebkitMaskImage:
+              "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%)",
+            maskImage:
+              "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%)",
+          }}
+        />
+        <div className="max-w-[1400px] mx-auto w-full relative">
+          <div className="max-w-4xl">
+            <span
+              style={{
+                fontSize: "clamp(72px, 8vw, 120px)",
+                fontWeight: 700,
+                lineHeight: 0.85,
+                color: "#0A0A0A",
+                display: "block",
+              }}
+            >
+              &ldquo;
+            </span>
+            <blockquote
+              className="mt-2"
+              style={{
+                fontSize: "clamp(24px, 3vw, 40px)",
+                fontWeight: 600,
+                lineHeight: 1.3,
+                letterSpacing: "-0.02em",
+                color: "#0A0A0A",
+              }}
+            >
+              Met Legal Talents bereiken wij precies de juridische
+              professionals die we zoeken. Het platform is intuïtief,
+              effectief en zonder drempels.
+            </blockquote>
+            <p
+              className="mt-8"
+              style={{
+                fontSize: "clamp(15px, 1.1vw, 17px)",
+                lineHeight: 1.65,
+                color: "#0A0A0A",
+                maxWidth: "560px",
+              }}
+            >
+              Maak vandaag nog een gratis account aan en bereik duizenden
+              juridische professionals. Geen creditcard vereist, direct actief.
+            </p>
           </div>
         </div>
       </section>
@@ -209,171 +361,131 @@ export default function VoorWerkgeversPage() {
       {/* ── Hoe het werkt ──────────────────────────────────────── */}
       <section
         id="hoe-het-werkt"
-        className="bg-[#F5F7FF] scroll-mt-20"
-        style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
+        className="scroll-mt-20 w-full"
+        style={{
+          padding: "clamp(60px, 10vh, 160px) clamp(24px, 5vw, 80px)",
+          background: "#FFFFFF",
+        }}
       >
-        <div className="max-w-[1400px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
-            <div className="lg:col-span-5">
-              <span
-                className="inline-block rounded-full bg-[#E9EEFF]"
-                style={{
-                  padding: "6px 16px",
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  letterSpacing: "0.02em",
-                  color: "#587DFE",
-                }}
-              >
-                HOE HET WERKT
-              </span>
-              <h2
-                style={{
-                  fontSize: "clamp(32px, 4vw, 56px)",
-                  fontWeight: 700,
-                  lineHeight: 1.1,
-                  letterSpacing: "-0.025em",
-                  color: "#0A0A0A",
-                  marginTop: "20px",
-                }}
-              >
-                In drie stappen live
-                <span style={{ color: "#587DFE" }}>.</span>
-              </h2>
-              <p
-                style={{
-                  fontSize: "clamp(15px, 1.1vw, 17px)",
-                  lineHeight: 1.65,
-                  color: "#5A6094",
-                  maxWidth: "640px",
-                  marginTop: "20px",
-                }}
-              >
-                Geen ingewikkelde onboarding. Binnen een paar minuten plaatst u
-                uw eerste vacature.
-              </p>
-              <div className="mt-8">
-                <Link href="/register" className="btn-primary">
-                  Gratis account aanmaken
-                </Link>
-              </div>
-            </div>
+        <div className="max-w-[1400px] mx-auto w-full">
+          <div className="max-w-3xl">
+            <h2
+              className="text-left"
+              style={{
+                fontSize: "clamp(32px, 4vw, 56px)",
+                fontWeight: 700,
+                lineHeight: 1.1,
+                letterSpacing: "-0.025em",
+                color: "#0A0A0A",
+              }}
+            >
+              In drie stappen live
+              <span style={{ color: "#587DFE" }}>.</span>
+            </h2>
+            <p
+              className="text-left"
+              style={{
+                fontSize: "clamp(15px, 1.1vw, 17px)",
+                lineHeight: 1.65,
+                color: "#5A6094",
+                maxWidth: "640px",
+                marginTop: "20px",
+              }}
+            >
+              Geen ingewikkelde onboarding. Binnen een paar minuten plaatst u
+              uw eerste vacature.
+            </p>
+          </div>
 
-            <div className="lg:col-span-7 flex flex-col gap-5">
-              {STEPS.map((step) => (
+          {/* Step cards: vertical on mobile → 3-col on desktop */}
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+            {STEPS.map((step) => (
+              <div
+                key={step.num}
+                className="w-full rounded-2xl bg-white shadow-sm ring-1 ring-[#E2E5F0] p-6 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(88,125,254,0.12)]"
+              >
                 <div
-                  key={step.num}
-                  className="bg-[#EEF1FF] rounded-[8px] p-6 sm:p-8 flex gap-5 items-start"
+                  className="shrink-0 w-10 h-10 rounded-full bg-[#587DFE] flex items-center justify-center mb-5"
+                  style={{
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    color: "#FFFFFF",
+                    boxShadow: "0 6px 16px -6px rgba(88,125,254,0.55)",
+                  }}
                 >
-                  <div
-                    className="shrink-0 w-10 h-10 rounded-full bg-[#587DFE] flex items-center justify-center"
-                    style={{ fontSize: "15px", fontWeight: 600, color: "#FFFFFF" }}
-                  >
-                    {step.num}
-                  </div>
-                  <div>
-                    <h3 style={{ fontSize: "18px", fontWeight: 600, color: "#2C337A" }}>
-                      {step.title}
-                    </h3>
-                    <p style={{ fontSize: "15px", lineHeight: 1.6, color: "#5A6094", marginTop: "6px" }}>
-                      {step.desc}
-                    </p>
-                  </div>
+                  {step.num}
                 </div>
-              ))}
-            </div>
+                <h3
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: 600,
+                    letterSpacing: "-0.01em",
+                    color: "#2C337A",
+                  }}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  style={{
+                    fontSize: "15px",
+                    lineHeight: 1.6,
+                    color: "#5A6094",
+                    marginTop: "8px",
+                  }}
+                >
+                  {step.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12">
+            <Link href="/register" className="btn-primary">
+              Gratis account aanmaken
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Voor werkgevers image + quote ──────────────────────── */}
+      {/* ── Bottom CTA — full-width band ────────────────────────── */}
       <section
-        style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
+        className="relative isolate overflow-hidden"
+        style={{
+          padding: "clamp(80px, 10vh, 140px) clamp(24px, 5vw, 80px)",
+          background: `linear-gradient(135deg,
+            #4B3BD6 0%,
+            #4A5DE8 20%,
+            #3E8BF5 45%,
+            #22C6E0 75%,
+            #7FE6F0 100%)`,
+        }}
       >
-        <div className="max-w-[1400px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 items-stretch gap-12 lg:gap-20">
-            {/* Image */}
-            <div className="relative lg:overflow-visible overflow-hidden">
-              <div className="relative rounded-[8px] overflow-hidden h-full min-h-[400px]">
-                <Image
-                  src="/foto 4.jpg"
-                  alt="Juridisch team in vergadering"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-              </div>
-            </div>
+        {/* Layered radial mesh — vibrant purple → blue → cyan wash */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(55% 70% at 8% 0%,
+                rgba(215, 168, 255, 0.85) 0%,
+                rgba(215, 168, 255, 0) 60%),
+              radial-gradient(60% 80% at 95% 10%,
+                rgba(42, 20, 230, 0.70) 0%,
+                rgba(59, 44, 220, 0) 55%),
+              radial-gradient(50% 65% at 75% 100%,
+                rgba(64, 232, 255, 0.75) 0%,
+                rgba(64, 232, 255, 0) 60%),
+              radial-gradient(45% 55% at 0% 90%,
+                rgba(178, 140, 255, 0.55) 0%,
+                rgba(178, 140, 255, 0) 60%),
+              radial-gradient(38% 50% at 45% 40%,
+                rgba(255, 255, 255, 0.28) 0%,
+                rgba(255, 255, 255, 0) 65%)
+            `,
+          }}
+        />
 
-            {/* Quote + text */}
-            <div className="flex flex-col justify-center">
-              <span
-                style={{
-                  fontSize: "clamp(72px, 8vw, 120px)",
-                  fontWeight: 700,
-                  lineHeight: 0.85,
-                  color: "#587DFE",
-                }}
-              >
-                &ldquo;
-              </span>
-              <blockquote
-                className="mt-2"
-                style={{
-                  fontSize: "clamp(24px, 3vw, 40px)",
-                  fontWeight: 600,
-                  lineHeight: 1.3,
-                  letterSpacing: "-0.02em",
-                  color: "#2C337A",
-                }}
-              >
-                Met Legal Talents bereiken wij precies de juridische
-                professionals die we zoeken. Het platform is intuïtief,
-                effectief en zonder drempels.
-              </blockquote>
-              <p
-                className="mt-8"
-                style={{
-                  fontSize: "clamp(15px, 1.1vw, 17px)",
-                  lineHeight: 1.65,
-                  color: "#5A6094",
-                  maxWidth: "500px",
-                }}
-              >
-                Maak vandaag nog een gratis account aan en bereik duizenden
-                juridische professionals. Geen creditcard vereist, direct actief.
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-5">
-                <Link href="/register" className="btn-primary">
-                  Gratis account aanmaken
-                </Link>
-                <Link href="/jobs" className="btn-secondary">
-                  Bekijk vacatures
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Employer CTA */}
-      <section
-        className="bg-[#587DFE]"
-        style={{ padding: "clamp(80px, 10vh, 140px) clamp(24px, 5vw, 80px)" }}
-      >
-        <div className="max-w-[1400px] mx-auto text-center">
-          <span
-            className="inline-block rounded-full border border-white/30"
-            style={{
-              padding: "6px 16px",
-              fontSize: "13px",
-              fontWeight: 500,
-              letterSpacing: "0.02em",
-              color: "rgba(255,255,255,0.85)",
-            }}
-          >
-            KLAAR OM TE STARTEN?
-          </span>
+        <div className="max-w-[1400px] mx-auto text-center relative">
           <h2
             className="mx-auto"
             style={{
@@ -382,8 +494,8 @@ export default function VoorWerkgeversPage() {
               lineHeight: 1.1,
               letterSpacing: "-0.025em",
               color: "#FFFFFF",
-              marginTop: "24px",
               maxWidth: "700px",
+              textShadow: "0 1px 24px rgba(20, 24, 80, 0.28)",
             }}
           >
             Bereik juridisch talent vandaag nog
@@ -393,9 +505,11 @@ export default function VoorWerkgeversPage() {
             style={{
               fontSize: "clamp(15px, 1.1vw, 17px)",
               lineHeight: 1.65,
-              color: "rgba(255,255,255,0.8)",
-              maxWidth: "500px",
+              color: "#FFFFFF",
+              opacity: 0.95,
+              maxWidth: "520px",
               marginTop: "20px",
+              textShadow: "0 1px 16px rgba(20, 24, 80, 0.25)",
             }}
           >
             Maak een gratis account aan, plaats uw eerste vacature en ontvang
@@ -411,8 +525,12 @@ export default function VoorWerkgeversPage() {
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 font-medium transition-all duration-200 hover:bg-white/10"
-              style={{ fontSize: "15px", color: "#FFFFFF" }}
+              className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium transition-all duration-200 hover:bg-white/15"
+              style={{
+                fontSize: "15px",
+                color: "#FFFFFF",
+                border: "2px solid rgba(255, 255, 255, 0.85)",
+              }}
             >
               Inloggen
             </Link>
