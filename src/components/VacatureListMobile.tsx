@@ -66,7 +66,7 @@ export default function VacatureListMobile({ jobs, limit = 5 }: Props) {
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <h3
-                  className="font-semibold leading-snug line-clamp-1"
+                  className="font-semibold leading-snug line-clamp-2 break-words"
                   style={{
                     fontSize: "16px",
                     letterSpacing: "-0.01em",
