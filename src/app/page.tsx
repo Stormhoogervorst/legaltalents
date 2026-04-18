@@ -227,7 +227,7 @@ export default async function HomePage() {
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <h3
-                        className="font-semibold leading-snug line-clamp-1"
+                        className="font-semibold leading-snug line-clamp-2"
                         style={{
                           fontSize: "16px",
                           letterSpacing: "-0.01em",
@@ -405,34 +405,21 @@ export default async function HomePage() {
                 <span style={{ color: "#587DFE" }}>.</span>
               </h2>
 
-
               <p
                 style={{
                   fontSize: "16px",
                   lineHeight: 1.65,
                   color: "#5A6094",
                   maxWidth: "480px",
-                  marginTop: "24px",
+                  marginTop: "28px",
                 }}
               >
-                Plaats uw werkgeversprofiel en vacatures op Legal Talents en
-                ontvang sollicitaties van studenten en young professionals
-                die doelgericht zoeken binnen de juridische markt.
-              </p>
-              <p
-                style={{
-                  fontSize: "15px",
-                  lineHeight: 1.6,
-                  color: "#5A6094",
-                  maxWidth: "480px",
-                  marginTop: "12px",
-                  fontWeight: 500,
-                }}
-              >
-                Vind de beste juridische stages bij topkantoren — of bied ze aan.
+                Maak eenvoudig een werkgeversprofiel aan en plaats je vacatures
+                online. Sollicitaties komen direct binnen via de mail en in het
+                dashboard. Zo houd je makkelijk overzicht.
               </p>
 
-              <div className="flex flex-col gap-5 mt-8">
+              <div className="flex flex-col gap-5 mt-10">
                 {[
                   { label: "Gratis profiel", desc: "Maak direct een werkgeversprofiel aan." },
                   { label: "Onbeperkt plaatsen", desc: "Publiceer zoveel vacatures als u wilt." },
@@ -551,7 +538,7 @@ export default async function HomePage() {
                   padding: 0,
                 }}
               >
-                Artikelen<br className="md:hidden" />&amp; inzichten
+                Artikelen <br className="md:hidden" />&amp; inzichten
                 <span style={{ color: "#587DFE" }}>.</span>
               </h2>
               <Link
