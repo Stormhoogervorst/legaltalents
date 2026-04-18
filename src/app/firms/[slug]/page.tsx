@@ -65,12 +65,8 @@ export default async function FirmPage({ params }: Props) {
   const jobList = (jobs ?? []) as Job[];
   const initials = firmData.name.slice(0, 2).toUpperCase();
 
-  // Subtitle bits for the hero — location and (optionally) practice areas
-  const subtitleParts: string[] = [];
-  if (firmData.location) subtitleParts.push(firmData.location);
-  if (firmData.practice_areas && firmData.practice_areas.length > 0) {
-    subtitleParts.push(firmData.practice_areas.slice(0, 3).join(", "));
-  }
+  const hasHeroPracticeTags =
+    !!(firmData.practice_areas && firmData.practice_areas.length > 0);
 
   return (
     <div className="relative min-h-screen flex flex-col bg-white">
@@ -88,6 +84,8 @@ export default async function FirmPage({ params }: Props) {
               #A8B6FF 62%,
               #C9D4FF 82%,
               #FFFFFF 100%)`,
+            paddingLeft: "clamp(24px, 5vw, 80px)",
+            paddingRight: "clamp(24px, 5vw, 80px)",
           }}
         >
           {/* Layered radial gradients — soft "liquid" purple → blue wash */}
@@ -130,8 +128,8 @@ export default async function FirmPage({ params }: Props) {
           <div
             className="max-w-[1400px] mx-auto relative"
             style={{
-              padding:
-                "calc(4.25rem + clamp(32px, 4vh, 56px)) clamp(24px, 5vw, 80px) clamp(80px, 12vh, 160px)",
+              paddingTop: "calc(4.25rem + clamp(32px, 4vh, 56px))",
+              paddingBottom: "clamp(80px, 12vh, 160px)",
             }}
           >
             {/* Breadcrumb / back link */}
@@ -143,10 +141,10 @@ export default async function FirmPage({ params }: Props) {
               ← Alle werkgevers
             </Link>
 
-            <div className="mt-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-10">
-              {/* Firm logo — liquid glass */}
+            <div className="mt-6 flex flex-col md:flex-row items-start gap-6">
+              {/* Firm logo — liquid glass, no extra margin so left edge aligns with breadcrumb */}
               <div
-                className="w-16 h-16 md:w-20 md:h-20 rounded-[4px] flex items-center justify-center shrink-0 overflow-hidden"
+                className="w-16 h-16 md:w-20 md:h-20 rounded-[4px] shrink-0 flex items-center justify-center overflow-hidden"
                 style={{
                   background: "rgba(255, 255, 255, 0.9)",
                   backdropFilter: "blur(6px)",
@@ -169,8 +167,8 @@ export default async function FirmPage({ params }: Props) {
                 )}
               </div>
 
-              <div className="flex-1 min-w-0">
-                {/* Firm name */}
+              {/* Firm name + practice area tags */}
+              <div className="flex flex-col gap-3">
                 <h1
                   className="font-bold tracking-[-0.03em] leading-[1.05]"
                   style={{
@@ -182,17 +180,14 @@ export default async function FirmPage({ params }: Props) {
                   {firmData.name}
                 </h1>
 
-                {/* Subtitle — location · practice areas */}
-                {subtitleParts.length > 0 && (
-                  <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2">
-                    {subtitleParts.map((part, idx) => (
+                {hasHeroPracticeTags && (
+                  <div className="flex flex-wrap gap-2">
+                    {firmData.practice_areas?.map((area) => (
                       <span
-                        key={`${part}-${idx}`}
-                        className="inline-flex items-center gap-3 text-[15px] font-medium text-white/90"
-                        style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
+                        key={area}
+                        className="rounded-full bg-[#2C337A] px-3 py-1 text-xs font-semibold text-white"
                       >
-                        {idx > 0 && <span className="text-white/50">·</span>}
-                        {part}
+                        {area}
                       </span>
                     ))}
                   </div>
@@ -319,17 +314,21 @@ export default async function FirmPage({ params }: Props) {
                 {firmData.practice_areas && firmData.practice_areas.length > 0 && (
                   <div className="border-b border-[#E5E5E5] pb-4">
                     <p
-                      className="text-[13px] font-medium uppercase tracking-[0.02em] mb-1"
+                      className="text-[13px] font-medium uppercase tracking-[0.02em] mb-2"
                       style={{ color: "#999999" }}
                     >
                       Rechtsgebieden
                     </p>
-                    <p
-                      className="text-[15px] leading-relaxed"
-                      style={{ color: "#0A0A0A" }}
-                    >
-                      {firmData.practice_areas.join(", ")}
-                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {firmData.practice_areas.map((area) => (
+                        <span
+                          key={area}
+                          className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white"
+                        >
+                          {area}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )}
 
