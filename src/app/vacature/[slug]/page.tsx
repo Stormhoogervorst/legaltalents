@@ -44,7 +44,7 @@ function buildJobPostingJsonLd(
     description: plainDescription,
     datePosted: job.created_at.split("T")[0],
     employmentType: EMPLOYMENT_TYPE_MAP[job.type] ?? "OTHER",
-    url: `${BASE_URL}/jobs/${job.slug}`,
+    url: `${BASE_URL}/vacature/${job.slug}`,
   };
 
   if (firm) {
@@ -253,7 +253,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
               <div className="lg:col-span-8 flex flex-col items-start text-left">
                 {/* Breadcrumb / back link — above the logo, left-aligned */}
                 <Link
-                  href="/jobs"
+                  href="/vacatures"
                   className="inline-flex items-center gap-2 text-[14px] font-medium text-white/80 hover:text-white transition-colors duration-200"
                   style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
                 >
@@ -263,7 +263,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                 {/* Firm logo — directly above title, left edge matches title */}
                 {firm && (
                   <Link
-                    href={firm.slug ? `/firms/${firm.slug}` : "#"}
+                    href={firm.slug ? `/werkgevers/${firm.slug}` : "#"}
                     className="mt-8 w-16 h-16 md:w-20 md:h-20 rounded-[4px] flex items-center justify-center shrink-0 overflow-hidden transition-opacity duration-200 hover:opacity-90"
                     style={{
                       background: "rgba(255, 255, 255, 0.9)",
@@ -304,7 +304,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                 <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2">
                   {firm?.name && (
                     <Link
-                      href={firm.slug ? `/firms/${firm.slug}` : "#"}
+                      href={firm.slug ? `/werkgevers/${firm.slug}` : "#"}
                       className="text-[15px] font-semibold text-[#0A0A0A] border-b border-[#0A0A0A]/30 hover:border-[#587DFE] hover:text-[#587DFE] transition-colors duration-200 pb-0.5"
                     >
                       {firm.name}
@@ -406,13 +406,11 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                     Geen zin in gedoe? Solliciteer binnen 1 minuut met je LinkedIn-profiel — geen CV nodig.
                   </p>
                 </div>
-                <div className="relative shrink-0">
-                  <LinkedInQuickApply
-                    jobId={typedJob.id}
-                    jobSlug={typedJob.slug}
-                    alreadyApplied={alreadyApplied}
-                  />
-                </div>
+                <LinkedInQuickApply
+                  jobId={typedJob.id}
+                  jobSlug={typedJob.slug}
+                  alreadyApplied={alreadyApplied}
+                />
               </div>
 
               {/* Description */}
@@ -542,7 +540,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                     <div className="border-t border-[#E5E5E5] pt-5 mt-2 flex flex-col gap-3">
                       {firm.slug && (
                         <Link
-                          href={`/firms/${firm.slug}`}
+                          href={`/werkgevers/${firm.slug}`}
                           className="btn-primary w-full"
                         >
                           Bekijk werkgeversprofiel

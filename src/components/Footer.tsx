@@ -43,9 +43,9 @@ export default function Footer() {
               </p>
               <ul className="space-y-2.5">
                 {[
-                  { label: "Vacatures", href: "/jobs" },
+                  { label: "Vacatures", href: "/vacatures" },
                   { label: "Stages", href: "/stages" },
-                  { label: "Werkgevers", href: "/firms" },
+                  { label: "Werkgevers", href: "/werkgevers" },
                   { label: "Kennisbank", href: "/kennisbank" },
                   { label: "Recruitment", href: "/recruitment" },
                 ].map((link) => (

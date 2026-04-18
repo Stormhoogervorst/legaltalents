@@ -96,7 +96,7 @@ export default function CtaBand() {
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link
-            href="/jobs"
+            href="/vacatures"
             className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-medium transition-transform duration-200 hover:scale-[1.03]"
             style={{ fontSize: "15px", color: "#2C337A" }}
           >

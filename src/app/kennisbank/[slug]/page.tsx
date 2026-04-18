@@ -246,7 +246,7 @@ export default async function BlogArticlePage({ params }: Props) {
                   </div>
                 )}
                 <Link
-                  href={`/firms/${firm.slug}`}
+                  href={`/werkgevers/${firm.slug}`}
                   className="text-[14px] font-medium text-white/90 hover:text-white transition-colors duration-200"
                   style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
                 >
@@ -364,7 +364,7 @@ export default async function BlogArticlePage({ params }: Props) {
                     )}
 
                     <Link
-                      href={`/firms/${firm.slug}`}
+                      href={`/werkgevers/${firm.slug}`}
                       className="btn-primary"
                     >
                       Werkgeversprofiel bekijken

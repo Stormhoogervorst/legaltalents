@@ -134,7 +134,7 @@ export default async function FirmPage({ params }: Props) {
           >
             {/* Breadcrumb / back link */}
             <Link
-              href="/firms"
+              href="/werkgevers"
               className="inline-flex items-center gap-2 text-[14px] font-medium text-white/80 hover:text-white transition-colors duration-200"
               style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
             >
@@ -418,7 +418,7 @@ export default async function FirmPage({ params }: Props) {
                 Momenteel geen openstaande vacatures bij {firmData.name}.
                 Bekijk onze andere werkgevers of kom later terug.
               </p>
-              <Link href="/firms" className="btn-primary mt-8">
+              <Link href="/werkgevers" className="btn-primary mt-8">
                 Alle werkgevers bekijken
               </Link>
             </div>

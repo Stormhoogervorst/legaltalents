@@ -16,11 +16,15 @@ type NavbarPublicProps = {
 function useNavActive(pathname: string | null) {
   const p = pathname ?? "";
   return {
-    vacatures: p === "/jobs" || p.startsWith("/jobs/"),
+    vacatures:
+      p === "/vacatures" ||
+      p.startsWith("/vacatures/") ||
+      p === "/vacature" ||
+      p.startsWith("/vacature/"),
     stages: p === "/stages" || p.startsWith("/stages/"),
     werkgevers:
-      p === "/firms" ||
-      p.startsWith("/firms/") ||
+      p === "/werkgevers" ||
+      p.startsWith("/werkgevers/") ||
       p === "/voor-werkgevers",
     kennisbank: p === "/kennisbank" || p.startsWith("/kennisbank/"),
     recruitment: p === "/recruitment" || p.startsWith("/recruitment/"),
@@ -120,13 +124,13 @@ export default function NavbarPublic({
               </Link>
 
               <div className="hidden md:flex items-center gap-6 lg:gap-8">
-                <Link href="/jobs" className={linkClass("vacatures")} title="Juridische Vacatures">
+                <Link href="/vacatures" className={linkClass("vacatures")} title="Juridische Vacatures">
                   Vacatures
                 </Link>
                 <Link href="/stages" className={linkClass("stages")} title="Juridische Stages">
                   Stages
                 </Link>
-                <Link href="/firms" className={linkClass("werkgevers")}>
+                <Link href="/werkgevers" className={linkClass("werkgevers")}>
                   Werkgevers
                 </Link>
                 <Link href="/kennisbank" className={linkClass("kennisbank")}>
@@ -177,9 +181,9 @@ export default function NavbarPublic({
         >
           <div className="max-w-[1400px] mx-auto flex flex-col items-stretch">
             {[
-              { href: "/jobs", key: "vacatures" as const, label: "Vacatures", title: "Juridische Vacatures" },
+              { href: "/vacatures", key: "vacatures" as const, label: "Vacatures", title: "Juridische Vacatures" },
               { href: "/stages", key: "stages" as const, label: "Stages", title: "Juridische Stages" },
-              { href: "/firms", key: "werkgevers" as const, label: "Werkgevers" },
+              { href: "/werkgevers", key: "werkgevers" as const, label: "Werkgevers" },
               { href: "/kennisbank", key: "kennisbank" as const, label: "Kennisbank" },
               { href: "/recruitment", key: "recruitment" as const, label: "Recruitment" },
             ].map((item) => (

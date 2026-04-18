@@ -186,7 +186,7 @@ export default function LinkedInConfirmForm({
           <strong className="text-[#0A0A0A] font-semibold">{firmName}</strong>{" "}
           is in goede orde ontvangen. De werkgever neemt contact met je op.
         </p>
-        <a href={`/jobs/${jobSlug}`} className="btn-primary mt-8">
+        <a href={`/vacature/${jobSlug}`} className="btn-primary mt-8">
           Terug naar vacature
         </a>
       </div>

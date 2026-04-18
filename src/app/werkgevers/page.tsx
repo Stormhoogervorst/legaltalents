@@ -1,11 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
-import VacatureCard from "@/components/VacatureCard";
+import CtaBand from "@/components/CtaBand";
+import GridCard from "@/components/GridCard";
 import RadiusSelect from "@/components/RadiusSelect";
-import { Job, JobFirmPreview, JOB_TYPE_OPTIONS } from "@/types";
 import { geocodeCity } from "@/lib/geocode";
-import { Search, MapPin, ChevronDown } from "lucide-react";
+import { MapPin, Users, ChevronDown } from "lucide-react";
+import Link from "next/link";
+import { Firm } from "@/types";
+
+export const revalidate = 0;
 
 const PRACTICE_AREAS = [
   "Arbeidsrecht",
@@ -24,23 +28,18 @@ const PRACTICE_AREAS = [
 ];
 
 interface SearchParams {
-  q?: string;
   locatie?: string;
   straal?: string;
-  type?: string;
   rechtsgebied?: string;
-  functie?: string;
 }
 
-export const revalidate = 0;
-
 export const metadata = {
-  title: "Vacatures | Legal Talents",
+  title: "Werkgevers | Legal Talents",
   description:
-    "Bekijk alle juridische vacatures, stages en studentbanen bij juridische werkgevers in Nederland.",
+    "Bekijk alle juridische werkgevers die actief vacatures plaatsen op Legal Talents.",
 };
 
-export default async function JobsPage({
+export default async function FirmsPage({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>;
@@ -48,21 +47,11 @@ export default async function JobsPage({
   const params = await searchParams;
   const supabase = await createClient();
 
-  const fuzzy = (term: string) => term.trim().replace(/[\s\-]+/g, "%");
-
-  const TYPE_ALIASES: Record<string, string[]> = {
-    fulltime: ["fulltime", "full-time", "Voltijd"],
-    parttime: ["parttime", "part-time", "Deeltijd"],
-    "business-course": ["business-course", "lawcourse", "summer-course"],
-    stage: ["stage", "internship", "student", "Studentbaan"],
-  };
-
   const radiusKm = parseInt(params.straal ?? "0", 10) || 0;
   const useGeo = !!(params.locatie && radiusKm > 0);
   const geo = useGeo ? await geocodeCity(params.locatie!) : null;
 
-  let jobs: Job[] | null = null;
-
+  let nearbyFirmIds: Set<string> | null = null;
   if (geo && useGeo) {
     const { data: geoJobs } = await supabase.rpc("get_jobs_in_radius", {
       lat: geo.lat,
@@ -71,105 +60,51 @@ export default async function JobsPage({
       job_status: "active",
     });
 
-    const nearbyIds = ((geoJobs ?? []) as { id: string }[]).map((j) => j.id);
-
-    if (nearbyIds.length > 0) {
-      let geoQuery = supabase
-        .from("jobs")
-        .select("*, firms ( name, logo_url, slug )")
-        .in("id", nearbyIds);
-
-      if (params.q) {
-        const q = fuzzy(params.q);
-        geoQuery = geoQuery.or(
-          `title.ilike.%${q}%,practice_area.ilike.%${q}%,description.ilike.%${q}%,location.ilike.%${q}%`
-        );
-      }
-      if (params.type) {
-        const aliases = TYPE_ALIASES[params.type] ?? [params.type];
-        geoQuery = geoQuery.in("type", aliases);
-      }
-      if (params.rechtsgebied) {
-        geoQuery = geoQuery.ilike("practice_area", `%${params.rechtsgebied}%`);
-      }
-      if (params.functie) {
-        geoQuery = geoQuery.ilike("title", `%${params.functie}%`);
-      }
-
-      const { data } = await geoQuery;
-      const orderedIds = nearbyIds;
-      const dataMap = new Map((data ?? []).map((j) => [j.id, j]));
-      jobs = orderedIds
-        .map((id) => dataMap.get(id))
-        .filter(Boolean) as typeof data;
-    } else {
-      jobs = [];
-    }
-  } else {
-    let query = supabase
-      .from("jobs")
-      .select("*, firms ( name, logo_url, slug )")
-      .eq("status", "active")
-      .order("created_at", { ascending: false });
-
-    if (params.q) {
-      const q = fuzzy(params.q);
-      query = query.or(
-        `title.ilike.%${q}%,practice_area.ilike.%${q}%,description.ilike.%${q}%,location.ilike.%${q}%`
-      );
-    }
-    if (params.locatie) {
-      const loc = fuzzy(params.locatie);
-      query = query.ilike("location", `%${loc}%`);
-    }
-    if (params.type) {
-      const aliases = TYPE_ALIASES[params.type] ?? [params.type];
-      query = query.in("type", aliases);
-    }
-    if (params.rechtsgebied) {
-      query = query.ilike("practice_area", `%${params.rechtsgebied}%`);
-    }
-    if (params.functie) {
-      query = query.ilike("title", `%${params.functie}%`);
-    }
-
-    const { data } = await query;
-    jobs = data;
+    const jobRows = (geoJobs ?? []) as { firm_id: string | null }[];
+    nearbyFirmIds = new Set(
+      jobRows
+        .map((j) => j.firm_id)
+        .filter((id): id is string => typeof id === "string")
+    );
   }
 
-  type JobWithFirm = Omit<Job, "firms"> & { firms: JobFirmPreview | null };
-  const jobList = (jobs ?? []).map((j) => ({
-    ...j,
-    firms: Array.isArray(j.firms) ? (j.firms[0] ?? null) : (j.firms ?? null),
-  })) as JobWithFirm[];
+  const { data: firms } = await supabase
+    .from("firms")
+    .select(
+      "id, name, slug, location, practice_areas, logo_url, team_size, is_published"
+    )
+    .eq("is_published", true)
+    .order("name", { ascending: true });
+
+  let firmList = (firms ?? []) as Firm[];
+
+  if (nearbyFirmIds) {
+    const ids = nearbyFirmIds;
+    firmList = firmList.filter((f) => ids.has(f.id));
+  } else if (params.locatie) {
+    const loc = params.locatie.toLowerCase();
+    firmList = firmList.filter((f) =>
+      f.location?.toLowerCase().includes(loc)
+    );
+  }
+  if (params.rechtsgebied) {
+    const area = params.rechtsgebied.toLowerCase();
+    firmList = firmList.filter((f) =>
+      f.practice_areas?.some((a) => a.toLowerCase().includes(area))
+    );
+  }
 
   const hasFilters = !!(
-    params.q ||
     params.locatie ||
-    params.type ||
     params.rechtsgebied ||
-    params.functie ||
     (params.straal && params.straal !== "0")
   );
-
-  const filterParts: string[] = [];
-  if (params.functie) filterParts.push(params.functie);
-  if (params.rechtsgebied) filterParts.push(params.rechtsgebied);
-  const filterLabel = filterParts.length > 0 ? filterParts.join(" — ") : null;
-
-  const headingText = filterLabel
-    ? `${filterLabel} vacatures`
-    : "Alle vacatures";
-
-  const subtitleText = filterLabel
-    ? `Bekijk alle actuele ${filterLabel.toLowerCase()} vacatures bij juridische werkgevers in Nederland.`
-    : "Stages, studentbanen en startersfuncties bij de beste juridische werkgevers in Nederland.";
 
   return (
     <div className="relative min-h-screen flex flex-col bg-white">
       <NavbarPublic variant="hero" />
 
-      {/* Hero — mesh-gradient matching the homepage, fading seamlessly to white */}
+      {/* Hero — vivid mesh gradient matching the homepage, fading seamlessly to white */}
       <div className="-mt-[4.25rem]">
         <section
           className="relative isolate overflow-hidden"
@@ -183,7 +118,6 @@ export default async function JobsPage({
               #FFFFFF 100%)`,
           }}
         >
-          {/* Layered radial gradients — soft "liquid" purple → blue wash */}
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0"
@@ -235,7 +169,7 @@ export default async function JobsPage({
                 textShadow: "0 1px 24px rgba(20, 24, 80, 0.25)",
               }}
             >
-              {headingText}
+              Juridische werkgevers
             </h1>
             <p
               className="mt-6 leading-relaxed max-w-[640px]"
@@ -247,11 +181,12 @@ export default async function JobsPage({
                 textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)",
               }}
             >
-              {subtitleText}
+              Ontdek de kantoren en organisaties die actief zoeken naar juridisch
+              talent. Vind een werkgever die bij je past.
             </p>
 
             {/* Deep-navy filter pill — matches the homepage hero search contrast */}
-            <form method="GET" className="mt-10 max-w-[1100px]">
+            <form method="GET" className="mt-10 max-w-[960px]">
               <div
                 className="flex flex-col md:flex-row items-stretch flex-wrap rounded-[28px] p-2 gap-2"
                 style={{
@@ -260,35 +195,17 @@ export default async function JobsPage({
                     "0 20px 40px -18px rgba(10, 15, 61, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.10) inset",
                 }}
               >
-                {/* Search */}
-                <label
-                  htmlFor="filter-q"
-                  className="flex items-center gap-2.5 flex-1 min-w-[220px] px-4 rounded-[22px]"
-                >
-                  <Search
-                    className="h-4 w-4 shrink-0"
-                    style={{ color: "rgba(255, 255, 255, 0.65)" }}
-                  />
-                  <input
-                    id="filter-q"
-                    name="q"
-                    defaultValue={params.q ?? ""}
-                    placeholder="Zoek op titel of trefwoord"
-                    className="w-full bg-transparent border-none outline-none focus:outline-none py-3 text-[14px] text-white placeholder:text-white/55"
-                  />
-                </label>
-
                 {/* Location */}
                 <label
-                  htmlFor="filter-locatie"
-                  className="flex items-center gap-2.5 md:w-[170px] min-w-0 px-4 rounded-[22px] md:border-l border-white/10"
+                  htmlFor="locatie"
+                  className="flex items-center gap-2.5 flex-1 min-w-[220px] px-4 rounded-[22px]"
                 >
                   <MapPin
                     className="h-4 w-4 shrink-0"
                     style={{ color: "rgba(255, 255, 255, 0.65)" }}
                   />
                   <input
-                    id="filter-locatie"
+                    id="locatie"
                     name="locatie"
                     defaultValue={params.locatie ?? ""}
                     placeholder="Locatie"
@@ -301,44 +218,18 @@ export default async function JobsPage({
                   <RadiusSelect
                     name="straal"
                     defaultValue={params.straal ?? "0"}
-                    locationInputId="filter-locatie"
+                    locationInputId="locatie"
                     className="w-full bg-transparent border-none outline-none focus:outline-none appearance-none py-3 text-[14px] text-white cursor-pointer"
                   />
                 </div>
 
-                {/* Type */}
-                <label
-                  htmlFor="filter-type"
-                  className="relative flex items-center md:w-[160px] min-w-0 px-4 rounded-[22px] md:border-l border-white/10"
-                >
-                  <select
-                    id="filter-type"
-                    name="type"
-                    defaultValue={params.type ?? ""}
-                    className="w-full bg-transparent border-none outline-none focus:outline-none appearance-none py-3 text-[14px] text-white cursor-pointer pr-6"
-                  >
-                    <option value="" className="text-[#0A0F3D]">
-                      Alle types
-                    </option>
-                    {JOB_TYPE_OPTIONS.map(({ value, label }) => (
-                      <option key={value} value={value} className="text-[#0A0F3D]">
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown
-                    className="h-4 w-4 pointer-events-none absolute right-4"
-                    style={{ color: "rgba(255, 255, 255, 0.55)" }}
-                  />
-                </label>
-
                 {/* Practice area */}
                 <label
-                  htmlFor="filter-rechtsgebied"
-                  className="relative flex items-center md:w-[210px] min-w-0 px-4 rounded-[22px] md:border-l border-white/10"
+                  htmlFor="rechtsgebied"
+                  className="relative flex items-center flex-1 md:max-w-[260px] min-w-0 px-4 rounded-[22px] md:border-l border-white/10"
                 >
                   <select
-                    id="filter-rechtsgebied"
+                    id="rechtsgebied"
                     name="rechtsgebied"
                     defaultValue={params.rechtsgebied ?? ""}
                     className="w-full bg-transparent border-none outline-none focus:outline-none appearance-none py-3 text-[14px] text-white cursor-pointer pr-6"
@@ -347,7 +238,11 @@ export default async function JobsPage({
                       Alle rechtsgebieden
                     </option>
                     {PRACTICE_AREAS.map((area) => (
-                      <option key={area} value={area} className="text-[#0A0F3D]">
+                      <option
+                        key={area}
+                        value={area}
+                        className="text-[#0A0F3D]"
+                      >
                         {area}
                       </option>
                     ))}
@@ -376,13 +271,13 @@ export default async function JobsPage({
 
               {hasFilters && (
                 <div className="mt-4">
-                  <a
-                    href="/jobs"
+                  <Link
+                    href="/werkgevers"
                     className="text-[13px] font-medium border-b border-white/30 pb-0.5 hover:border-white transition-colors"
                     style={{ color: "rgba(255, 255, 255, 0.8)" }}
                   >
                     Filters wissen
-                  </a>
+                  </Link>
                 </div>
               )}
             </form>
@@ -396,35 +291,67 @@ export default async function JobsPage({
           paddingLeft: "clamp(24px, 5vw, 80px)",
           paddingRight: "clamp(24px, 5vw, 80px)",
           paddingTop: "clamp(40px, 5vh, 64px)",
-          paddingBottom: "clamp(80px, 10vh, 140px)",
+          paddingBottom: "clamp(100px, 12vh, 180px)",
         }}
       >
         <div className="max-w-[1400px] mx-auto">
-          <div className="flex items-baseline justify-between mb-6">
-            <p className="text-[13px] font-medium tracking-[0.02em] text-[#999999]">
-              {jobList.length === 0
-                ? "Geen resultaten"
-                : `${jobList.length} vacature${jobList.length !== 1 ? "s" : ""}`}
+          {/* Result count */}
+          <div className="mb-6">
+            <p
+              className="text-[13px] font-medium tracking-wide"
+              style={{ color: "#999999" }}
+            >
+              {firmList.length === 0
+                ? "Geen werkgevers gevonden"
+                : `${firmList.length} werkgever${firmList.length !== 1 ? "s" : ""}`}
             </p>
           </div>
 
-          {jobList.length > 0 ? (
+          {/* Firm grid */}
+          {firmList.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-              {jobList.map((job) => (
-                <VacatureCard key={job.id} job={job} />
-              ))}
+              {firmList.map((firm) => {
+                const initials = firm.name.slice(0, 2).toUpperCase();
+                const meta: { icon: React.ReactNode; text: string }[] = [];
+
+                if (firm.location) {
+                  meta.push({
+                    icon: <MapPin className="h-3 w-3 shrink-0" />,
+                    text: firm.location,
+                  });
+                }
+                if (firm.team_size) {
+                  meta.push({
+                    icon: <Users className="h-3 w-3 shrink-0" />,
+                    text: `${firm.team_size} medewerkers`,
+                  });
+                }
+
+                return (
+                  <GridCard
+                    key={firm.id}
+                    href={`/werkgevers/${firm.slug}`}
+                    logoUrl={firm.logo_url}
+                    logoFallback={
+                      <span className="font-semibold text-sm text-[#587DFE]">
+                        {initials}
+                      </span>
+                    }
+                    title={firm.name}
+                    meta={meta}
+                    pills={firm.practice_areas ?? []}
+                  />
+                );
+              })}
             </div>
           ) : (
-            <div
-              className="pt-16 pb-8"
-              style={{ maxWidth: "640px" }}
-            >
+            <div className="pt-16 pb-8" style={{ maxWidth: "640px" }}>
               <h2
                 className="font-bold tracking-[-0.025em] leading-[1.1] text-[#0A0A0A]"
                 style={{ fontSize: "clamp(36px, 4.5vw, 64px)" }}
               >
                 {hasFilters
-                  ? "Geen vacatures gevonden"
+                  ? "Geen werkgevers gevonden"
                   : "Binnenkort beschikbaar"}
               </h2>
               <p
@@ -436,18 +363,20 @@ export default async function JobsPage({
                 }}
               >
                 {hasFilters
-                  ? "Probeer andere filters of verwijder de huidige selectie om meer resultaten te zien."
-                  : "Er zijn momenteel geen actieve vacatures. Kom binnenkort terug voor nieuwe mogelijkheden."}
+                  ? "Probeer andere filters of verwijder de huidige selectie."
+                  : "Er zijn momenteel geen gepubliceerde werkgevers. Kom later terug."}
               </p>
               {hasFilters && (
-                <a href="/jobs" className="btn-primary mt-8">
-                  Bekijk alle vacatures
-                </a>
+                <Link href="/werkgevers" className="btn-primary mt-8">
+                  Alle werkgevers bekijken
+                </Link>
               )}
             </div>
           )}
         </div>
       </section>
+
+      <CtaBand />
 
       <Footer />
     </div>

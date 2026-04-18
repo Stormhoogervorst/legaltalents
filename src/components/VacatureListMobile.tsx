@@ -41,7 +41,7 @@ export default function VacatureListMobile({ jobs, limit = 5 }: Props) {
         return (
           <li key={job.id}>
             <Link
-              href={`/jobs/${job.slug}`}
+              href={`/vacature/${job.slug}`}
               className="flex gap-4 rounded-[16px] p-5 transition-all duration-200 active:scale-[0.99]"
               style={{
                 backgroundImage:

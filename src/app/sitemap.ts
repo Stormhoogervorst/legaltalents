@@ -17,13 +17,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${BASE_URL}/jobs`,
+      url: `${BASE_URL}/vacatures`,
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: `${BASE_URL}/firms`,
+      url: `${BASE_URL}/werkgevers`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.8,
@@ -39,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Per-functie pages (no city)
   for (const fn of JOB_FUNCTIONS) {
     entries.push({
-      url: `${BASE_URL}/jobs?functie=${encodeURIComponent(fn)}`,
+      url: `${BASE_URL}/vacatures?functie=${encodeURIComponent(fn)}`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.6,
@@ -50,7 +50,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const area of PRACTICE_AREAS) {
     if (area === "Overig") continue;
     entries.push({
-      url: `${BASE_URL}/jobs?rechtsgebied=${encodeURIComponent(area)}`,
+      url: `${BASE_URL}/vacatures?rechtsgebied=${encodeURIComponent(area)}`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.6,
@@ -103,7 +103,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const job of jobs ?? []) {
     entries.push({
-      url: `${BASE_URL}/jobs/${job.slug}`,
+      url: `${BASE_URL}/vacature/${job.slug}`,
       lastModified: new Date(job.updated_at),
       changeFrequency: "weekly",
       priority: 0.6,
@@ -117,7 +117,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const firm of firms ?? []) {
     entries.push({
-      url: `${BASE_URL}/firms/${firm.slug}`,
+      url: `${BASE_URL}/werkgevers/${firm.slug}`,
       lastModified: new Date(firm.created_at),
       changeFrequency: "monthly",
       priority: 0.5,

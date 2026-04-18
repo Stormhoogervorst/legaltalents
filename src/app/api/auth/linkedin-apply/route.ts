@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const slug = searchParams.get("slug");
 
   const base = process.env.NEXT_PUBLIC_SITE_URL || origin;
-  const jobPage = `${base}/vacatures/${slug || ""}`;
+  const jobPage = `${base}/vacature/${slug || ""}`;
 
   if (!code || !jobId || !slug) {
     return NextResponse.redirect(`${jobPage}?error=missing_params`);
@@ -23,6 +23,6 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.redirect(
-    `${base}/vacatures/${slug}/solliciteren/bevestig-linkedin?job_id=${encodeURIComponent(jobId)}`
+    `${base}/vacature/${slug}/bevestig-linkedin?job_id=${encodeURIComponent(jobId)}`
   );
 }

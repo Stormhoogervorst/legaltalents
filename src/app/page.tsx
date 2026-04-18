@@ -115,7 +115,7 @@ export default async function HomePage() {
               De nieuwste juridische vacatures
               <span style={{ color: "#587DFE" }}>.</span>
             </h2>
-            <Link href="/jobs" className="btn-primary shrink-0 mb-1">
+            <Link href="/vacatures" className="btn-primary shrink-0 mb-1">
               Alle vacatures
             </Link>
           </div>
@@ -126,7 +126,7 @@ export default async function HomePage() {
               <div className="md:hidden">
                 <VacatureListMobile jobs={allJobs} limit={5} />
                 <Link
-                  href="/jobs"
+                  href="/vacatures"
                   className="btn-primary mt-6 w-full justify-center inline-flex"
                 >
                   Alle vacatures
@@ -189,7 +189,7 @@ export default async function HomePage() {
               Uitgelichte werkgevers
               <span style={{ color: "#587DFE" }}>.</span>
             </h2>
-            <Link href="/firms" className="btn-primary shrink-0 mb-1">
+            <Link href="/werkgevers" className="btn-primary shrink-0 mb-1">
               Alle werkgevers
             </Link>
           </div>
@@ -200,7 +200,7 @@ export default async function HomePage() {
               {featuredFirms.map((firm) => (
                 <li key={firm.id}>
                   <Link
-                    href={`/firms/${firm.slug}`}
+                    href={`/werkgevers/${firm.slug}`}
                     className="flex items-center gap-4 rounded-[16px] px-4 py-5 transition-all duration-200 active:scale-[0.99]"
                     style={{
                       backgroundImage:
@@ -271,7 +271,7 @@ export default async function HomePage() {
             </ul>
 
             <Link
-              href="/firms"
+              href="/werkgevers"
               className="btn-primary mt-6 w-full justify-center inline-flex"
             >
               Alle werkgevers
@@ -283,7 +283,7 @@ export default async function HomePage() {
             {featuredFirms.map((firm) => (
               <Link
                 key={firm.id}
-                href={`/firms/${firm.slug}`}
+                href={`/werkgevers/${firm.slug}`}
                 className="group rounded-[16px] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(88,125,254,0.12)]"
                 style={{
                   backgroundImage:

@@ -51,7 +51,7 @@ export default function VacatureCard({ job, stageMode }: Props) {
 
   return (
     <GridCard
-      href={`/jobs/${job.slug}`}
+      href={`/vacature/${job.slug}`}
       logoUrl={logoUrl}
       topRight={date ?? undefined}
       title={job.title}

@@ -116,7 +116,7 @@ export default function JuridischeVacaturesIndexPage() {
           >
             {/* Breadcrumb */}
             <Link
-              href="/jobs"
+              href="/vacatures"
               className="inline-flex items-center gap-2 text-[14px] font-medium text-white/80 hover:text-white transition-colors duration-200"
               style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
             >
@@ -167,7 +167,7 @@ export default function JuridischeVacaturesIndexPage() {
             {JOB_FUNCTIONS.map((fn) => (
               <Link
                 key={fn}
-                href={`/jobs?functie=${encodeURIComponent(fn)}`}
+                href={`/vacatures?functie=${encodeURIComponent(fn)}`}
                 title={`Bekijk alle ${fn} vacatures`}
                 className="text-[15px] font-medium text-[#0A0A0A] hover:text-[#587DFE] transition-colors duration-200 py-1"
               >
@@ -191,7 +191,7 @@ export default function JuridischeVacaturesIndexPage() {
             {PRACTICE_AREAS.filter((a) => a !== "Overig").map((area) => (
               <Link
                 key={area}
-                href={`/jobs?rechtsgebied=${encodeURIComponent(area)}`}
+                href={`/vacatures?rechtsgebied=${encodeURIComponent(area)}`}
                 title={`Bekijk alle ${area} vacatures`}
                 className="text-[15px] font-medium text-[#0A0A0A] hover:text-[#587DFE] transition-colors duration-200 py-1"
               >

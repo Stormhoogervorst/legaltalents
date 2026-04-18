@@ -115,7 +115,7 @@ export default function HeroSection() {
 
         {/* Composite pill search bar — deep navy for strong contrast */}
         <form
-          action="/jobs"
+          action="/vacatures"
           method="GET"
           className="mt-8"
           style={{ maxWidth: "580px" }}

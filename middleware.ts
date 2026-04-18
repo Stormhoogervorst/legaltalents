@@ -82,9 +82,11 @@ export async function middleware(request: NextRequest) {
 
   // Logged-in users are sent to /portal when they visit auth pages.
   // Explicitly excluded: the LinkedIn apply confirmation flow at
-  // /vacatures/[slug]/solliciteren/... so users arriving after OAuth
+  // /vacature/[slug]/bevestig-linkedin so users arriving after OAuth
   // are never bounced away mid-application.
-  const isApplyFlow = pathname.startsWith("/vacatures/") && pathname.includes("/solliciteren/");
+  const isApplyFlow =
+    pathname.startsWith("/vacature/") &&
+    pathname.includes("/bevestig-linkedin");
   if (
     user &&
     !isApplyFlow &&

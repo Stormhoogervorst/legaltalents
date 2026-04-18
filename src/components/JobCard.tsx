@@ -18,7 +18,7 @@ export default function JobCard({ job }: Props) {
 
   return (
     <Link
-      href={`/jobs/${job.slug}`}
+      href={`/vacature/${job.slug}`}
       className="group flex items-center gap-5 sm:gap-8 py-6 border-b border-[#E5E5E5] transition-colors duration-300 hover:bg-[#FAFAFA] -mx-2 px-2"
     >
       {/* Firm logo */}

@@ -157,7 +157,7 @@ export default async function CityJobsPage({
       "@type": "ListItem",
       position: i + 1,
       name: job.title,
-      url: `${BASE_URL}/jobs/${job.slug}`,
+      url: `${BASE_URL}/vacature/${job.slug}`,
     })),
   };
 
@@ -229,7 +229,7 @@ export default async function CityJobsPage({
           >
             {/* Breadcrumb */}
             <Link
-              href="/jobs"
+              href="/vacatures"
               className="inline-flex items-center gap-2 text-[14px] font-medium text-white/80 hover:text-white transition-colors duration-200"
               style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
             >
@@ -408,7 +408,7 @@ export default async function CityJobsPage({
                   : `Momenteel zijn er geen vacatures in ${name}. Bekijk alle landelijke vacatures of kom binnenkort terug.`}
               </p>
               <div className="flex flex-wrap items-center gap-6 mt-8">
-                <Link href="/jobs" className="btn-primary">
+                <Link href="/vacatures" className="btn-primary">
                   Bekijk alle vacatures
                 </Link>
                 {hasFilters && (

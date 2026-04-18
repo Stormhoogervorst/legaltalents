@@ -19,14 +19,14 @@ export default async function ConfirmLinkedInPage({
   const { slug } = await params;
   const { job_id: jobId } = await searchParams;
 
-  if (!jobId) redirect(`/jobs/${slug}`);
+  if (!jobId) redirect(`/vacature/${slug}`);
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect(`/jobs/${slug}`);
+  if (!user) redirect(`/vacature/${slug}`);
 
   const meta = user.user_metadata ?? {};
   const fullName: string = meta.full_name ?? meta.name ?? "";
@@ -40,7 +40,7 @@ export default async function ConfirmLinkedInPage({
     .eq("status", "active")
     .maybeSingle();
 
-  if (!job) redirect(`/jobs/${slug}`);
+  if (!job) redirect(`/vacature/${slug}`);
 
   const firm = Array.isArray(job.firms) ? job.firms[0] : job.firms;
   const firmName = (firm as { name: string } | null)?.name ?? "";
@@ -52,7 +52,7 @@ export default async function ConfirmLinkedInPage({
     .eq("applicant_email", email)
     .maybeSingle();
 
-  if (existing) redirect(`/jobs/${slug}?error=already_applied`);
+  if (existing) redirect(`/vacature/${slug}?error=already_applied`);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">

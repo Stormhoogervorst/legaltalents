@@ -119,7 +119,7 @@ export default async function CityStagesPage({
       "@type": "ListItem",
       position: i + 1,
       name: job.title,
-      url: `${BASE_URL}/jobs/${job.slug}`,
+      url: `${BASE_URL}/vacature/${job.slug}`,
     })),
   };
 
@@ -341,7 +341,7 @@ export default async function CityStagesPage({
                   : `Momenteel zijn er geen stages in ${name}. Bekijk alle landelijke stages of kom binnenkort terug.`}
               </p>
               <div className="flex flex-wrap items-center gap-6 mt-8">
-                <Link href="/jobs?type=stage" className="btn-primary">
+                <Link href="/vacatures?type=stage" className="btn-primary">
                   Bekijk alle stages
                 </Link>
                 {hasFilters && (
