@@ -33,37 +33,43 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    if (recaptchaRequired) {
-      if (!recaptchaToken) {
-        setError("Voltooi de reCAPTCHA-verificatie.");
-        setLoading(false);
-        return;
+    try {
+      if (recaptchaRequired) {
+        if (!recaptchaToken) {
+          setError("Voltooi de reCAPTCHA-verificatie.");
+          setLoading(false);
+          return;
+        }
+        const captcha = await verifyRecaptchaAction(recaptchaToken);
+        if (!captcha.ok) {
+          setError(captcha.error);
+          resetRecaptcha();
+          setLoading(false);
+          return;
+        }
       }
-      const captcha = await verifyRecaptchaAction(recaptchaToken);
-      if (!captcha.ok) {
-        setError(captcha.error);
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        setError(
+          signInError.message === "Invalid login credentials"
+            ? "E-mailadres of wachtwoord is onjuist."
+            : signInError.message
+        );
         resetRecaptcha();
         setLoading(false);
-        return;
+      } else {
+        router.push("/portal");
+        router.refresh();
       }
-    }
-
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (signInError) {
-      setError(
-        signInError.message === "Invalid login credentials"
-          ? "E-mailadres of wachtwoord is onjuist."
-          : signInError.message
-      );
+    } catch {
+      setError("Er is een onverwachte fout opgetreden. Probeer het opnieuw.");
       resetRecaptcha();
       setLoading(false);
-    } else {
-      router.push("/portal");
-      router.refresh();
     }
   };
 
@@ -72,31 +78,37 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    if (recaptchaRequired) {
-      if (!recaptchaToken) {
-        setError("Voltooi de reCAPTCHA-verificatie.");
-        setLoading(false);
-        return;
+    try {
+      if (recaptchaRequired) {
+        if (!recaptchaToken) {
+          setError("Voltooi de reCAPTCHA-verificatie.");
+          setLoading(false);
+          return;
+        }
+        const captcha = await verifyRecaptchaAction(recaptchaToken);
+        if (!captcha.ok) {
+          setError(captcha.error);
+          resetRecaptcha();
+          setLoading(false);
+          return;
+        }
       }
-      const captcha = await verifyRecaptchaAction(recaptchaToken);
-      if (!captcha.ok) {
-        setError(captcha.error);
+
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${location.origin}/api/auth/callback?next=/portal/settings`,
+      });
+
+      if (resetError) {
+        setError(resetError.message);
         resetRecaptcha();
         setLoading(false);
-        return;
+      } else {
+        setResetSent(true);
+        setLoading(false);
       }
-    }
-
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${location.origin}/api/auth/callback?next=/portal/settings`,
-    });
-
-    if (resetError) {
-      setError(resetError.message);
+    } catch {
+      setError("Er is een onverwachte fout opgetreden. Probeer het opnieuw.");
       resetRecaptcha();
-      setLoading(false);
-    } else {
-      setResetSent(true);
       setLoading(false);
     }
   };

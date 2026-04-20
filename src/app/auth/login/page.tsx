@@ -31,30 +31,36 @@ function LoginForm() {
     setLoading(true);
     setError(null);
 
-    if (recaptchaRequired) {
-      if (!recaptchaToken) {
-        setError("Please complete the reCAPTCHA verification.");
-        setLoading(false);
-        return;
+    try {
+      if (recaptchaRequired) {
+        if (!recaptchaToken) {
+          setError("Please complete the reCAPTCHA verification.");
+          setLoading(false);
+          return;
+        }
+        const captcha = await verifyRecaptchaAction(recaptchaToken);
+        if (!captcha.ok) {
+          setError(captcha.error);
+          resetRecaptcha();
+          setLoading(false);
+          return;
+        }
       }
-      const captcha = await verifyRecaptchaAction(recaptchaToken);
-      if (!captcha.ok) {
-        setError(captcha.error);
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        setError(error.message);
         resetRecaptcha();
         setLoading(false);
-        return;
+      } else {
+        router.push(redirectTo);
+        router.refresh();
       }
-    }
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      setError(error.message);
+    } catch {
+      setError("An unexpected error occurred. Please try again.");
       resetRecaptcha();
       setLoading(false);
-    } else {
-      router.push(redirectTo);
-      router.refresh();
     }
   };
 
