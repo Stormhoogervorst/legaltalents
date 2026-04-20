@@ -51,6 +51,15 @@ const config: Config = {
           DEFAULT: "#E2E5F0",
         },
       },
+      keyframes: {
+        fadeInUp: {
+          "0%": { opacity: "0", transform: "translateY(6px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        "fade-in-up": "fadeInUp 280ms ease-out both",
+      },
     },
   },
   plugins: [require("@tailwindcss/typography")],

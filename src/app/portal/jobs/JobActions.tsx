@@ -7,8 +7,6 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
-  Eye,
-  EyeOff,
   XCircle,
   Loader2,
 } from "lucide-react";
@@ -134,24 +132,6 @@ export default function JobActions({ job }: Props) {
 
           <div className="my-1 border-t border-gray-100" />
 
-          {job.status !== "active" && (
-            <button
-              onClick={() => changeStatus("active")}
-              className="w-full flex items-center gap-2.5 px-4 py-2 text-green-600 hover:bg-green-50 transition-colors"
-            >
-              <Eye className="h-4 w-4" />
-              Publiceren
-            </button>
-          )}
-          {job.status !== "draft" && (
-            <button
-              onClick={() => changeStatus("draft")}
-              className="w-full flex items-center gap-2.5 px-4 py-2 text-yellow-600 hover:bg-yellow-50 transition-colors"
-            >
-              <EyeOff className="h-4 w-4" />
-              Naar concept
-            </button>
-          )}
           {job.status !== "closed" && (
             <button
               onClick={() => changeStatus("closed")}

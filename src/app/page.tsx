@@ -444,7 +444,7 @@ export default async function HomePage() {
                 <Link href="/voor-werkgevers" className="btn-secondary sm:w-auto w-full">
                   Meer info
                 </Link>
-                <Link href="/aanmelden" className="btn-primary sm:w-auto w-full">
+                <Link href="/register" className="btn-primary sm:w-auto w-full">
                   Upload vacature
                 </Link>
               </div>
