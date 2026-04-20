@@ -40,34 +40,54 @@ export default function LoginPage() {
           setLoading(false);
           return;
         }
+        console.debug("[login] verifying reCAPTCHA token...");
         const captcha = await verifyRecaptchaAction(recaptchaToken);
         if (!captcha.ok) {
-          setError(captcha.error);
+          console.error("[login] reCAPTCHA verification failed", captcha);
+          const codes = captcha.codes?.length ? ` (codes: ${captcha.codes.join(", ")})` : "";
+          setError(`${captcha.error}${codes}`);
           resetRecaptcha();
           setLoading(false);
           return;
         }
+        console.debug("[login] reCAPTCHA OK", captcha);
       }
 
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      console.debug("[login] calling supabase.auth.signInWithPassword for", email);
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (signInError) {
+        console.error("[login] signInWithPassword error", {
+          message: signInError.message,
+          name: signInError.name,
+          status: signInError.status,
+          code: (signInError as { code?: string }).code,
+          full: signInError,
+        });
         setError(
           signInError.message === "Invalid login credentials"
             ? "E-mailadres of wachtwoord is onjuist."
-            : signInError.message
+            : `${signInError.message}${signInError.status ? ` (status ${signInError.status})` : ""}`
         );
         resetRecaptcha();
         setLoading(false);
       } else {
+        console.debug("[login] signIn success", { userId: data?.user?.id });
         router.push("/portal");
         router.refresh();
       }
-    } catch {
-      setError("Er is een onverwachte fout opgetreden. Probeer het opnieuw.");
+    } catch (err) {
+      console.error("[login] unexpected exception during login flow", err);
+      const message =
+        err instanceof Error
+          ? `${err.name}: ${err.message}`
+          : typeof err === "string"
+            ? err
+            : JSON.stringify(err);
+      setError(`Onverwachte fout: ${message}`);
       resetRecaptcha();
       setLoading(false);
     }
@@ -87,7 +107,9 @@ export default function LoginPage() {
         }
         const captcha = await verifyRecaptchaAction(recaptchaToken);
         if (!captcha.ok) {
-          setError(captcha.error);
+          console.error("[forgot-password] reCAPTCHA verification failed", captcha);
+          const codes = captcha.codes?.length ? ` (codes: ${captcha.codes.join(", ")})` : "";
+          setError(`${captcha.error}${codes}`);
           resetRecaptcha();
           setLoading(false);
           return;
@@ -99,6 +121,12 @@ export default function LoginPage() {
       });
 
       if (resetError) {
+        console.error("[forgot-password] resetPasswordForEmail error", {
+          message: resetError.message,
+          name: resetError.name,
+          status: resetError.status,
+          full: resetError,
+        });
         setError(resetError.message);
         resetRecaptcha();
         setLoading(false);
@@ -106,8 +134,15 @@ export default function LoginPage() {
         setResetSent(true);
         setLoading(false);
       }
-    } catch {
-      setError("Er is een onverwachte fout opgetreden. Probeer het opnieuw.");
+    } catch (err) {
+      console.error("[forgot-password] unexpected exception", err);
+      const message =
+        err instanceof Error
+          ? `${err.name}: ${err.message}`
+          : typeof err === "string"
+            ? err
+            : JSON.stringify(err);
+      setError(`Onverwachte fout: ${message}`);
       resetRecaptcha();
       setLoading(false);
     }

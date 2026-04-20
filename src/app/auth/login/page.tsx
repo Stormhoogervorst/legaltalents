@@ -38,27 +38,46 @@ function LoginForm() {
           setLoading(false);
           return;
         }
+        console.debug("[auth/login] verifying reCAPTCHA token...");
         const captcha = await verifyRecaptchaAction(recaptchaToken);
         if (!captcha.ok) {
-          setError(captcha.error);
+          console.error("[auth/login] reCAPTCHA verification failed", captcha);
+          const codes = captcha.codes?.length ? ` (codes: ${captcha.codes.join(", ")})` : "";
+          setError(`${captcha.error}${codes}`);
           resetRecaptcha();
           setLoading(false);
           return;
         }
       }
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      console.debug("[auth/login] calling supabase.auth.signInWithPassword for", email);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        setError(error.message);
+        console.error("[auth/login] signInWithPassword error", {
+          message: error.message,
+          name: error.name,
+          status: error.status,
+          code: (error as { code?: string }).code,
+          full: error,
+        });
+        setError(`${error.message}${error.status ? ` (status ${error.status})` : ""}`);
         resetRecaptcha();
         setLoading(false);
       } else {
+        console.debug("[auth/login] signIn success", { userId: data?.user?.id });
         router.push(redirectTo);
         router.refresh();
       }
-    } catch {
-      setError("An unexpected error occurred. Please try again.");
+    } catch (err) {
+      console.error("[auth/login] unexpected exception during login flow", err);
+      const message =
+        err instanceof Error
+          ? `${err.name}: ${err.message}`
+          : typeof err === "string"
+            ? err
+            : JSON.stringify(err);
+      setError(`Unexpected error: ${message}`);
       resetRecaptcha();
       setLoading(false);
     }

@@ -25,6 +25,10 @@ export async function verifyRecaptchaToken(
 ): Promise<RecaptchaVerifyResult> {
   const secret = process.env.RECAPTCHA_SECRET_KEY;
   if (!secret) {
+    console.error(
+      "[recaptcha] RECAPTCHA_SECRET_KEY is not set in the server environment. " +
+        "Add it to your .env(.local) and restart the dev server."
+    );
     return {
       ok: false,
       error: "reCAPTCHA secret key is not configured on the server.",
@@ -46,6 +50,12 @@ export async function verifyRecaptchaToken(
     });
 
     if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      console.error("[recaptcha] siteverify HTTP error", {
+        status: res.status,
+        statusText: res.statusText,
+        body: text,
+      });
       return {
         ok: false,
         error: `reCAPTCHA verification request failed (${res.status}).`,
@@ -53,15 +63,30 @@ export async function verifyRecaptchaToken(
     }
 
     json = (await res.json()) as GoogleSiteverifyJson;
-  } catch {
+  } catch (err) {
+    console.error("[recaptcha] network error reaching siteverify", err);
     return { ok: false, error: "Could not reach reCAPTCHA verification service." };
   }
 
   if (!json.success) {
+    const codes = json["error-codes"] ?? [];
+    console.error("[recaptcha] verification rejected by Google", {
+      codes,
+      hostname: json.hostname,
+      remoteip,
+    });
+    const friendly =
+      codes.includes("missing-input-secret") || codes.includes("invalid-input-secret")
+        ? "reCAPTCHA secret key is missing or invalid on the server."
+        : codes.includes("timeout-or-duplicate")
+          ? "reCAPTCHA token expired or was already used. Try again."
+          : codes.includes("invalid-input-response") || codes.includes("missing-input-response")
+            ? "reCAPTCHA token is missing or invalid."
+            : "reCAPTCHA verification failed.";
     return {
       ok: false,
-      error: "reCAPTCHA verification failed.",
-      codes: json["error-codes"],
+      error: friendly,
+      codes,
     };
   }
 
