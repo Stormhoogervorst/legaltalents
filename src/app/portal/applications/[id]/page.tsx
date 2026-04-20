@@ -15,6 +15,7 @@ import {
   Linkedin,
 } from "lucide-react";
 import { toPublicLinkedInProfileUrl } from "@/lib/linkedin-profile-url";
+import { isLinkedInPlaceholderEmail } from "@/lib/applicant-email";
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +67,7 @@ export default async function ApplicationDetailPage({ params }: Props) {
 
   const job = Array.isArray(app.jobs) ? app.jobs[0] : app.jobs;
   const linkedInHref = toPublicLinkedInProfileUrl(app.linkedin_url);
+  const hasRealEmail = !isLinkedInPlaceholderEmail(app.applicant_email);
 
   // Generate a signed URL for the CV (valid for 1 hour)
   let cvSignedUrl: string | null = null;
@@ -122,12 +124,18 @@ export default async function ApplicationDetailPage({ params }: Props) {
               <div className="w-8 h-8 bg-primary-light rounded-lg flex items-center justify-center shrink-0">
                 <Mail className="h-4 w-4 text-primary" />
               </div>
-              <a
-                href={`mailto:${app.applicant_email}`}
-                className="text-sm text-primary hover:underline break-all"
-              >
-                {app.applicant_email}
-              </a>
+              {hasRealEmail ? (
+                <a
+                  href={`mailto:${app.applicant_email}`}
+                  className="text-sm text-primary hover:underline break-all"
+                >
+                  {app.applicant_email}
+                </a>
+              ) : (
+                <span className="text-sm italic text-gray-400">
+                  Geen e-mailadres gedeeld (LinkedIn)
+                </span>
+              )}
             </li>
             {app.applicant_phone && (
               <li className="flex items-center gap-3">

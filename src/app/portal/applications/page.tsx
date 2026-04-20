@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Users, Mail, Phone, Building2, ChevronLeft, ChevronRight, Linkedin } from "lucide-react";
 import { toPublicLinkedInProfileUrl } from "@/lib/linkedin-profile-url";
+import { isLinkedInPlaceholderEmail } from "@/lib/applicant-email";
 import DeleteApplicationButton from "@/components/portal/DeleteApplicationButton";
 
 export const dynamic = "force-dynamic";
@@ -148,6 +149,7 @@ export default async function ApplicationsPage({ searchParams }: Props) {
                 {appList.map((app) => {
                   const job = Array.isArray(app.jobs) ? app.jobs[0] : app.jobs;
                   const linkedInHref = toPublicLinkedInProfileUrl(app.linkedin_url);
+                  const hasRealEmail = !isLinkedInPlaceholderEmail(app.applicant_email);
                   return (
                     <tr key={app.id} className="hover:bg-gray-50 transition-colors group">
                       <td className="px-6 py-4">
@@ -159,13 +161,20 @@ export default async function ApplicationsPage({ searchParams }: Props) {
                         </Link>
                       </td>
                       <td className="px-4 py-4">
-                        <a
-                          href={`mailto:${app.applicant_email}`}
-                          className="flex items-center gap-1.5 text-sm text-primary hover:underline"
-                        >
-                          <Mail className="h-3.5 w-3.5 shrink-0" />
-                          {app.applicant_email}
-                        </a>
+                        {hasRealEmail ? (
+                          <a
+                            href={`mailto:${app.applicant_email}`}
+                            className="flex items-center gap-1.5 text-sm text-primary hover:underline"
+                          >
+                            <Mail className="h-3.5 w-3.5 shrink-0" />
+                            {app.applicant_email}
+                          </a>
+                        ) : (
+                          <span className="flex items-center gap-1.5 text-sm italic text-gray-400">
+                            <Mail className="h-3.5 w-3.5 shrink-0" />
+                            Geen e-mail (LinkedIn)
+                          </span>
+                        )}
                         {app.applicant_phone && (
                           <a
                             href={`tel:${app.applicant_phone}`}
@@ -235,6 +244,7 @@ export default async function ApplicationsPage({ searchParams }: Props) {
             {appList.map((app) => {
               const job = Array.isArray(app.jobs) ? app.jobs[0] : app.jobs;
               const linkedInHref = toPublicLinkedInProfileUrl(app.linkedin_url);
+              const hasRealEmail = !isLinkedInPlaceholderEmail(app.applicant_email);
               return (
                 <div
                   key={app.id}
@@ -271,13 +281,20 @@ export default async function ApplicationsPage({ searchParams }: Props) {
                   </div>
 
                   <div className="space-y-1">
-                    <a
-                      href={`mailto:${app.applicant_email}`}
-                      className="flex items-center gap-1.5 text-sm text-primary"
-                    >
-                      <Mail className="h-3.5 w-3.5 shrink-0" />
-                      {app.applicant_email}
-                    </a>
+                    {hasRealEmail ? (
+                      <a
+                        href={`mailto:${app.applicant_email}`}
+                        className="flex items-center gap-1.5 text-sm text-primary"
+                      >
+                        <Mail className="h-3.5 w-3.5 shrink-0" />
+                        {app.applicant_email}
+                      </a>
+                    ) : (
+                      <span className="flex items-center gap-1.5 text-sm italic text-gray-400">
+                        <Mail className="h-3.5 w-3.5 shrink-0" />
+                        Geen e-mail (LinkedIn)
+                      </span>
+                    )}
                     {app.applicant_phone && (
                       <a
                         href={`tel:${app.applicant_phone}`}
