@@ -6,11 +6,12 @@ import {
   type RecaptchaVerifyResult,
 } from "@/lib/recaptcha/verify-server";
 
-export type { RecaptchaVerifyResult };
-
 /**
  * Server Action: verifies the client token before you run auth or other mutations.
  * Uses the caller IP when available (x-forwarded-for / x-real-ip) for Google's optional remoteip check.
+ *
+ * Note: files with "use server" may only export async functions. Types and
+ * re-exports are stripped by the Next.js compiler and will crash at runtime.
  */
 export async function verifyRecaptchaAction(
   token: string
