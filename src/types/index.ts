@@ -66,7 +66,7 @@ export interface Firm {
   slug: string;
   contact_person: string | null;
   notification_email: string;
-  cc_email: string | null;
+  cc_emails: string[];
   phone: string | null;
   location: string | null;
   practice_areas: string[] | null;

@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
     .from("jobs")
     .select(`
       id, title, firm_id,
-      firms ( name, notification_email, cc_email )
+      firms ( name, notification_email, cc_emails )
     `)
     .eq("id", jobId)
     .eq("status", "active")
@@ -252,7 +252,14 @@ export async function POST(request: NextRequest) {
   const notificationEmail = (
     firm as { notification_email: string } | null
   )?.notification_email;
-  const ccEmail = (firm as { cc_email: string | null } | null)?.cc_email;
+  const ccEmailsRaw = (firm as { cc_emails: string[] | null } | null)
+    ?.cc_emails;
+  const ccEmails = Array.isArray(ccEmailsRaw)
+    ? ccEmailsRaw
+        .filter((e): e is string => typeof e === "string")
+        .map((e) => e.trim())
+        .filter((e) => e.length > 0)
+    : [];
 
   if (!notificationEmail) {
     console.error("[/api/apply] No notification email for firm:", firmName);
@@ -261,7 +268,14 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-  console.log("[/api/apply] Firm:", firmName, "notificationEmail:", notificationEmail);
+  console.log(
+    "[/api/apply] Firm:",
+    firmName,
+    "notificationEmail:",
+    notificationEmail,
+    "ccEmails:",
+    ccEmails.length > 0 ? ccEmails.join(", ") : "(none)"
+  );
 
   // 4. Read CV into buffer (for email attachment + storage)
   const cvArrayBuffer = await cvFile.arrayBuffer();
@@ -314,7 +328,7 @@ export async function POST(request: NextRequest) {
     await resend.emails.send({
       from: "Legal Talents <noreply@legal-talents.nl>",
       to: notificationEmail,
-      ...(ccEmail ? { cc: ccEmail } : {}),
+      ...(ccEmails.length > 0 ? { cc: ccEmails } : {}),
       subject: `Nieuwe sollicitatie: ${firstName} ${lastName} voor ${job.title}`,
       html: firmEmailHtml({
         firstName,

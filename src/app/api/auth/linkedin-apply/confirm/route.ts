@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     .from("jobs")
     .select(`
       id, title, firm_id,
-      firms ( name, notification_email, cc_email )
+      firms ( name, notification_email, cc_emails )
     `)
     .eq("id", jobId)
     .eq("status", "active")
@@ -163,7 +163,14 @@ export async function POST(request: NextRequest) {
   const firmName = (firm as { name: string } | null)?.name ?? "";
   const notificationEmail = (firm as { notification_email: string } | null)
     ?.notification_email;
-  const ccEmail = (firm as { cc_email: string | null } | null)?.cc_email;
+  const ccEmailsRaw = (firm as { cc_emails: string[] | null } | null)
+    ?.cc_emails;
+  const ccEmails = Array.isArray(ccEmailsRaw)
+    ? ccEmailsRaw
+        .filter((e): e is string => typeof e === "string")
+        .map((e) => e.trim())
+        .filter((e) => e.length > 0)
+    : [];
 
   const firstName = fullName.trim().split(/\s+/)[0] ?? "";
 
@@ -176,7 +183,7 @@ export async function POST(request: NextRequest) {
         resend.emails.send({
           from: "Legal Talents <noreply@legal-talents.nl>",
           to: notificationEmail,
-          ...(ccEmail ? { cc: ccEmail } : {}),
+          ...(ccEmails.length > 0 ? { cc: ccEmails } : {}),
           subject: `Nieuwe sollicitatie (LinkedIn): ${fullName} voor ${job.title}`,
           html: firmHtml({
             fullName,

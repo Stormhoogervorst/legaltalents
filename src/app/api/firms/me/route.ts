@@ -61,10 +61,29 @@ const updateFirmSchema = z.object({
   // user_id, id, created_at are never accepted here
 });
 
-// Email-settings-only schema — used by the settings page
+// Email-settings-only schema — used by the settings page.
+// cc_emails is a list of extra CC addresses (0 or more). An empty array
+// clears the field. We trim, lowercase, and de-duplicate server-side as
+// a defence-in-depth measure on top of the client's validation.
+const MAX_CC_EMAILS = 20;
+
 const emailSettingsSchema = z.object({
   notification_email: z.string().email().max(200).optional(),
-  cc_email: z.string().email().max(200).nullable().optional(),
+  cc_emails: z
+    .array(z.string().email().max(200))
+    .max(MAX_CC_EMAILS)
+    .transform((arr) => {
+      const seen = new Set<string>();
+      const out: string[] = [];
+      for (const raw of arr) {
+        const e = raw.trim().toLowerCase();
+        if (!e || seen.has(e)) continue;
+        seen.add(e);
+        out.push(e);
+      }
+      return out;
+    })
+    .optional(),
 });
 
 // ── PATCH /api/firms/me — update own firm (profile) ───────────────────────
@@ -93,7 +112,7 @@ export async function PATCH(request: NextRequest) {
   const isEmailSettings =
     body !== null &&
     typeof body === "object" &&
-    ("notification_email" in body || "cc_email" in body) &&
+    ("notification_email" in body || "cc_emails" in body) &&
     !("name" in body) &&
     !("location" in body);
 

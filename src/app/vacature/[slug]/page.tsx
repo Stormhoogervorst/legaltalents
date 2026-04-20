@@ -133,7 +133,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
       firms (
         id, name, slug, logo_url, location, practice_areas,
         description, why_work_with_us, team_size, website_url,
-        notification_email, cc_email
+        notification_email, cc_emails
       )
     `)
     .eq("slug", slug)
@@ -144,7 +144,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
 
   const firm = (
     Array.isArray(job.firms) ? job.firms[0] : job.firms
-  ) as Firm & { notification_email: string; cc_email: string | null };
+  ) as Firm & { notification_email: string; cc_emails: string[] };
 
   const typedJob = job as unknown as Job;
 

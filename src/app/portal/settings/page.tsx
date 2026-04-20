@@ -13,14 +13,13 @@ export default async function SettingsPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // Check if user owns a firm
+  // Check if user owns a firm (owners can edit e-mailinstellingen)
   const { data: ownedFirm } = await supabase
     .from("firms")
-    .select("id, name")
+    .select("id, name, notification_email, cc_emails")
     .eq("user_id", user.id)
     .maybeSingle();
 
-  // Determine the user's firm (owned or linked via profile)
   let firmId: string | null = ownedFirm?.id ?? null;
   const isOwner = !!ownedFirm;
 
@@ -37,6 +36,10 @@ export default async function SettingsPage() {
     <SettingsClient
       hasFirm={!!firmId}
       isOwner={isOwner}
+      initialNotificationEmail={ownedFirm?.notification_email ?? ""}
+      initialCcEmails={
+        Array.isArray(ownedFirm?.cc_emails) ? ownedFirm!.cc_emails : []
+      }
     />
   );
 }
