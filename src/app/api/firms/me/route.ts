@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getImpersonatedFirmId } from "@/lib/impersonation";
 
 const RLS_FIRM_MESSAGE =
   "U heeft geen rechten om een kantoor aan te maken. Neem contact op met support.";
@@ -119,6 +121,61 @@ export async function PATCH(request: NextRequest) {
     !("name" in body) &&
     !("location" in body);
 
+  // Step B: Resolve the target firm BEFORE any mutation.
+  //
+  // Two modes:
+  //  1) Normal — the authenticated user owns a firm. We look it up by
+  //     user_id = user.id.
+  //  2) Impersonation — the authenticated user is an admin with an active
+  //     impersonation cookie. In that case the target is the impersonated
+  //     firm (by id), and writes go through the service-role client so we
+  //     are not rejected by RLS (which would otherwise see the admin's uid
+  //     and refuse writes on someone else's row).
+  //
+  // Crucially, during impersonation we MUST NOT fall back to an insert —
+  // that was the bug that silently created duplicate employer rows owned
+  // by the admin. If the impersonated firm cannot be found we return 404.
+  const impersonatedFirmId = await getImpersonatedFirmId();
+  const isImpersonating = !!impersonatedFirmId;
+
+  let targetFirmId: string | null = null;
+  let targetUserId: string | null = null;
+  let writeClient = supabase;
+
+  if (isImpersonating) {
+    const admin = createAdminClient();
+    const { data: impersonatedFirm } = await admin
+      .from("firms")
+      .select("id, user_id, slug")
+      .eq("id", impersonatedFirmId!)
+      .maybeSingle();
+
+    if (!impersonatedFirm) {
+      return NextResponse.json(
+        { error: "Geïmpersoneerde werkgever niet gevonden." },
+        { status: 404 }
+      );
+    }
+
+    targetFirmId = impersonatedFirm.id as string;
+    targetUserId = impersonatedFirm.user_id as string;
+    writeClient = admin;
+  } else {
+    const { data: ownedFirm } = await supabase
+      .from("firms")
+      .select("id, user_id, slug")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (ownedFirm) {
+      targetFirmId = ownedFirm.id as string;
+      targetUserId = ownedFirm.user_id as string;
+    }
+  }
+
+  // Step C: validate body (now we know whether we are updating or
+  // inserting — inserts are only allowed for the authenticated user's own
+  // first-time profile, never during impersonation).
   let validatedData: Record<string, unknown>;
 
   if (isEmailSettings) {
@@ -138,20 +195,30 @@ export async function PATCH(request: NextRequest) {
         { status: 400 }
       );
     }
-    // Derive is_published from the update — a firm is live when all required
-    // fields are present in the DB after the update.
-    const d = result.data;
-    const isPublishedUpdate = result.data;
 
-    // We need to merge with existing data to determine is_published correctly.
-    // Fetch the current record first.
-    const { data: existing } = await supabase
-      .from("firms")
-      .select(
-        "name, location, practice_areas, description, contact_person, notification_email"
-      )
-      .eq("user_id", user.id)
-      .maybeSingle();
+    // Derive is_published from the merged (existing + patch) record so a
+    // partial update does not accidentally flip the firm to unpublished.
+    const d = result.data;
+
+    let existing: {
+      name: string | null;
+      location: string | null;
+      practice_areas: string[] | null;
+      description: string | null;
+      contact_person: string | null;
+      notification_email: string | null;
+    } | null = null;
+
+    if (targetFirmId) {
+      const { data } = await writeClient
+        .from("firms")
+        .select(
+          "name, location, practice_areas, description, contact_person, notification_email"
+        )
+        .eq("id", targetFirmId)
+        .maybeSingle();
+      existing = data as typeof existing;
+    }
 
     const merged = {
       name: d.name ?? existing?.name,
@@ -159,9 +226,7 @@ export async function PATCH(request: NextRequest) {
       practice_areas: d.practice_areas ?? existing?.practice_areas,
       description: d.description ?? existing?.description,
       contact_person: d.contact_person ?? existing?.contact_person,
-      notification_email:
-        (isPublishedUpdate as { notification_email?: string }).notification_email ??
-        existing?.notification_email,
+      notification_email: d.notification_email ?? existing?.notification_email,
     };
 
     const isPublished =
@@ -179,78 +244,95 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Geen velden om bij te werken." }, { status: 400 });
   }
 
-  // Step B: IDOR protection — always filter by user_id = authenticated user's id.
-  // No firm ID from the client is needed or trusted.
-  const { data: firm } = await supabase
-    .from("firms")
-    .select("id, slug")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (firm) {
-    // Update existing record — firm_id is authoritative from the DB
-    const { error } = await supabase
+  // Step D: perform the mutation.
+  if (targetFirmId) {
+    // Strict update on the resolved firm id — never by user_id during
+    // impersonation, and never an upsert/insert that could create a
+    // duplicate row.
+    const { error } = await writeClient
       .from("firms")
       .update(validatedData)
-      .eq("user_id", user.id);
+      .eq("id", targetFirmId);
 
     if (error) {
       console.error("[PATCH /api/firms/me] update error:", error.message);
       return firmWriteErrorResponse(error.message, error.code);
     }
-  } else {
-    // First time creating a firm profile — generate slug server-side
-    if (!("name" in validatedData) || !validatedData.name) {
-      return NextResponse.json(
-        { error: "Naam is verplicht voor een nieuw werkgeversprofiel." },
-        { status: 400 }
-      );
-    }
-    const name = String(validatedData.name);
-    const slug =
-      name
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "") +
-      "-" +
-      Math.random().toString(36).substring(2, 8);
 
-    const { data: inserted, error } = await supabase
-      .from("firms")
-      .insert({
-        ...validatedData,
-        user_id: user.id, // always server-resolved
-        slug,
-      })
-      .select("id")
-      .single();
-
-    if (error) {
-      console.error("[PATCH /api/firms/me] insert error:", error.message);
-      return firmWriteErrorResponse(error.message, error.code);
+    // Best-effort: ensure the impersonated user's profile is linked to the
+    // firm (normally already the case, but keeps data consistent).
+    if (isImpersonating && targetUserId) {
+      const admin = writeClient;
+      await admin
+        .from("profiles")
+        .update({ firm_id: targetFirmId })
+        .eq("id", targetUserId);
     }
 
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({ firm_id: inserted.id })
-      .eq("id", user.id);
-
-    if (profileError) {
-      console.error(
-        "[PATCH /api/firms/me] profile firm_id link error:",
-        profileError.message
-      );
-      if (isRlsPolicyError(profileError.message, profileError.code)) {
-        return NextResponse.json({ error: RLS_FIRM_MESSAGE }, { status: 403 });
-      }
-      return NextResponse.json(
-        { error: "Kantoor aangemaakt maar koppeling met profiel mislukt." },
-        { status: 500 }
-      );
-    }
+    return NextResponse.json({ success: true, firm_id: targetFirmId });
   }
 
-  return NextResponse.json({ success: true });
+  // No firm yet — only allowed for the authenticated user creating their
+  // own first profile. Impersonation was already handled above (and would
+  // have returned 404), so reaching this branch implies !isImpersonating.
+  if (isImpersonating) {
+    // Defence-in-depth: should be unreachable.
+    return NextResponse.json(
+      { error: "Kan tijdens impersonatie geen nieuw profiel aanmaken." },
+      { status: 409 }
+    );
+  }
+
+  if (!("name" in validatedData) || !validatedData.name) {
+    return NextResponse.json(
+      { error: "Naam is verplicht voor een nieuw werkgeversprofiel." },
+      { status: 400 }
+    );
+  }
+  const name = String(validatedData.name);
+  const slug =
+    name
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") +
+    "-" +
+    Math.random().toString(36).substring(2, 8);
+
+  const { data: inserted, error: insertError } = await supabase
+    .from("firms")
+    .insert({
+      ...validatedData,
+      user_id: user.id, // always server-resolved, never client-provided
+      slug,
+    })
+    .select("id")
+    .single();
+
+  if (insertError) {
+    console.error("[PATCH /api/firms/me] insert error:", insertError.message);
+    return firmWriteErrorResponse(insertError.message, insertError.code);
+  }
+
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .update({ firm_id: inserted.id })
+    .eq("id", user.id);
+
+  if (profileError) {
+    console.error(
+      "[PATCH /api/firms/me] profile firm_id link error:",
+      profileError.message
+    );
+    if (isRlsPolicyError(profileError.message, profileError.code)) {
+      return NextResponse.json({ error: RLS_FIRM_MESSAGE }, { status: 403 });
+    }
+    return NextResponse.json(
+      { error: "Kantoor aangemaakt maar koppeling met profiel mislukt." },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({ success: true, firm_id: inserted.id });
 }

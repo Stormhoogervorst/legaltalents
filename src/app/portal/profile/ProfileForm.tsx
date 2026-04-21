@@ -2,7 +2,6 @@
 
 import { useState, useRef, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client"; // used only for logo storage upload
 import {
   Loader2,
   CheckCircle,
@@ -67,6 +66,7 @@ type Props = {
   firm: Firm;
   userId: string;
   userEmail: string;
+  isImpersonating?: boolean;
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -95,9 +95,21 @@ const labelCls = "block text-sm font-medium text-gray-700 mb-1";
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function ProfileForm({ firm, userId, userEmail }: Props) {
+export default function ProfileForm({
+  firm,
+  userId,
+  userEmail,
+  isImpersonating = false,
+}: Props) {
+  // `userId` is the session user's id. It is NOT used for the storage
+  // write path anymore — during impersonation the session user is the
+  // admin, so writing to `${userId}/logo.ext` would pollute the admin's
+  // storage and (previously) caused a duplicate firm to be created. The
+  // logo upload now goes through `/api/firms/me/logo`, which derives the
+  // correct target firm + owner on the server.
+  void userId;
+
   const router = useRouter();
-  const supabase = createClient();
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Form state — initialise from existing firm or empty defaults
@@ -198,29 +210,41 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
 
     let logoUrl = firm?.logo_url ?? null;
 
-    // Upload new logo if selected
+    // Upload a new logo server-side. The server route derives the correct
+    // target firm (also when impersonating), so we never rely on the
+    // session user id alone — that was what caused a duplicate firm to be
+    // created when an admin uploaded a logo while impersonating.
     if (logoFile) {
-      const ext = logoFile.name.split(".").pop() ?? "jpg";
-      const path = `${userId}/logo.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from("logos")
-        .upload(path, logoFile, { upsert: true, contentType: logoFile.type });
+      const fd = new FormData();
+      fd.append("file", logoFile);
 
-      if (uploadError) {
-        setSaveError(`Logo uploaden mislukt: ${uploadError.message}`);
+      const uploadRes = await fetch("/api/firms/me/logo", {
+        method: "POST",
+        credentials: "include",
+        body: fd,
+      });
+
+      if (!uploadRes.ok) {
+        const json = await uploadRes.json().catch(() => ({}));
+        setSaveError(
+          typeof json?.error === "string" && json.error
+            ? json.error
+            : "Logo uploaden mislukt."
+        );
         setSaving(false);
         return;
       }
-      const { data: urlData } = supabase.storage
-        .from("logos")
-        .getPublicUrl(path);
-      logoUrl = urlData.publicUrl;
+
+      const json = (await uploadRes.json()) as { logo_url?: string };
+      logoUrl = json.logo_url ?? logoUrl;
     } else if (logoPreview === null) {
       // User explicitly removed the logo
       logoUrl = null;
     }
 
-    // user_id and slug are managed server-side — do not send from client
+    // firmId / user_id / slug are authoritative on the server — never
+    // forwarded from the client for the WHERE clause. The server reads
+    // the impersonation cookie to resolve the target firm.
     const payload = {
       name: name.trim(),
       location: location.trim(),
@@ -235,9 +259,6 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
       team_size: teamSize || null,
     };
 
-    // Send to API route — ownership is verified server-side via auth session.
-    // The firm.id / user_id from client props is never trusted for the WHERE
-    // clause; the server always re-derives the firm from the session.
     const res = await fetch("/api/firms/me", {
       method: "PATCH",
       credentials: "include",
@@ -262,7 +283,15 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
 
     setSaveSuccess(true);
     setSaving(false);
-    router.push("/portal");
+
+    // Tijdens impersonatie blijft de admin op het profielscherm zodat de
+    // update direct zichtbaar geverifieerd kan worden. In de normale
+    // gebruikersflow gaat de werkgever terug naar het portaal.
+    if (isImpersonating) {
+      router.refresh();
+    } else {
+      router.push("/portal");
+    }
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────

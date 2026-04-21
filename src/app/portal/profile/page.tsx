@@ -36,9 +36,9 @@ export default async function ProfilePage() {
 
       {isImpersonating && (
         <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Alleen-lezen weergave: tijdens impersonatie kun je het profiel van
-          deze werkgever bekijken, maar niet opslaan. Beëindig de impersonatie
-          om weer als admin te werken.
+          Je bewerkt nu dit werkgeversprofiel als admin. Wijzigingen worden
+          direct opgeslagen op deze bestaande werkgever — er wordt geen nieuw
+          profiel aangemaakt.
         </div>
       )}
 
@@ -46,6 +46,7 @@ export default async function ProfilePage() {
         firm={firm as Parameters<typeof ProfileForm>[0]["firm"]}
         userId={user!.id}
         userEmail={user!.email ?? ""}
+        isImpersonating={isImpersonating}
       />
 
       {/* ── Gevarenzone — buiten de <form> zodat de verwijder-knop geen
