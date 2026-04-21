@@ -200,14 +200,22 @@ export async function PATCH(request: NextRequest) {
     // partial update does not accidentally flip the firm to unpublished.
     const d = result.data;
 
-    let existing: {
+    // `writeClient` is een union van de anon-client en de service-role
+    // client; in combinatie met de gegenereerde Supabase-types kan TS
+    // op Vercel de `.maybeSingle()`-return narrowen tot `never` in één
+    // van de takken. We typeren `existing` daarom expliciet en casten de
+    // ruwe response via `unknown` zodat de build niet struikelt over
+    // een type-intersectie die TS als `never` ziet.
+    type ExistingFirm = {
       name: string | null;
       location: string | null;
       practice_areas: string[] | null;
       description: string | null;
       contact_person: string | null;
       notification_email: string | null;
-    } | null = null;
+    };
+
+    let existing: ExistingFirm | null = null;
 
     if (targetFirmId) {
       const { data } = await writeClient
@@ -217,16 +225,23 @@ export async function PATCH(request: NextRequest) {
         )
         .eq("id", targetFirmId)
         .maybeSingle();
-      existing = data as typeof existing;
+      existing = (data as unknown as ExistingFirm | null) ?? null;
     }
 
+    // Robuuste cast op `existing` — TS op Vercel's build kan `existing`
+    // anders tot `never` narrowen (zie toelichting hierboven), waardoor
+    // `existing?.name` zou falen met "Property 'name' does not exist on
+    // type 'never'". Casten via `unknown as ExistingFirm` houdt de
+    // null-check intact en voorkomt die false positive.
+    const ex = existing as ExistingFirm | null;
+
     const merged = {
-      name: d.name ?? existing?.name,
-      location: d.location ?? existing?.location,
-      practice_areas: d.practice_areas ?? existing?.practice_areas,
-      description: d.description ?? existing?.description,
-      contact_person: d.contact_person ?? existing?.contact_person,
-      notification_email: d.notification_email ?? existing?.notification_email,
+      name: d.name ?? ex?.name,
+      location: d.location ?? ex?.location,
+      practice_areas: d.practice_areas ?? ex?.practice_areas,
+      description: d.description ?? ex?.description,
+      contact_person: d.contact_person ?? ex?.contact_person,
+      notification_email: d.notification_email ?? ex?.notification_email,
     };
 
     const isPublished =
