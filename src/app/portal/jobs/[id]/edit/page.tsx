@@ -59,7 +59,7 @@ export default async function EditJobPage({ params }: Props) {
 
       <JobForm
         firmId={firm.id}
-        firmSlug={firm.slug}
+        firmSlug={firm.slug ?? ""}
         job={{
           id: job.id,
           title: job.title,
