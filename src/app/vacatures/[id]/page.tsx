@@ -8,10 +8,10 @@ import Footer from "@/components/Footer";
 import JobCard from "@/components/JobCard";
 import { Job, JobFirmPreview, JOB_TYPE_OPTIONS } from "@/types";
 import { CITIES, cityDisplayName, cityLocationFilter, isValidCity } from "@/lib/cities";
+import { SITE_URL as BASE_URL } from "@/lib/site";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export const revalidate = 0;
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://legaltalents.nl";
 
 const PRACTICE_AREAS = [
   "Arbeidsrecht",
@@ -227,14 +227,18 @@ export default async function CityJobsPage({
                 "calc(4.25rem + clamp(32px, 4vh, 56px)) clamp(24px, 5vw, 80px) clamp(80px, 10vh, 140px)",
             }}
           >
-            {/* Breadcrumb */}
-            <Link
-              href="/vacatures"
-              className="inline-flex items-center gap-2 text-[14px] font-medium text-white/80 hover:text-white transition-colors duration-200"
+            <div
+              className="text-white"
               style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
             >
-              ← Alle vacatures
-            </Link>
+              <Breadcrumbs
+                items={[
+                  { label: "Home", href: "/" },
+                  { label: "Vacatures", href: "/vacatures" },
+                  { label: name, href: `/vacatures/${city}` },
+                ]}
+              />
+            </div>
 
             <h1
               className="mt-8 font-bold tracking-[-0.03em] leading-[1.05]"

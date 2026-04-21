@@ -21,7 +21,7 @@ export default function VacancyCard({ vacancy }: Props) {
         <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-700 font-bold text-lg uppercase overflow-hidden">
           {vacancy.company_logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={vacancy.company_logo_url} alt={vacancy.company_name} className="w-full h-full object-cover" />
+            <img src={vacancy.company_logo_url} alt={`${vacancy.company_name} logo`} className="w-full h-full object-cover" />
           ) : (
             vacancy.company_name[0]
           )}

@@ -38,7 +38,7 @@ export default function VacatureCarousel({ jobs }: Props) {
       <Swiper
         modules={[Autoplay]}
         autoplay={{ delay: 3000, disableOnInteraction: false, pauseOnMouseEnter: true }}
-        loop={true}
+        loop={displayJobs.length > 3}
         breakpoints={{
           0:    { slidesPerView: 1, spaceBetween: 24 },
           640:  { slidesPerView: 2, spaceBetween: 24 },

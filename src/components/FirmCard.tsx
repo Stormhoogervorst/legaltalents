@@ -19,7 +19,7 @@ export default function FirmCard({ firm }: Props) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={firm.logo_url}
-            alt={firm.name}
+            alt={`${firm.name} logo`}
             className="w-full h-full object-contain p-2"
           />
         ) : (

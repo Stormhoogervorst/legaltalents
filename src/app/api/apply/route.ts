@@ -7,6 +7,7 @@ import {
 } from "@/lib/linkedin-profile-url";
 import { verifyRecaptchaToken } from "@/lib/recaptcha/verify-server";
 import { checkRateLimit, getRequestIp } from "@/lib/security/rate-limit";
+import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -75,7 +76,7 @@ function firmEmailHtml(data: {
   <div style="background: #F3F4F6; border-radius: 8px; padding: 16px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; margin-bottom: 24px;">${data.motivation}</div>
 
   <p style="font-size: 13px; color: #9CA3AF; border-top: 1px solid #F3F4F6; padding-top: 16px;">
-    CV is bijgevoegd als bijlage · Ontvangen via <a href="https://legal-talents.nl" style="color: #587DFE;">Legal Talents</a>
+    CV is bijgevoegd als bijlage · Ontvangen via <a href="${SITE_URL}" style="color: #587DFE;">Legal Talents</a>
   </p>
 </body>
 </html>`;
@@ -116,7 +117,7 @@ function studentEmailHtml(data: {
   <p style="font-size: 14px; font-weight: 700; color: #587DFE;">Het Legal Talents team</p>
 
   <p style="font-size: 13px; color: #9CA3AF; border-top: 1px solid #F3F4F6; padding-top: 16px; margin-top: 24px;">
-    <a href="https://legal-talents.nl" style="color: #587DFE;">legal-talents.nl</a> · Je ontvangt dit bericht omdat je gesolliciteerd hebt via Legal Talents.
+    <a href="${SITE_URL}" style="color: #587DFE;">legal-talents.nl</a> · Je ontvangt dit bericht omdat je gesolliciteerd hebt via Legal Talents.
   </p>
 </body>
 </html>`;

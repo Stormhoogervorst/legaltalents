@@ -7,6 +7,7 @@ import CtaBand from "@/components/CtaBand";
 import JobCard from "@/components/JobCard";
 import { Firm, Job, JobFirmPreview } from "@/types";
 import { Metadata } from "next";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export const revalidate = 0;
 
@@ -132,14 +133,18 @@ export default async function FirmPage({ params }: Props) {
               paddingBottom: "clamp(80px, 12vh, 160px)",
             }}
           >
-            {/* Breadcrumb / back link */}
-            <Link
-              href="/werkgevers"
-              className="inline-flex items-center gap-2 text-[14px] font-medium text-white/80 hover:text-white transition-colors duration-200"
+            <div
+              className="text-white"
               style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
             >
-              ← Alle werkgevers
-            </Link>
+              <Breadcrumbs
+                items={[
+                  { label: "Home", href: "/" },
+                  { label: "Werkgevers", href: "/werkgevers" },
+                  { label: firmData.name, href: `/werkgevers/${firmData.slug}` },
+                ]}
+              />
+            </div>
 
             <div className="mt-6 flex flex-col md:flex-row items-start gap-6">
               {/* Firm logo — liquid glass, no extra margin so left edge aligns with breadcrumb */}
@@ -157,7 +162,7 @@ export default async function FirmPage({ params }: Props) {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={firmData.logo_url}
-                    alt={firmData.name}
+                    alt={`${firmData.name} logo`}
                     className="w-12 h-12 md:w-14 md:h-14 object-contain"
                   />
                 ) : (

@@ -6,8 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
 import CtaBand from "@/components/CtaBand";
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://legaltalents.nl";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { SITE_URL as BASE_URL } from "@/lib/site";
 
 const categoryLabels: Record<string, string> = {
   carriere: "Carrière",
@@ -189,17 +189,22 @@ export default async function BlogArticlePage({ params }: Props) {
                 "calc(4.25rem + clamp(48px, 6vh, 96px)) clamp(24px, 5vw, 80px) clamp(72px, 9vh, 120px)",
             }}
           >
-            {/* Breadcrumb */}
-            <Link
-              href="/kennisbank"
-              className="inline-flex items-center gap-1.5 text-[14px] font-medium text-white/85 hover:text-white transition-colors duration-200 group"
+            <div
+              className="text-white"
               style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.25)" }}
             >
-              <span className="group-hover:-translate-x-0.5 transition-transform duration-200">
-                ←
-              </span>
-              Kennisbank
-            </Link>
+              <Breadcrumbs
+                items={[
+                  { label: "Home", href: "/" },
+                  { label: "Kennisbank", href: "/kennisbank" },
+                  {
+                    label: categoryLabels[blog.category] ?? blog.category,
+                    href: `/kennisbank?categorie=${encodeURIComponent(blog.category)}`,
+                  },
+                  { label: blog.title, href: `/kennisbank/${blog.slug}` },
+                ]}
+              />
+            </div>
 
             <div className="mt-8 mb-6 flex items-center gap-3">
               <span
@@ -240,7 +245,7 @@ export default async function BlogArticlePage({ params }: Props) {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={firm.logo_url}
-                      alt={firm.name}
+                      alt={`${firm.name} logo`}
                       className="w-full h-full object-contain p-1"
                     />
                   </div>
@@ -336,7 +341,7 @@ export default async function BlogArticlePage({ params }: Props) {
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={firm.logo_url}
-                            alt={firm.name}
+                            alt={`${firm.name} logo`}
                             className="w-full h-full object-contain p-1"
                           />
                         ) : (

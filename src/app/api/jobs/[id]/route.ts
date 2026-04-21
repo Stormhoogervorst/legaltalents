@@ -39,6 +39,11 @@ const updateJobSchema = z.object({
     .optional(),
   required_education: z.string().max(300).trim().nullable().optional(),
   hours_per_week: z.number().int().min(1).max(168).nullable().optional(),
+  expires_at: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
+    .optional(),
   status: z.enum(["draft", "active", "closed"]).optional(),
 });
 

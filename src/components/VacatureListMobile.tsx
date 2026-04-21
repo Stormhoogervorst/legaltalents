@@ -55,7 +55,7 @@ export default function VacatureListMobile({ jobs, limit = 5 }: Props) {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={logoUrl}
-                    alt={firmName || job.title}
+                    alt={firmName ? `${firmName} logo` : job.title}
                     className="w-full h-full object-contain"
                   />
                 ) : (

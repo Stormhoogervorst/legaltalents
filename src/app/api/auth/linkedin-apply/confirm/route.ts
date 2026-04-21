@@ -8,6 +8,7 @@ import {
 } from "@/lib/linkedin-profile-url";
 import { verifyRecaptchaToken } from "@/lib/recaptcha/verify-server";
 import { checkRateLimit, getRequestIp } from "@/lib/security/rate-limit";
+import { SITE_URL } from "@/lib/site";
 
 export async function POST(request: NextRequest) {
   const ip = getRequestIp(request.headers);
@@ -266,9 +267,9 @@ function firmHtml(data: {
     </tr>
   </table>
   ${data.hasCv ? `<p style="font-size: 13px; color: #9CA3AF; border-top: 1px solid #F3F4F6; padding-top: 16px;">
-    CV is bijgevoegd als bijlage · Ontvangen via <a href="https://legal-talents.nl" style="color: #587DFE;">Legal Talents</a>
+    CV is bijgevoegd als bijlage · Ontvangen via <a href="${SITE_URL}" style="color: #587DFE;">Legal Talents</a>
   </p>` : `<p style="font-size: 13px; color: #9CA3AF; border-top: 1px solid #F3F4F6; padding-top: 16px;">
-    Ontvangen via <a href="https://legal-talents.nl" style="color: #587DFE;">Legal Talents</a>
+    Ontvangen via <a href="${SITE_URL}" style="color: #587DFE;">Legal Talents</a>
   </p>`}
 </body>
 </html>`;
@@ -302,7 +303,7 @@ function studentHtml(data: {
   <p style="font-size: 14px; color: #4B5563;">Succes!</p>
   <p style="font-size: 14px; font-weight: 700; color: #587DFE;">Het Legal Talents team</p>
   <p style="font-size: 13px; color: #9CA3AF; border-top: 1px solid #F3F4F6; padding-top: 16px; margin-top: 24px;">
-    <a href="https://legal-talents.nl" style="color: #587DFE;">legal-talents.nl</a>
+    <a href="${SITE_URL}" style="color: #587DFE;">legal-talents.nl</a>
   </p>
 </body>
 </html>`;

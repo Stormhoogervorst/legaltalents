@@ -6,6 +6,7 @@ import {
   isValidLinkedInInUrl,
 } from "@/lib/linkedin-profile-url";
 import { checkRateLimit, getRequestIp } from "@/lib/security/rate-limit";
+import { SITE_URL } from "@/lib/site";
 
 export async function POST(request: NextRequest) {
   console.log("[linkedin-apply/auto] POST received");
@@ -199,7 +200,7 @@ function firmEmailHtml(data: {
     </tr>
   </table>
   <p style="font-size: 13px; color: #9CA3AF; border-top: 1px solid #F3F4F6; padding-top: 16px;">
-    Gesolliciteerd via LinkedIn · <a href="https://legal-talents.nl" style="color: #587DFE;">Legal Talents</a>
+    Gesolliciteerd via LinkedIn · <a href="${SITE_URL}" style="color: #587DFE;">Legal Talents</a>
   </p>
 </body>
 </html>`;

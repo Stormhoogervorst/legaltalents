@@ -53,6 +53,7 @@ export type JobData = {
   start_date: string | null;
   required_education: string | null;
   hours_per_week: number | null;
+  expires_at: string | null;
   status: string;
 };
 
@@ -138,6 +139,7 @@ export default function JobForm({
   const [hoursPerWeek, setHoursPerWeek] = useState<string>(
     job?.hours_per_week != null ? String(job.hours_per_week) : ""
   );
+  const [expiresAt, setExpiresAt] = useState(job?.expires_at ?? "");
 
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -202,6 +204,7 @@ export default function JobForm({
         start_date: startDate || null,
         required_education: requiredEducation.trim() || null,
         hours_per_week: hoursPerWeek ? parseInt(hoursPerWeek, 10) : null,
+        expires_at: expiresAt || null,
         status: targetStatus,
         ...(slug ? { slug } : {}),
         ...(postedByAdmin
@@ -250,6 +253,7 @@ export default function JobForm({
       startDate,
       requiredEducation,
       hoursPerWeek,
+      expiresAt,
       editor,
       firmSlug,
       job,
@@ -454,6 +458,20 @@ export default function JobForm({
               onChange={(e) => setRequiredEducation(e.target.value)}
               className={inputCls}
             />
+          </div>
+
+          {/* Vervaldatum */}
+          <div>
+            <label className={labelCls}>Vervaldatum</label>
+            <input
+              type="date"
+              value={expiresAt}
+              onChange={(e) => setExpiresAt(e.target.value)}
+              className={inputCls}
+            />
+            <p className="mt-1 text-xs text-gray-400">
+              Als leeg, verloopt de vacature automatisch 60 dagen na plaatsing.
+            </p>
           </div>
         </div>
       </section>

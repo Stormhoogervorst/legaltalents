@@ -38,6 +38,11 @@ const createJobSchema = z.object({
     .optional(),
   required_education: z.string().max(300).trim().nullable().optional(),
   hours_per_week: z.number().int().min(1).max(168).nullable().optional(),
+  expires_at: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Ongeldige datum")
+    .nullable()
+    .optional(),
   status: z.enum(["draft", "active"]),
   slug: z.string().min(1).max(400),
   // Admin-only overrides: vacature plaatsen namens een andere werkgever.
@@ -147,7 +152,11 @@ export async function POST(request: NextRequest) {
   // service-role client. De admin-check is hierboven al gedaan.
   const db = postedByAdmin ? createAdminClient() : supabase;
 
-  const { error: insertError } = await db.from("jobs").insert({
+  // `expires_at` bewust alleen meesturen als de werkgever een datum koos.
+  // Wanneer het veld wordt weggelaten valt de INSERT terug op de DB-default
+  // (`now() + 60 days`), zodat élke vacature altijd een geldige validThrough
+  // heeft voor schema.org/JobPosting.
+  const insertPayload: Record<string, unknown> = {
     firm_id: firmId,
     title: d.title,
     location: d.location,
@@ -163,7 +172,12 @@ export async function POST(request: NextRequest) {
     latitude: geo?.lat ?? null,
     longitude: geo?.lng ?? null,
     posted_by_admin: postedByAdmin,
-  });
+  };
+  if (d.expires_at) {
+    insertPayload.expires_at = d.expires_at;
+  }
+
+  const { error: insertError } = await db.from("jobs").insert(insertPayload);
 
   if (insertError) {
     console.error("[POST /api/jobs] insert error:", insertError.message);

@@ -43,7 +43,7 @@ export default function GridCard({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logoUrl}
-              alt={title}
+              alt={`${title} logo`}
               className="w-full h-full object-contain"
             />
           ) : (

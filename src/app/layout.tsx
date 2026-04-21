@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import ImpersonationBar from "@/components/ImpersonationBar";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -10,9 +11,43 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Legal Talents | Hét platform voor Juridische Vacatures en Stages",
-  description: "Legal Talents is hét platform voor juridische vacatures en stages. Ontdek actuele posities bij topkantoren in de advocatuur en vind jouw volgende stap.",
-  keywords: ["juridische vacatures", "juridische stages", "advocatuur", "Legal Talents", "vacatures advocatuur", "stages advocatuur"],
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Legal Talents | Hét platform voor Juridische Vacatures en Stages",
+    template: "%s | Legal Talents",
+  },
+  description:
+    "Vind juridische stages en vacatures bij topkantoren in Nederland. Hét carrièreplatform voor rechtenstudenten en young professionals.",
+  keywords: [
+    "juridische vacatures",
+    "juridische stages",
+    "advocatuur",
+    "Legal Talents",
+    "vacatures advocatuur",
+    "stages advocatuur",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: "website",
+    locale: "nl_NL",
+    siteName: "Legal Talents",
+    url: "/",
+    title: "Legal Talents | Hét platform voor Juridische Vacatures en Stages",
+    description:
+      "Vind juridische stages en vacatures bij topkantoren in Nederland. Hét carrièreplatform voor rechtenstudenten en young professionals.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Legal Talents | Hét platform voor Juridische Vacatures en Stages",
+    description:
+      "Vind juridische stages en vacatures bij topkantoren in Nederland. Hét carrièreplatform voor rechtenstudenten en young professionals.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

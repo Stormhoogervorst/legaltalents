@@ -27,7 +27,7 @@ export default function JobCard({ job }: Props) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={logoUrl}
-            alt={firmName}
+            alt={`${firmName} logo`}
             className="w-10 h-10 object-contain"
           />
         ) : (

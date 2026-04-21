@@ -11,10 +11,11 @@ import LinkedInQuickApply from "@/components/LinkedInQuickApply";
 import { Job, Firm, jobTypeLabels } from "@/types";
 import { Metadata } from "next";
 import { JobType } from "@/types";
+import { SITE_URL as BASE_URL } from "@/lib/site";
+import { CITIES, cityDisplayName } from "@/lib/cities";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export const revalidate = 0;
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://legaltalents.nl";
 
 const EMPLOYMENT_TYPE_MAP: Record<string, string> = {
   fulltime: "FULL_TIME",
@@ -24,29 +25,76 @@ const EMPLOYMENT_TYPE_MAP: Record<string, string> = {
   stage: "INTERN",
   internship: "INTERN",
   student: "INTERN",
-  "business-course": "OTHER",
-  lawcourse: "OTHER",
-  "summer-course": "OTHER",
+  "business-course": "CONTRACTOR",
+  lawcourse: "CONTRACTOR",
+  "summer-course": "CONTRACTOR",
 };
 
-function buildJobPostingJsonLd(
-  job: { title: string; slug: string; description: string; location: string; type: JobType; created_at: string; salary_indication: string | null; hours_per_week: number | null },
-  firm: { name: string; logo_url: string | null; website_url: string | null } | null,
-) {
-  const plainDescription = job.description
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+const VALID_THROUGH_FALLBACK_DAYS = 60;
 
+/**
+ * Probeert een vrije locatie-string (bv. "Amsterdam Zuid", "Den Haag")
+ * te mappen naar een city-slug uit CITIES. Returnt null als geen match,
+ * zodat de breadcrumb de stad-stap overslaat i.p.v. een broken link.
+ */
+function locationToCitySlug(location: string): string | null {
+  if (!location) return null;
+  const normalized = location
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  for (const slug of CITIES) {
+    const display = cityDisplayName(slug).toLowerCase();
+    if (normalized.includes(display) || normalized.includes(slug)) {
+      return slug;
+    }
+  }
+  return null;
+}
+
+function computeValidThrough(createdAt: string, expiresAt: string | null | undefined): Date {
+  if (expiresAt) return new Date(expiresAt);
+  const created = new Date(createdAt).getTime();
+  return new Date(created + VALID_THROUGH_FALLBACK_DAYS * 24 * 60 * 60 * 1000);
+}
+
+function ensureHtmlDescription(description: string): string {
+  const trimmed = description.trim();
+  if (!trimmed) return "";
+  return /^<(p|ul|ol|div|h[1-6])[\s>]/i.test(trimmed) ? trimmed : `<p>${trimmed}</p>`;
+}
+
+function buildJobPostingJsonLd(
+  job: {
+    title: string;
+    slug: string;
+    description: string;
+    location: string;
+    type: JobType;
+    practice_area: string | null;
+    created_at: string;
+    expires_at?: string | null;
+    salary_indication: string | null;
+  },
+  firm: { name: string; logo_url: string | null; website_url: string | null } | null,
+  validThrough: Date,
+) {
   const jsonLd: Record<string, unknown> = {
-    "@context": "https://schema.org",
+    "@context": "https://schema.org/",
     "@type": "JobPosting",
     title: job.title,
-    description: plainDescription,
-    datePosted: job.created_at.split("T")[0],
+    description: ensureHtmlDescription(job.description),
+    datePosted: new Date(job.created_at).toISOString(),
+    validThrough: validThrough.toISOString(),
     employmentType: EMPLOYMENT_TYPE_MAP[job.type] ?? "OTHER",
+    directApply: true,
+    industry: "Legal Services",
     url: `${BASE_URL}/vacature/${job.slug}`,
   };
+
+  if (job.practice_area) {
+    jsonLd.occupationalCategory = job.practice_area;
+  }
 
   if (firm) {
     const org: Record<string, unknown> = {
@@ -76,7 +124,7 @@ function buildJobPostingJsonLd(
       value: {
         "@type": "QuantitativeValue",
         value: job.salary_indication,
-        unitText: job.hours_per_week ? "HOUR" : "MONTH",
+        unitText: "MONTH",
       },
     };
   }
@@ -130,7 +178,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
     .select(`
       id, title, slug, location, type, practice_area, description,
       salary_indication, start_date, required_education, hours_per_week,
-      status, created_at, firm_id,
+      status, created_at, expires_at, firm_id,
       firms (
         id, name, slug, logo_url, location, practice_areas,
         description, why_work_with_us, team_size, website_url,
@@ -143,6 +191,17 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
 
   if (!job) notFound();
 
+  const typedJob = job as unknown as Job;
+
+  // SEO/JobPosting: verlopen vacatures moeten uit de index. Google's
+  // JobPosting-richtlijnen accepteren zowel 404 als 410 voor verwijderde
+  // postings; Next.js' App Router biedt geen ingebouwde 410-helper, dus
+  // we vallen terug op notFound() (404) wat dezelfde indexerings­actie
+  // triggert. Zie ook prompt 5 in de SEO-roadmap.
+  const validThrough = computeValidThrough(typedJob.created_at, typedJob.expires_at);
+  const isJobExpired = validThrough.getTime() < Date.now();
+  if (isJobExpired) notFound();
+
   // View-tracking: verhoog de teller server-side bij elke pageload.
   // We gebruiken een RPC met SECURITY DEFINER zodat dit ook werkt zonder
   // publieke update-rechten op `jobs`. Loskoppelen van de render d.m.v.
@@ -154,15 +213,37 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
     Array.isArray(job.firms) ? job.firms[0] : job.firms
   ) as Firm & { notification_email: string; cc_emails: string[] };
 
-  const typedJob = job as unknown as Job;
-
   const postedDate = new Date(typedJob.created_at).toLocaleDateString("nl-NL", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
 
-  const jobPostingJsonLd = buildJobPostingJsonLd(typedJob, firm);
+  const jobPostingJsonLd = buildJobPostingJsonLd(
+    {
+      title: typedJob.title,
+      slug: typedJob.slug,
+      description: typedJob.description,
+      location: typedJob.location,
+      type: typedJob.type,
+      practice_area: typedJob.practice_area,
+      created_at: typedJob.created_at,
+      expires_at: typedJob.expires_at,
+      salary_indication: typedJob.salary_indication,
+    },
+    firm,
+    validThrough,
+  );
+
+  const citySlug = locationToCitySlug(typedJob.location ?? "");
+  const breadcrumbItems = [
+    { label: "Home", href: "/" },
+    { label: "Vacatures", href: "/vacatures" },
+    ...(citySlug
+      ? [{ label: cityDisplayName(citySlug), href: `/vacatures/${citySlug}` }]
+      : []),
+    { label: typedJob.title, href: `/vacature/${typedJob.slug}` },
+  ];
 
   const metaItems: { label: string; value: string }[] = [];
   if (typedJob.location) metaItems.push({ label: "Locatie", value: typedJob.location });
@@ -184,10 +265,12 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
 
   return (
     <div className="relative min-h-screen flex flex-col bg-white">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingJsonLd) }}
-      />
+      {jobPostingJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingJsonLd) }}
+        />
+      )}
       <NavbarPublic variant="hero" />
 
       <ApplicationStatusToast
@@ -259,14 +342,12 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                 exactly with the `Over de functie` column (lg:col-span-8). */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-16">
               <div className="lg:col-span-8 flex flex-col items-start text-left">
-                {/* Breadcrumb / back link — above the logo, left-aligned */}
-                <Link
-                  href="/vacatures"
-                  className="inline-flex items-center gap-2 text-[14px] font-medium text-white/80 hover:text-white transition-colors duration-200"
+                <div
+                  className="text-white"
                   style={{ textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)" }}
                 >
-                  ← Alle vacatures
-                </Link>
+                  <Breadcrumbs items={breadcrumbItems} />
+                </div>
 
                 {/* Firm logo — directly above title, left edge matches title */}
                 {firm && (
@@ -285,7 +366,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={firm.logo_url}
-                        alt={firm.name}
+                        alt={`${firm.name} logo`}
                         className="w-12 h-12 md:w-14 md:h-14 object-contain"
                       />
                     ) : (
@@ -490,7 +571,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={firm.logo_url}
-                            alt={firm.name}
+                            alt={`${firm.name} logo`}
                             className="w-9 h-9 object-contain"
                           />
                         ) : (

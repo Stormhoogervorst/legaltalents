@@ -46,7 +46,7 @@ export default function PortalNav() {
           <Link href="/" className="inline-flex items-center">
             <Image
               src="/legal-talents-logo.png"
-              alt="Legal Talents Logo"
+              alt="Legal Talents logo"
               width={150}
               height={40}
               className="h-8 w-auto"
@@ -91,7 +91,7 @@ export default function PortalNav() {
           <Link href="/" className="inline-flex items-center">
             <Image
               src="/legal-talents-logo.png"
-              alt="Legal Talents Logo"
+              alt="Legal Talents logo"
               width={150}
               height={40}
               className="h-7 w-auto"

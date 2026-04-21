@@ -35,13 +35,20 @@ export default async function EditJobPage({ params }: Props) {
   const { data: job } = await db
     .from("jobs")
     .select(
-      "id, title, slug, location, type, practice_area, description, salary_indication, start_date, required_education, hours_per_week, status"
+      "id, title, slug, location, type, practice_area, description, salary_indication, start_date, required_education, hours_per_week, expires_at, status"
     )
     .eq("id", id)
     .eq("firm_id", firm.id)
     .maybeSingle();
 
   if (!job) notFound();
+
+  // HTML <input type="date"> verwacht YYYY-MM-DD. `expires_at` komt uit
+  // Postgres als timestamptz ISO string ("2026-06-20T10:15:00+00:00");
+  // we strippen naar de date-portion zodat het veld correct pre-fills.
+  const expiresAtDate = job.expires_at
+    ? new Date(job.expires_at).toISOString().slice(0, 10)
+    : null;
 
   return (
     <div className="max-w-2xl">
@@ -71,6 +78,7 @@ export default async function EditJobPage({ params }: Props) {
           start_date: job.start_date,
           required_education: job.required_education,
           hours_per_week: job.hours_per_week,
+          expires_at: expiresAtDate,
           status: job.status,
         }}
       />

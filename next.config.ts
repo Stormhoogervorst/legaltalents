@@ -1,9 +1,12 @@
 import type { NextConfig } from "next";
 
-const allowedOrigins = [
-  process.env.NEXT_PUBLIC_SITE_URL,
-  "https://legal-talents.nl",
-].filter(Boolean) as string[];
+// CORS allow-list voor /api/*. De canonieke productie-URL komt uit
+// NEXT_PUBLIC_SITE_URL (zie .env.example). De apex-variant
+// (legal-talents.nl zonder www) wordt op DNS-niveau geredirect naar www en
+// hoeft hier niet expliciet toegevoegd te worden.
+const allowedOrigins = [process.env.NEXT_PUBLIC_SITE_URL].filter(
+  Boolean,
+) as string[];
 
 const nextConfig: NextConfig = {
   images: {
