@@ -26,25 +26,30 @@ import { IMPERSONATION_COOKIE } from "@/lib/impersonation";
 //     firm stond, wissen we die zodat de admin niet op een dead link
 //     blijft hangen.
 //
-// Veiligheid:
-//  - De admin mag zichzelf niet verwijderen (zou zichzelf uitloggen en
-//     het hele admin-portaal blokkeren).
-//  - We weigeren expliciet het verwijderen van een andere admin-account.
-//  - firm.id komt uit de form, maar wordt altijd server-side opnieuw
-//     gevalideerd tegen de database — niets van de client wordt blind
-//     vertrouwd.
+// Contract met de client:
+//  - Bij falen: `return { error: "..." }`. Nooit throwen voor business-
+//     fouten; dat laat Next.js de error-boundary triggeren en dat leest
+//     als een generieke render-crash voor de gebruiker.
+//  - Bij succes: `redirect(...)` — nadrukkelijk BUITEN elk try/catch,
+//     want Next.js gebruikt intern een thrown NEXT_REDIRECT om de
+//     navigatie te laten plaatsvinden. Als we die zouden vangen,
+//     blokkeren we de navigatie en crasht het scherm.
 
-export async function deleteEmployerAction(formData: FormData) {
+type DeleteEmployerResult = { error: string };
+
+export async function deleteEmployerAction(
+  formData: FormData
+): Promise<DeleteEmployerResult | void> {
   const employerId = String(formData.get("employerId") ?? "").trim();
   const confirm = String(formData.get("confirm") ?? "").trim();
 
   if (!employerId) {
-    throw new Error("Geen werkgever-id opgegeven.");
+    return { error: "Geen werkgever-id opgegeven." };
   }
   if (confirm !== "VERWIJDER") {
-    throw new Error(
-      "Bevestiging onjuist — typ 'VERWIJDER' exact om te bevestigen."
-    );
+    return {
+      error: "Bevestiging onjuist — typ 'VERWIJDER' exact om te bevestigen.",
+    };
   }
 
   // Step 1: admin-rol herverificatie
@@ -52,7 +57,11 @@ export async function deleteEmployerAction(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/admin/login");
+
+  if (!user) {
+    // Niet ingelogd: redirect gebeurt buiten elk try/catch.
+    redirect("/admin/login");
+  }
 
   const { data: selfProfile } = await supabase
     .from("profiles")
@@ -78,17 +87,17 @@ export async function deleteEmployerAction(formData: FormData) {
       "[deleteEmployerAction] firm lookup error:",
       firmError.message
     );
-    throw new Error("Werkgever ophalen mislukt.");
+    return { error: "Werkgever ophalen mislukt." };
   }
   if (!firm) {
-    throw new Error("Werkgever niet gevonden.");
+    return { error: "Werkgever niet gevonden." };
   }
 
   // Guard: admin mag zichzelf niet wegpoetsen via deze route.
   if (firm.user_id === user.id) {
-    throw new Error(
-      "Je kunt je eigen account niet via deze route verwijderen."
-    );
+    return {
+      error: "Je kunt je eigen account niet via deze route verwijderen.",
+    };
   }
 
   // Guard: weiger het verwijderen van andere admin-accounts. Werkgever-
@@ -101,14 +110,19 @@ export async function deleteEmployerAction(formData: FormData) {
     .maybeSingle<{ role: string | null }>();
 
   if (ownerProfile?.role === "admin") {
-    throw new Error(
-      "Deze werkgever is gekoppeld aan een admin-account en kan niet via dit scherm verwijderd worden."
-    );
+    return {
+      error:
+        "Deze werkgever is gekoppeld aan een admin-account en kan niet via dit scherm verwijderd worden.",
+    };
   }
 
-  // Step 3: storage-cleanup (best-effort)
+  // Step 3: storage-cleanup (best-effort). Bewust geïsoleerde try/catch;
+  // we willen nooit falen op een losse logo-file als de delete zelf
+  // prima gaat.
   try {
-    const { data: files } = await admin.storage.from("logos").list(firm.user_id);
+    const { data: files } = await admin.storage
+      .from("logos")
+      .list(firm.user_id);
     if (files && files.length > 0) {
       const paths = files.map((f) => `${firm.user_id}/${f.name}`);
       await admin.storage.from("logos").remove(paths);
@@ -117,38 +131,46 @@ export async function deleteEmployerAction(formData: FormData) {
     console.error("[deleteEmployerAction] storage cleanup failed:", err);
   }
 
-  // Step 4: delete auth.users — cascade ruimt de rest op.
-  const { error: deleteUserError } = await admin.auth.admin.deleteUser(
-    firm.user_id
-  );
+  // Step 4: delete auth.users — cascade ruimt de rest op. Strikt binnen
+  // een try/catch zodat we netjes een error terug kunnen geven zonder
+  // dat de UI crasht.
+  try {
+    const { error: deleteUserError } = await admin.auth.admin.deleteUser(
+      firm.user_id
+    );
 
-  if (deleteUserError) {
-    console.error(
-      "[deleteEmployerAction] auth.admin.deleteUser error:",
-      deleteUserError.message
-    );
-    // Fallback: als de auth.users-rij om wat voor reden dan ook niet
-    // bestaat (weesprofiel), verwijder dan de firm-rij direct. De
-    // cascade binnen `public` ruimt dan alsnog jobs/applications/blogs
-    // op. Dit voorkomt "zombie" werkgeversrijen die niet weg kunnen.
-    const notFound = /user not found|not_found|no user/i.test(
-      deleteUserError.message
-    );
-    if (notFound) {
+    if (deleteUserError) {
+      const notFound = /user not found|not_found|no user/i.test(
+        deleteUserError.message
+      );
+
+      if (!notFound) {
+        console.error(
+          "[deleteEmployerAction] auth.admin.deleteUser error:",
+          deleteUserError.message
+        );
+        return { error: "Werkgever verwijderen is mislukt." };
+      }
+
+      // Fallback: auth.users-rij bestaat niet meer (weesprofiel).
+      // Verwijder de firm-rij direct; de cascade binnen `public` ruimt
+      // dan alsnog jobs/applications/blogs op.
       const { error: firmDeleteError } = await admin
         .from("firms")
         .delete()
         .eq("id", firm.id);
+
       if (firmDeleteError) {
         console.error(
           "[deleteEmployerAction] firm fallback delete error:",
           firmDeleteError.message
         );
-        throw new Error("Werkgever verwijderen is mislukt.");
+        return { error: "Werkgever verwijderen is mislukt." };
       }
-    } else {
-      throw new Error("Werkgever verwijderen is mislukt.");
     }
+  } catch (err) {
+    console.error("[deleteEmployerAction] unexpected delete failure:", err);
+    return { error: "Werkgever verwijderen is mislukt." };
   }
 
   // Step 5: wis impersonatie-cookie als die toevallig op deze firm stond.
@@ -162,5 +184,9 @@ export async function deleteEmployerAction(formData: FormData) {
   revalidatePath("/admin/werkgevers");
   revalidatePath("/admin");
 
+  // BELANGRIJK: redirect() gooit intern een NEXT_REDIRECT-error die Next.js
+  // gebruikt om de navigatie te doen. Deze call MOET buiten elk try/catch
+  // blijven, anders vangen we die error en krijgt de gebruiker een
+  // generieke render-crash in plaats van een doorverwijzing.
   redirect("/admin/werkgevers?deleted=" + encodeURIComponent(firm.name));
 }

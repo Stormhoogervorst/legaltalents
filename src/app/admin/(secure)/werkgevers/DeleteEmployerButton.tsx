@@ -36,23 +36,15 @@ export default function DeleteEmployerButton({
     setError(null);
     const fd = new FormData(e.currentTarget);
     startTransition(async () => {
-      try {
-        await deleteEmployerAction(fd);
-      } catch (err) {
-        // Next.js gooit een NEXT_REDIRECT "error" bij redirect() — die
-        // mogen we niet als fout tonen, maar klakkeloos laten gaan.
-        if (
-          typeof err === "object" &&
-          err !== null &&
-          "digest" in err &&
-          typeof (err as { digest?: string }).digest === "string" &&
-          (err as { digest: string }).digest.startsWith("NEXT_REDIRECT")
-        ) {
-          throw err;
-        }
-        setError(
-          err instanceof Error ? err.message : "Verwijderen is mislukt."
-        );
+      // De action gebruikt bewust geen throw voor business-fouten; bij
+      // falen komt er `{ error }` terug, bij succes doet de server
+      // `redirect()` en eindigt deze promise zonder return-waarde
+      // (Next.js' NEXT_REDIRECT wordt dan afgehandeld door de router,
+      // buiten deze handler om). Daarom GEEN try/catch hier: dat zou
+      // de redirect-error vangen en op een error-boundary laten landen.
+      const result = await deleteEmployerAction(fd);
+      if (result?.error) {
+        setError(result.error);
       }
     });
   };
