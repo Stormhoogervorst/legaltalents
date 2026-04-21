@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import ProfileForm from "./ProfileForm";
+import DangerZone from "./DangerZone";
 
 export const metadata = {
   title: "Mijn profiel | Legal Talents",
@@ -34,6 +35,12 @@ export default async function ProfilePage() {
         userId={user!.id}
         userEmail={user!.email ?? ""}
       />
+
+      {/* ── Gevarenzone — buiten de <form> zodat de verwijder-knop geen
+          profielopslag triggert. ─────────────────────────────────────── */}
+      <div className="mt-10">
+        <DangerZone />
+      </div>
     </div>
   );
 }
