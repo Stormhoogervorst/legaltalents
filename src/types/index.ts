@@ -54,6 +54,7 @@ export interface Job {
   notification_email_override: string | null;
   latitude: number | null;
   longitude: number | null;
+  views: number;
   created_at: string;
   updated_at: string;
   firms?: JobFirmPreview | null;

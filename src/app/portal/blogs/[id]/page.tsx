@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getActingFirm } from "@/lib/impersonation";
 import EditBlogForm from "./EditBlogForm";
 import { deleteBlogAction, updateBlogAction } from "./actions";
 
@@ -22,11 +23,7 @@ export default async function EditBlogPage({ params }: Props) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: firm } = await supabase
-    .from("firms")
-    .select("id")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const { firm } = await getActingFirm<{ id: string }>("id", user.id);
   if (!firm) redirect("/portal/profile");
 
   const { data: blog } = await admin

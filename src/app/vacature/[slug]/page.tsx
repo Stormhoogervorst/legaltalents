@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
 import ApplicationForm from "@/components/ApplicationForm";
@@ -141,6 +142,13 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
     .maybeSingle();
 
   if (!job) notFound();
+
+  // View-tracking: verhoog de teller server-side bij elke pageload.
+  // We gebruiken een RPC met SECURITY DEFINER zodat dit ook werkt zonder
+  // publieke update-rechten op `jobs`. Loskoppelen van de render d.m.v.
+  // fire-and-forget zodat een trage DB-call nooit de pagina vertraagt.
+  const adminDb = createAdminClient();
+  void adminDb.rpc("increment_job_views", { job_id: (job as { id: string }).id });
 
   const firm = (
     Array.isArray(job.firms) ? job.firms[0] : job.firms

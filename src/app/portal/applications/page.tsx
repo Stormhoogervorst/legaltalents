@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getActingFirm } from "@/lib/impersonation";
 import { Users, Mail, Phone, Building2, ChevronLeft, ChevronRight, Linkedin } from "lucide-react";
 import { toPublicLinkedInProfileUrl } from "@/lib/linkedin-profile-url";
 import { isLinkedInPlaceholderEmail } from "@/lib/applicant-email";
@@ -27,11 +28,10 @@ export default async function ApplicationsPage({ searchParams }: Props) {
 
   if (!user) redirect("/login");
 
-  const { data: firm } = await supabase
-    .from("firms")
-    .select("id, name")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const { firm } = await getActingFirm<{ id: string; name: string }>(
+    "id, name",
+    user.id
+  );
 
   if (!firm) redirect("/portal/profile");
 

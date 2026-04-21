@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { getActingFirm } from "@/lib/impersonation";
 import SettingsClient from "./SettingsClient";
 
 export const metadata = {
@@ -13,33 +14,24 @@ export default async function SettingsPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // Check if user owns a firm (owners can edit e-mailinstellingen)
-  const { data: ownedFirm } = await supabase
-    .from("firms")
-    .select("id, name, notification_email, cc_emails")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const { firm, isImpersonating } = await getActingFirm<{
+    id: string;
+    name: string | null;
+    notification_email: string | null;
+    cc_emails: string[] | null;
+  }>("id, name, notification_email, cc_emails", user.id);
 
-  let firmId: string | null = ownedFirm?.id ?? null;
-  const isOwner = !!ownedFirm;
-
-  if (!firmId) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("firm_id")
-      .eq("id", user.id)
-      .maybeSingle();
-    firmId = profile?.firm_id ?? null;
-  }
+  // Admins kunnen tijdens impersonatie de instellingen meekijken; opslaan
+  // blijft gebonden aan de echte eigenaar (isOwner=false) zodat mutations
+  // nooit per ongeluk namens de klant gebeuren.
+  const isOwner = !!firm && !isImpersonating;
 
   return (
     <SettingsClient
-      hasFirm={!!firmId}
+      hasFirm={!!firm}
       isOwner={isOwner}
-      initialNotificationEmail={ownedFirm?.notification_email ?? ""}
-      initialCcEmails={
-        Array.isArray(ownedFirm?.cc_emails) ? ownedFirm!.cc_emails : []
-      }
+      initialNotificationEmail={firm?.notification_email ?? ""}
+      initialCcEmails={Array.isArray(firm?.cc_emails) ? firm!.cc_emails! : []}
     />
   );
 }

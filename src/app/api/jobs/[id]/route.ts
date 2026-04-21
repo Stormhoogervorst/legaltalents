@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getImpersonatedFirmId } from "@/lib/impersonation";
 import { geocodeCity } from "@/lib/geocode";
 
 // ── Zod schemas ────────────────────────────────────────────────────────────
@@ -42,15 +44,72 @@ const updateJobSchema = z.object({
 
 type Params = { params: Promise<{ id: string }> };
 
-// ── Shared: resolve authenticated user's firm ──────────────────────────────
+type ResolvedFirm = {
+  user: { id: string } | null;
+  firm: { id: string } | null;
+  /**
+   * True wanneer een admin op dit moment als werkgever is ingelogd via
+   * de impersonatie-cookie. In dat geval moet de caller met de
+   * service-role client schrijven, omdat RLS op `jobs` alleen writes
+   * toestaat voor de firm-owner.
+   */
+  isImpersonating: boolean;
+  response: NextResponse | null;
+};
 
-async function getAuthFirm(supabase: Awaited<ReturnType<typeof createClient>>) {
+/**
+ * Zoekt de firm waar de huidige request namens handelt.
+ *
+ * 1. Als er een geldig impersonatie-cookie is en de ingelogde user heeft
+ *    rol `admin`, dan is dat de firm (de helper valideert de rol zelf).
+ * 2. Anders de firm waarvan de ingelogde user eigenaar is
+ *    (`firms.user_id = auth.uid()`).
+ *
+ * Zo krijgen admins tijdens impersonatie niet langer
+ * "Geen werkgever gevonden voor dit account".
+ */
+async function resolveActingFirm(
+  supabase: Awaited<ReturnType<typeof createClient>>
+): Promise<ResolvedFirm> {
   const {
     data: { user },
     error: authError,
   } = await supabase.auth.getUser();
 
-  if (authError || !user) return { user: null, firm: null, response: NextResponse.json({ error: "Niet ingelogd." }, { status: 401 }) };
+  if (authError || !user) {
+    return {
+      user: null,
+      firm: null,
+      isImpersonating: false,
+      response: NextResponse.json({ error: "Niet ingelogd." }, { status: 401 }),
+    };
+  }
+
+  // getImpersonatedFirmId verifieert zelf dat de huidige user admin is —
+  // een stale cookie op een gewoon werkgeversaccount wordt genegeerd.
+  const impersonatedFirmId = await getImpersonatedFirmId();
+  if (impersonatedFirmId) {
+    const admin = createAdminClient();
+    const { data: firm } = await admin
+      .from("firms")
+      .select("id")
+      .eq("id", impersonatedFirmId)
+      .maybeSingle();
+
+    if (!firm) {
+      return {
+        user,
+        firm: null,
+        isImpersonating: true,
+        response: NextResponse.json(
+          { error: "Geïmpersoneerde werkgever bestaat niet meer." },
+          { status: 404 }
+        ),
+      };
+    }
+
+    return { user, firm, isImpersonating: true, response: null };
+  }
 
   const { data: firm } = await supabase
     .from("firms")
@@ -58,9 +117,19 @@ async function getAuthFirm(supabase: Awaited<ReturnType<typeof createClient>>) {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!firm) return { user, firm: null, response: NextResponse.json({ error: "Geen werkgever gevonden voor dit account." }, { status: 403 }) };
+  if (!firm) {
+    return {
+      user,
+      firm: null,
+      isImpersonating: false,
+      response: NextResponse.json(
+        { error: "Geen werkgever gevonden voor dit account." },
+        { status: 403 }
+      ),
+    };
+  }
 
-  return { user, firm, response: null };
+  return { user, firm, isImpersonating: false, response: null };
 }
 
 // ── PATCH /api/jobs/[id] — update a job ───────────────────────────────────
@@ -69,7 +138,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const { firm, response } = await getAuthFirm(supabase);
+  const { firm, isImpersonating, response } = await resolveActingFirm(supabase);
   if (response) return response;
 
   let body: unknown;
@@ -98,7 +167,13 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     updatePayload.longitude = geo?.lng ?? null;
   }
 
-  const { data: updated, error } = await supabase
+  // RLS op `jobs` laat schrijven alleen toe voor de firm-owner. Tijdens
+  // impersonatie is de ingelogde sessie de admin (niet de owner), dus
+  // switchen we naar de service-role client. De admin-check zit al in
+  // getImpersonatedFirmId().
+  const db = isImpersonating ? createAdminClient() : supabase;
+
+  const { data: updated, error } = await db
     .from("jobs")
     .update(updatePayload)
     .eq("id", id)
@@ -126,13 +201,16 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const { firm, response } = await getAuthFirm(supabase);
+  const { firm, isImpersonating, response } = await resolveActingFirm(supabase);
   if (response) return response;
 
-  // Step B: IDOR protection — WHERE id = :id AND firm_id = :auth_firm_id
-  // Werkgever A cannot delete a vacature belonging to werkgever B even if
-  // they know the UUID, because the firm_id filter will return 0 rows.
-  const { data: deleted, error } = await supabase
+  // IDOR-bescherming: WHERE id = :id AND firm_id = :acting_firm_id.
+  // Werkgever A kan nooit een vacature van werkgever B verwijderen —
+  // óók niet wanneer de request via de service-role client loopt,
+  // want de firm-filter returnt dan simpelweg 0 rijen.
+  const db = isImpersonating ? createAdminClient() : supabase;
+
+  const { data: deleted, error } = await db
     .from("jobs")
     .delete()
     .eq("id", id)

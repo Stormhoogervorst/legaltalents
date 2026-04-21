@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import {
   ArrowLeft,
   Briefcase,
@@ -7,10 +7,12 @@ import {
   Mail,
   Globe,
   MapPin,
+  Plus,
   Shield,
+  UserRoundCog,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { impersonateEmployerAction } from "@/lib/impersonation-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -53,22 +55,8 @@ const statusLabel: Record<string, string> = {
 export default async function AdminFirmDetailPage({ params }: Props) {
   const { id } = await params;
 
-  // ── Auth + admin guard ────────────────────────────────────────────────────
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login?redirectTo=/admin");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profile?.role !== "admin") redirect("/?error=unauthorized");
-
-  // ── Fetch firm + jobs + applications via service role ─────────────────────
+  // Auth + admin-rol worden afgedwongen door (secure)/layout.tsx en
+  // middleware.ts. We mogen direct met de service-role client praten.
   const admin = createAdminClient();
 
   const { data: firm } = await admin
@@ -158,10 +146,18 @@ export default async function AdminFirmDetailPage({ params }: Props) {
                     Website
                   </a>
                 )}
+                <span className="inline-flex items-center gap-1.5">
+                  Aangemaakt op{" "}
+                  {new Date(firm.created_at).toLocaleDateString("nl-NL", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {firm.is_published ? (
                 <span className="inline-flex items-center rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700">
                   Gepubliceerd
@@ -180,6 +176,25 @@ export default async function AdminFirmDetailPage({ params }: Props) {
                   Bekijk publieke pagina
                 </Link>
               )}
+              <form action={impersonateEmployerAction}>
+                <input type="hidden" name="employerId" value={firm.id} />
+                <button
+                  type="submit"
+                  title="Open het werkgevers-dashboard precies zoals deze klant het ziet"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-amber-950 ring-1 ring-inset ring-amber-600 transition hover:bg-amber-400"
+                >
+                  <UserRoundCog className="h-3.5 w-3.5" />
+                  Log in als dit bedrijf
+                </button>
+              </form>
+              <Link
+                href={`/portal/jobs/new?asEmployer=${firm.id}`}
+                title="Open het vacature-formulier met deze werkgever al ingevuld"
+                className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-700"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Plaats vacature namens dit bedrijf
+              </Link>
             </div>
           </div>
 

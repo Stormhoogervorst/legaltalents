@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getActingFirm } from "@/lib/impersonation";
 import { Plus, Briefcase } from "lucide-react";
 import JobActions from "./JobActions";
 import JobStatusToggle from "./JobStatusToggle";
@@ -20,17 +21,11 @@ export default async function JobsPage() {
 
   if (!user) redirect("/login");
 
-  // Step 1: fetch firm for this user
-  const { data: firm, error: firmError } = await supabase
-    .from("firms")
-    .select("id, slug")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (firmError) {
-    console.error("[portal/jobs] Firm fetch error (user_id:", user.id, "):", firmError);
-  }
-  console.log("[portal/jobs] user.id:", user.id, "| firm:", firm);
+  // Step 1: fetch firm for this user (inclusief impersonatie-overlay).
+  const { firm } = await getActingFirm<{ id: string; slug: string | null }>(
+    "id, slug",
+    user.id
+  );
 
   if (!firm) redirect("/portal/profile");
 

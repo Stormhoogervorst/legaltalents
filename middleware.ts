@@ -72,6 +72,11 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // /admin/login is de publieke "geheime voordeur" voor de Super Admin.
+  // Hier mag elke (niet-)bezoeker langs zonder role-check.
+  const isAdminLogin =
+    pathname === "/admin/login" || pathname.startsWith("/admin/login/");
+
   // Resolve admin role once, only when a downstream branch needs it. The
   // profiles_self_read RLS policy (id = auth.uid()) allows this query with the
   // anon key + the user's session cookie — no service role needed here.
@@ -92,15 +97,26 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── /admin guard ──────────────────────────────────────────────────────────
-  // Unauthenticated  → /login?redirectTo=<pathname>
-  // Authenticated non-admin → /?error=unauthorized
-  if (pathname.startsWith("/admin")) {
-    if (!user) {
+  // /admin/login zelf staat altijd open (de inlogpagina kan zichzelf nooit
+  // dichtmaken). Een ingelogde admin die /admin/login bezoekt wordt
+  // doorgestuurd naar /admin, een ingelogde non-admin naar de homepage.
+  if (isAdminLogin) {
+    if (user) {
       const url = request.nextUrl.clone();
-      url.pathname = "/login";
-      url.searchParams.set("redirectTo", pathname);
+      url.pathname = isAdmin ? "/admin" : "/";
+      url.search = "";
+      if (!isAdmin) url.searchParams.set("error", "unauthorized");
       return NextResponse.redirect(url);
     }
+  } else if (pathname.startsWith("/admin")) {
+    // Geen sessie → naar de admin-voordeur, NIET naar de werkgevers-login.
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/admin/login";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+    // Ingelogd maar geen admin → terug naar homepage met waarschuwing.
     if (!isAdmin) {
       const url = request.nextUrl.clone();
       url.pathname = "/";

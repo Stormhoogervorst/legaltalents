@@ -1,6 +1,8 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getActingFirm } from "@/lib/impersonation";
 import { ChevronLeft } from "lucide-react";
 import JobForm from "@/components/JobForm";
 
@@ -18,15 +20,19 @@ export default async function EditJobPage({ params }: Props) {
 
   if (!user) redirect("/login");
 
-  const { data: firm } = await supabase
-    .from("firms")
-    .select("id, slug")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const { firm, isImpersonating } = await getActingFirm<{
+    id: string;
+    slug: string | null;
+  }>("id, slug", user.id);
 
   if (!firm) redirect("/portal/profile");
 
-  const { data: job } = await supabase
+  // Tijdens impersonatie leest de admin-sessie een firm die hij niet zelf
+  // bezit — RLS op `jobs` staat dat lezen niet toe. Vallen we terug op de
+  // service-role client (de admin-check is al gedaan in getActingFirm).
+  const db = isImpersonating ? createAdminClient() : supabase;
+
+  const { data: job } = await db
     .from("jobs")
     .select(
       "id, title, slug, location, type, practice_area, description, salary_indication, start_date, required_education, hours_per_week, status"

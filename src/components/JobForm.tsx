@@ -12,6 +12,7 @@ import {
   Bold,
   Italic,
   List,
+  Shield,
 } from "lucide-react";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -59,6 +60,20 @@ type Props = {
   firmId: string;
   firmSlug: string;
   job?: JobData;
+  /**
+   * Admin-flow "plaats vacature namens dit bedrijf": toont een banner,
+   * stuurt bij opslaan het veld `posted_by_admin: true` mee en geeft de
+   * API een expliciete `firm_id` zodat de admin-server niet afhankelijk
+   * is van de eigen session-firm.
+   */
+  postedByAdmin?: boolean;
+  firmName?: string;
+  /**
+   * Route waar de gebruiker naartoe moet na opslaan. Default is
+   * /portal/jobs; bij de admin-flow gaat de admin terug naar
+   * /admin/werkgevers/[id].
+   */
+  returnTo?: string;
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -99,7 +114,14 @@ function ToolbarButton({
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function JobForm({ firmId, firmSlug, job }: Props) {
+export default function JobForm({
+  firmId,
+  firmSlug,
+  job,
+  postedByAdmin = false,
+  firmName,
+  returnTo,
+}: Props) {
   const router = useRouter();
 
   const [title, setTitle] = useState(job?.title ?? "");
@@ -165,9 +187,11 @@ export default function JobForm({ firmId, firmSlug, job }: Props) {
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/^-|-$/g, "")}-${nanoid(6)}`;
 
-      // firmId is provided by the server component but the API route
-      // re-derives the real firm from the authenticated session, so
-      // it is only used here to build the slug prefix.
+      // firmId is provided by the server component but de API-route
+      // re-derives de firm normaal gesproken uit de sessie. In de
+      // admin-flow ("namens werkgever X") geven we de firm_id én de
+      // `posted_by_admin` vlag expliciet mee. De server controleert dan
+      // nogmaals of de user echt admin is vóór hij die velden accepteert.
       const payload = {
         title: title.trim(),
         location: location.trim(),
@@ -180,6 +204,9 @@ export default function JobForm({ firmId, firmSlug, job }: Props) {
         hours_per_week: hoursPerWeek ? parseInt(hoursPerWeek, 10) : null,
         status: targetStatus,
         ...(slug ? { slug } : {}),
+        ...(postedByAdmin
+          ? { firm_id: firmId, posted_by_admin: true }
+          : {}),
       };
 
       let res: Response;
@@ -210,7 +237,7 @@ export default function JobForm({ firmId, firmSlug, job }: Props) {
 
       setTimeout(() => {
         router.refresh();
-        router.push("/portal/jobs");
+        router.push(returnTo ?? "/portal/jobs");
       }, 800);
     },
     [
@@ -226,12 +253,33 @@ export default function JobForm({ firmId, firmSlug, job }: Props) {
       editor,
       firmSlug,
       job,
+      postedByAdmin,
+      returnTo,
       router,
     ]
   );
 
   return (
     <div className="space-y-6">
+      {postedByAdmin && (
+        <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <Shield className="mt-0.5 h-4 w-4 shrink-0" />
+          <div>
+            <p className="font-semibold">
+              Je plaatst namens {firmName ?? "deze werkgever"}
+            </p>
+            <p className="text-red-700">
+              De vacature wordt gekoppeld aan het bedrijf en gemarkeerd als
+              door admin geplaatst ({" "}
+              <code className="rounded bg-red-100 px-1 py-0.5 text-[11px] font-mono">
+                posted_by_admin
+              </code>{" "}
+              = true).
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* ── Verplichte velden ─────────────────────────────────────── */}
       <section className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5">
         <h2 className="text-lg font-semibold text-black">

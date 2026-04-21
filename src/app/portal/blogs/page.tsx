@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getActingFirm } from "@/lib/impersonation";
 import { Plus, FileText } from "lucide-react";
 import BlogsToast from "./BlogsToast";
 
@@ -29,11 +30,7 @@ export default async function BlogsPage({ searchParams }: Props) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: firm } = await supabase
-    .from("firms")
-    .select("id")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const { firm } = await getActingFirm<{ id: string }>("id", user.id);
 
   if (!firm) redirect("/portal/profile");
 

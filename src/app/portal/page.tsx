@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getActingFirm } from "@/lib/impersonation";
 import { Briefcase, Users, Plus, AlertCircle, ChevronRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -19,33 +20,11 @@ export default async function PortalDashboardPage() {
 
   if (!user) redirect("/login");
 
-  // Check if user owns a firm
-  const { data: ownedFirm } = await supabase
-    .from("firms")
-    .select("id, name, is_published")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  let firm = ownedFirm;
-
-  // If not a firm owner, check if user is a team member linked via profiles.firm_id
-  if (!firm) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("firm_id")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (profile?.firm_id) {
-      const admin = createAdminClient();
-      const { data: teamFirm } = await admin
-        .from("firms")
-        .select("id, name, is_published")
-        .eq("id", profile.firm_id)
-        .maybeSingle();
-      firm = teamFirm;
-    }
-  }
+  const { firm } = await getActingFirm<{
+    id: string;
+    name: string;
+    is_published: boolean | null;
+  }>("id, name, is_published", user.id);
 
   if (!firm) redirect("/portal/profile");
 

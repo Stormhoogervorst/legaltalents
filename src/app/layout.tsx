@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
+import ImpersonationBar from "@/components/ImpersonationBar";
 import "./globals.css";
 
 const inter = Inter({
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="nl">
       <body className={inter.className}>
+        <ImpersonationBar />
         {children}
         <Toaster richColors position="top-right" />
       </body>
