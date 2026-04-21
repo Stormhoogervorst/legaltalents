@@ -31,6 +31,18 @@ const PRACTICE_AREAS = [
   "Overig",
 ] as const;
 
+// Bedrijfsgrootte (juridische markt). De value wordt opgeslagen in
+// firms.team_size; het label wordt in de dropdown getoond.
+const TEAM_SIZE_OPTIONS = [
+  { value: "1-5", label: "1 - 5 medewerkers" },
+  { value: "6-20", label: "6 - 20 medewerkers" },
+  { value: "21-50", label: "21 - 50 medewerkers" },
+  { value: "51-100", label: "51 - 100 medewerkers" },
+  { value: "100+", label: "100+ medewerkers" },
+] as const;
+
+type TeamSizeValue = (typeof TEAM_SIZE_OPTIONS)[number]["value"];
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Firm = {
@@ -47,6 +59,7 @@ type Firm = {
   website_url: string | null;
   linkedin_url: string | null;
   salary_indication: string | null;
+  team_size: string | null;
   is_published: boolean;
 } | null;
 
@@ -107,6 +120,14 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
   );
   const [websiteUrl, setWebsiteUrl] = useState(firm?.website_url ?? "");
   const [linkedinUrl, setLinkedinUrl] = useState(firm?.linkedin_url ?? "");
+  // Alleen bekende opties voorselecteren; onbekende/legacy waarden laten we
+  // leeg zodat de gebruiker een geldige optie kiest.
+  const initialTeamSize =
+    firm?.team_size &&
+    TEAM_SIZE_OPTIONS.some((o) => o.value === firm.team_size)
+      ? (firm.team_size as TeamSizeValue)
+      : "";
+  const [teamSize, setTeamSize] = useState<TeamSizeValue | "">(initialTeamSize);
   // Logo state
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(
@@ -211,6 +232,7 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
       why_work_with_us: whyWorkWithUs.trim() || null,
       website_url: websiteUrl.trim() || null,
       linkedin_url: linkedinUrl.trim() || null,
+      team_size: teamSize || null,
     };
 
     // Send to API route — ownership is verified server-side via auth session.
@@ -482,6 +504,27 @@ export default function ProfileForm({ firm, userId, userEmail }: Props) {
             onChange={(e) => setWhyWorkWithUs(e.target.value)}
             className={`${inputCls} resize-none`}
           />
+        </div>
+
+        {/* Bedrijfsgrootte */}
+        <div>
+          <label className={labelCls}>Bedrijfsgrootte</label>
+          <select
+            value={teamSize}
+            onChange={(e) => setTeamSize(e.target.value as TeamSizeValue | "")}
+            className={inputCls}
+          >
+            <option value="">Kies bedrijfsgrootte…</option>
+            {TEAM_SIZE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-gray-400">
+            Geef het aantal medewerkers op zodat kandidaten weten wat voor
+            werkgever jullie zijn.
+          </p>
         </div>
 
         {/* Website */}

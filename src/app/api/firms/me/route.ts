@@ -40,7 +40,10 @@ const PRACTICE_AREAS = [
   "Overig",
 ] as const;
 
-const TEAM_SIZES = ["1–10", "11–50", "51–200", "200+"] as const;
+// Bedrijfsgrootte — opties afgestemd op de juridische markt.
+// Waarden worden opgeslagen als compacte strings; de UI toont ze als
+// "{team_size} medewerkers" (zie o.a. FirmCard).
+const TEAM_SIZES = ["1-5", "6-20", "21-50", "51-100", "100+"] as const;
 
 // Explicit allowlist of updatable columns — prevents mass-assignment of
 // sensitive columns like user_id, id, slug (on update), is_published, etc.
