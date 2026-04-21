@@ -76,7 +76,22 @@ export default function LoginPage() {
         setLoading(false);
       } else {
         console.debug("[login] signIn success", { userId: data?.user?.id });
-        router.push("/portal");
+
+        // Bepaal bestemming op basis van rol. Admins gaan direct naar /admin,
+        // overige accounts naar /portal. De query gebruikt de verse sessie-
+        // cookie en valt terug via de profiles_self_read RLS policy.
+        let destination = "/portal";
+        const userId = data?.user?.id;
+        if (userId) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", userId)
+            .maybeSingle();
+          if (profile?.role === "admin") destination = "/admin";
+        }
+
+        router.push(destination);
         router.refresh();
       }
     } catch (err) {

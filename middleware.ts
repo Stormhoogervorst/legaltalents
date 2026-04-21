@@ -72,6 +72,44 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Resolve admin role once, only when a downstream branch needs it. The
+  // profiles_self_read RLS policy (id = auth.uid()) allows this query with the
+  // anon key + the user's session cookie — no service role needed here.
+  const needsRoleLookup =
+    !!user &&
+    (pathname.startsWith("/admin") ||
+      pathname.startsWith("/login") ||
+      pathname.startsWith("/register"));
+
+  let isAdmin = false;
+  if (needsRoleLookup) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user!.id)
+      .maybeSingle();
+    isAdmin = profile?.role === "admin";
+  }
+
+  // ── /admin guard ──────────────────────────────────────────────────────────
+  // Unauthenticated  → /login?redirectTo=<pathname>
+  // Authenticated non-admin → /?error=unauthorized
+  if (pathname.startsWith("/admin")) {
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("redirectTo", pathname);
+      return NextResponse.redirect(url);
+    }
+    if (!isAdmin) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      url.search = "";
+      url.searchParams.set("error", "unauthorized");
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Unauthenticated users cannot access /portal
   if (pathname.startsWith("/portal") && !user) {
     const url = request.nextUrl.clone();
@@ -80,7 +118,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Logged-in users are sent to /portal when they visit auth pages.
+  // Logged-in users are sent away from auth pages.
+  // Admins land on /admin, everyone else on /portal.
   // Explicitly excluded: the LinkedIn apply confirmation flow at
   // /vacature/[slug]/bevestig-linkedin so users arriving after OAuth
   // are never bounced away mid-application.
@@ -93,7 +132,7 @@ export async function middleware(request: NextRequest) {
     (pathname.startsWith("/login") || pathname.startsWith("/register"))
   ) {
     const url = request.nextUrl.clone();
-    url.pathname = "/portal";
+    url.pathname = isAdmin ? "/admin" : "/portal";
     return NextResponse.redirect(url);
   }
 

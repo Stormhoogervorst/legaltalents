@@ -58,7 +58,7 @@ export default async function AdminFirmDetailPage({ params }: Props) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/login?redirectTo=/admin");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -66,7 +66,7 @@ export default async function AdminFirmDetailPage({ params }: Props) {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (profile?.role !== "admin") redirect("/");
+  if (profile?.role !== "admin") redirect("/?error=unauthorized");
 
   // ── Fetch firm + jobs + applications via service role ─────────────────────
   const admin = createAdminClient();

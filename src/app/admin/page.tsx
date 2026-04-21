@@ -37,7 +37,7 @@ export default async function AdminDashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+  if (!user) redirect("/login?redirectTo=/admin");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -45,7 +45,7 @@ export default async function AdminDashboardPage() {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (profile?.role !== "admin") redirect("/");
+  if (profile?.role !== "admin") redirect("/?error=unauthorized");
 
   // ── 2. Fetch data with service-role (bypasses RLS) ────────────────────────
   // Safe here because we've already verified the caller is an admin.
