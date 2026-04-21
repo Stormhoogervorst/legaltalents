@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Building2, ChevronRight, Shield } from "lucide-react";
+import { Building2, CheckCircle2, ChevronRight, Shield } from "lucide-react";
 import { createAdminClient } from "@/lib/supabase/admin";
+import DeleteEmployerButton from "./DeleteEmployerButton";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +43,13 @@ type ApplicationRow = {
   job_id: string | null;
 };
 
-export default async function AdminWerkgeversPage() {
+type PageProps = {
+  searchParams?: Promise<{ deleted?: string }>;
+};
+
+export default async function AdminWerkgeversPage({ searchParams }: PageProps) {
+  const sp = (await searchParams) ?? {};
+  const deletedName = typeof sp.deleted === "string" ? sp.deleted : null;
   // Auth + admin-rol worden afgedwongen door (secure)/layout.tsx en
   // middleware.ts. We mogen direct met de service-role client praten.
   const admin = createAdminClient();
@@ -93,6 +100,17 @@ export default async function AdminWerkgeversPage() {
           Alle geregistreerde werkgevers op het platform, nieuwste eerst.
         </p>
       </div>
+
+      {deletedName && (
+        <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          <span>
+            Werkgever{" "}
+            <span className="font-semibold">{deletedName}</span> en alle
+            gekoppelde data zijn verwijderd.
+          </span>
+        </div>
+      )}
 
       {/* Table */}
       <div className="rounded-2xl bg-white ring-1 ring-gray-200 shadow-sm overflow-hidden">
@@ -182,13 +200,20 @@ export default async function AdminWerkgeversPage() {
                         })}
                       </td>
                       <td className="px-4 py-4 text-right">
-                        <Link
-                          href={`/admin/werkgevers/${firm.id}`}
-                          className="inline-flex items-center gap-1 rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-700 transition"
-                        >
-                          Beheer
-                          <ChevronRight className="h-3.5 w-3.5" />
-                        </Link>
+                        <div className="inline-flex items-center gap-1.5">
+                          <DeleteEmployerButton
+                            employerId={firm.id}
+                            employerName={firm.name}
+                            variant="icon"
+                          />
+                          <Link
+                            href={`/admin/werkgevers/${firm.id}`}
+                            className="inline-flex items-center gap-1 rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-gray-700 transition"
+                          >
+                            Beheer
+                            <ChevronRight className="h-3.5 w-3.5" />
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   );

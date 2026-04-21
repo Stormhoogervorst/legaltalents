@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { impersonateEmployerAction } from "@/lib/impersonation-actions";
+import DeleteEmployerButton from "../DeleteEmployerButton";
 
 export const dynamic = "force-dynamic";
 
@@ -195,6 +196,10 @@ export default async function AdminFirmDetailPage({ params }: Props) {
                 <Plus className="h-3.5 w-3.5" />
                 Plaats vacature namens dit bedrijf
               </Link>
+              <DeleteEmployerButton
+                employerId={firm.id}
+                employerName={firm.name}
+              />
             </div>
           </div>
 
