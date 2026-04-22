@@ -3,32 +3,19 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { geocodeCity } from "@/lib/geocode";
+import { RECHTSGEBIEDEN_MET_OVERIG } from "@/lib/constants/rechtsgebieden";
 
 // ── Zod schemas ────────────────────────────────────────────────────────────
 
 const JOB_TYPES = ["fulltime", "parttime", "business-course", "stage"] as const;
 
-const PRACTICE_AREAS = [
-  "Arbeidsrecht",
-  "Bestuursrecht",
-  "Erfrecht",
-  "Familierecht",
-  "Intellectueel eigendom",
-  "IT-recht",
-  "Ondernemingsrecht",
-  "Onroerend goed",
-  "Personen- en familierecht",
-  "Strafrecht",
-  "Vastgoedrecht",
-  "Verbintenissenrecht",
-  "Overig",
-] as const;
-
 const createJobSchema = z.object({
   title: z.string().min(1, "Titel is verplicht").max(200).trim(),
   location: z.string().min(1, "Vestigingsplaats is verplicht").max(200).trim(),
   type: z.enum(JOB_TYPES, { message: "Ongeldig type" }),
-  practice_area: z.enum(PRACTICE_AREAS, { message: "Ongeldig rechtsgebied" }),
+  practice_area: z.enum(RECHTSGEBIEDEN_MET_OVERIG, {
+    message: "Ongeldig rechtsgebied",
+  }),
   description: z.string().min(1, "Beschrijving is verplicht").max(100_000),
   salary_indication: z.string().max(200).trim().nullable().optional(),
   start_date: z

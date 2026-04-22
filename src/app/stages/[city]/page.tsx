@@ -12,24 +12,9 @@ import { CITIES, cityDisplayName, cityLocationFilter, isValidCity } from "@/lib/
 import { getCityJobCount } from "@/lib/jobs/getCityJobCount";
 import { SITE_URL as BASE_URL } from "@/lib/site";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { RECHTSGEBIEDEN_MET_OVERIG } from "@/lib/constants/rechtsgebieden";
 
 export const revalidate = 0;
-
-const PRACTICE_AREAS = [
-  "Arbeidsrecht",
-  "Bestuursrecht",
-  "Erfrecht",
-  "Familierecht",
-  "Intellectueel eigendom",
-  "IT-recht",
-  "Ondernemingsrecht",
-  "Onroerend goed",
-  "Personen- en familierecht",
-  "Strafrecht",
-  "Vastgoedrecht",
-  "Verbintenissenrecht",
-  "Overig",
-];
 
 const STAGE_TYPE_VALUES = ["stage", "internship", "student", "Studentbaan"];
 
@@ -264,7 +249,7 @@ export default async function CityStagesPage({
                     <option value="" className="text-[#0A0F3D]">
                       Alle rechtsgebieden
                     </option>
-                    {PRACTICE_AREAS.map((area) => (
+                    {RECHTSGEBIEDEN_MET_OVERIG.map((area) => (
                       <option key={area} value={area} className="text-[#0A0F3D]">
                         {area}
                       </option>

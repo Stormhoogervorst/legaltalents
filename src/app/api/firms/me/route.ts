@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getImpersonatedFirmId } from "@/lib/impersonation";
+import { RECHTSGEBIEDEN_MET_OVERIG } from "@/lib/constants/rechtsgebieden";
 
 const RLS_FIRM_MESSAGE =
   "U heeft geen rechten om een kantoor aan te maken. Neem contact op met support.";
@@ -26,22 +27,6 @@ function firmWriteErrorResponse(message: string, code?: string) {
 
 // ── Zod schemas ────────────────────────────────────────────────────────────
 
-const PRACTICE_AREAS = [
-  "Arbeidsrecht",
-  "Bestuursrecht",
-  "Erfrecht",
-  "Familierecht",
-  "Intellectueel eigendom",
-  "IT-recht",
-  "Ondernemingsrecht",
-  "Onroerend goed",
-  "Personen- en familierecht",
-  "Strafrecht",
-  "Vastgoedrecht",
-  "Verbintenissenrecht",
-  "Overig",
-] as const;
-
 // Bedrijfsgrootte — opties afgestemd op de juridische markt.
 // Waarden worden opgeslagen als compacte strings; de UI toont ze als
 // "{team_size} medewerkers" (zie o.a. FirmCard).
@@ -52,7 +37,7 @@ const TEAM_SIZES = ["1-5", "6-20", "21-50", "51-100", "100+"] as const;
 const updateFirmSchema = z.object({
   name: z.string().min(1).max(200).trim().optional(),
   location: z.string().min(1).max(200).trim().optional(),
-  practice_areas: z.array(z.enum(PRACTICE_AREAS)).optional(),
+  practice_areas: z.array(z.enum(RECHTSGEBIEDEN_MET_OVERIG)).optional(),
   description: z.string().max(10_000).trim().optional(),
   contact_person: z.string().max(200).trim().optional(),
   notification_email: z.string().email().max(200).optional(),

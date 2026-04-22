@@ -4,32 +4,17 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getImpersonatedFirmId } from "@/lib/impersonation";
 import { geocodeCity } from "@/lib/geocode";
+import { RECHTSGEBIEDEN_MET_OVERIG } from "@/lib/constants/rechtsgebieden";
 
 // ── Zod schemas ────────────────────────────────────────────────────────────
 
 const JOB_TYPES = ["fulltime", "parttime", "business-course", "stage"] as const;
 
-const PRACTICE_AREAS = [
-  "Arbeidsrecht",
-  "Bestuursrecht",
-  "Erfrecht",
-  "Familierecht",
-  "Intellectueel eigendom",
-  "IT-recht",
-  "Ondernemingsrecht",
-  "Onroerend goed",
-  "Personen- en familierecht",
-  "Strafrecht",
-  "Vastgoedrecht",
-  "Verbintenissenrecht",
-  "Overig",
-] as const;
-
 const updateJobSchema = z.object({
   title: z.string().min(1).max(200).trim().optional(),
   location: z.string().min(1).max(200).trim().optional(),
   type: z.enum(JOB_TYPES).optional(),
-  practice_area: z.enum(PRACTICE_AREAS).optional(),
+  practice_area: z.enum(RECHTSGEBIEDEN_MET_OVERIG).optional(),
   description: z.string().min(1).max(100_000).optional(),
   salary_indication: z.string().max(200).trim().nullable().optional(),
   start_date: z

@@ -11,24 +11,9 @@ import {
   Globe,
   Linkedin,
 } from "lucide-react";
+import { RECHTSGEBIEDEN_MET_OVERIG } from "@/lib/constants/rechtsgebieden";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-
-const PRACTICE_AREAS = [
-  "Arbeidsrecht",
-  "Bestuursrecht",
-  "Erfrecht",
-  "Familierecht",
-  "Intellectueel eigendom",
-  "IT-recht",
-  "Ondernemingsrecht",
-  "Onroerend goed",
-  "Personen- en familierecht",
-  "Strafrecht",
-  "Vastgoedrecht",
-  "Verbintenissenrecht",
-  "Overig",
-] as const;
 
 // Bedrijfsgrootte (juridische markt). De value wordt opgeslagen in
 // firms.team_size; het label wordt in de dropdown getoond.
@@ -373,7 +358,7 @@ export default function ProfileForm({
             Selecteer één of meerdere rechtsgebieden
           </p>
           <div className="flex flex-wrap gap-2">
-            {PRACTICE_AREAS.map((area) => {
+            {RECHTSGEBIEDEN_MET_OVERIG.map((area) => {
               const selected = practiceAreas.includes(area);
               return (
                 <button

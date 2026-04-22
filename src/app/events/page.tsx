@@ -4,22 +4,7 @@ import Footer from "@/components/Footer";
 import CtaBand from "@/components/CtaBand";
 import JobCard from "@/components/JobCard";
 import { Job, JobFirmPreview } from "@/types";
-
-const PRACTICE_AREAS = [
-  "Arbeidsrecht",
-  "Bestuursrecht",
-  "Erfrecht",
-  "Familierecht",
-  "Intellectueel eigendom",
-  "IT-recht",
-  "Ondernemingsrecht",
-  "Onroerend goed",
-  "Personen- en familierecht",
-  "Strafrecht",
-  "Vastgoedrecht",
-  "Verbintenissenrecht",
-  "Overig",
-];
+import { RECHTSGEBIEDEN } from "@/lib/constants/rechtsgebieden";
 
 const BUSINESS_COURSE_TYPES = ["business-course", "lawcourse", "summer-course"];
 
@@ -32,9 +17,12 @@ interface SearchParams {
 export const revalidate = 0;
 
 export const metadata = {
-  title: "Events & Business Courses | Legal Talents",
+  title: "Events & Business Courses",
   description:
     "Bekijk alle juridische events en business courses bij werkgevers in Nederland.",
+  alternates: {
+    canonical: "/events",
+  },
 };
 
 export default async function EventsPage({
@@ -166,7 +154,7 @@ export default async function EventsPage({
                 className="w-full bg-transparent border-0 border-b border-[#CCCCCC] py-3 text-[15px] text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] transition-colors duration-200 appearance-none cursor-pointer"
               >
                 <option value="">Alle rechtsgebieden</option>
-                {PRACTICE_AREAS.map((area) => (
+                {RECHTSGEBIEDEN.map((area) => (
                   <option key={area} value={area}>
                     {area}
                   </option>

@@ -8,24 +8,9 @@ import { geocodeCity } from "@/lib/geocode";
 import { MapPin, Users, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { Firm } from "@/types";
+import { RECHTSGEBIEDEN } from "@/lib/constants/rechtsgebieden";
 
 export const revalidate = 0;
-
-const PRACTICE_AREAS = [
-  "Arbeidsrecht",
-  "Bestuursrecht",
-  "Erfrecht",
-  "Familierecht",
-  "Intellectueel eigendom",
-  "IT-recht",
-  "Ondernemingsrecht",
-  "Onroerend goed",
-  "Personen- en familierecht",
-  "Strafrecht",
-  "Vastgoedrecht",
-  "Verbintenissenrecht",
-  "Overig",
-];
 
 interface SearchParams {
   locatie?: string;
@@ -34,9 +19,12 @@ interface SearchParams {
 }
 
 export const metadata = {
-  title: "Werkgevers | Legal Talents",
+  title: "Werkgevers",
   description:
     "Bekijk alle juridische werkgevers die actief vacatures plaatsen op Legal Talents.",
+  alternates: {
+    canonical: "/werkgevers",
+  },
 };
 
 export default async function FirmsPage({
@@ -237,7 +225,7 @@ export default async function FirmsPage({
                     <option value="" className="text-[#0A0F3D]">
                       Alle rechtsgebieden
                     </option>
-                    {PRACTICE_AREAS.map((area) => (
+                    {RECHTSGEBIEDEN.map((area) => (
                       <option
                         key={area}
                         value={area}

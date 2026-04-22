@@ -10,6 +10,7 @@ import VacatureListMobile from "@/components/VacatureListMobile";
 import OrganizationJsonLd from "@/components/OrganizationJsonLd";
 import { createClient } from "@/lib/supabase/server";
 import { Firm, Job } from "@/types";
+import { RECHTSGEBIEDEN } from "@/lib/constants/rechtsgebieden";
 
 interface BlogPreview {
   id: string;
@@ -31,21 +32,8 @@ const blogCategoryLabels: Record<string, string> = {
 /**
  * Rechtsgebieden voor de interne-linking sectie onderaan de homepage.
  * Links naar /vacatures?rechtsgebied=... — bestaande filter matcht via ilike.
+ * Zie `@/lib/constants/rechtsgebieden` voor de canonieke lijst.
  */
-const PRACTICE_AREAS = [
-  "Arbeidsrecht",
-  "Ondernemingsrecht",
-  "Strafrecht",
-  "Familierecht",
-  "Erfrecht",
-  "Fiscaal recht",
-  "Bestuursrecht",
-  "Vastgoedrecht",
-  "Intellectueel eigendom",
-  "Mededingingsrecht",
-  "Insolventierecht",
-  "Europees recht",
-] as const;
 
 /**
  * FAQ-content en FAQPage JSON-LD worden uit dezelfde array opgebouwd,
@@ -141,39 +129,21 @@ export default async function HomePage() {
         style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
       >
         <div className="max-w-[1400px] mx-auto">
-          {/* Mobiel: titel over twee regels, dot in brand-kleur naast "vacatures" */}
-          <div className="md:hidden mb-10">
+          {/* Eén H2 voor mobile én desktop. Knop alleen op desktop (mobiel staat ie onder de lijst). */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between md:gap-6 mb-10 md:mb-16">
             <h2
               className="text-left"
               style={{
-                fontSize: "clamp(30px, 9.5vw, 42px)",
+                fontSize: "clamp(30px, 6vw, 56px)",
                 fontWeight: 700,
                 lineHeight: 1.05,
                 letterSpacing: "-0.025em",
                 color: "#0A0A0A",
               }}
             >
-              Nieuwste<br className="block md:hidden" />
-              vacatures
-              <span style={{ color: "#587DFE" }}>.</span>
-            </h2>
-          </div>
-
-          {/* Desktop: titel + knop naast elkaar */}
-          <div className="hidden md:flex items-end justify-between gap-6 mb-16">
-            <h2
-              style={{
-                fontSize: "clamp(32px, 4vw, 56px)",
-                fontWeight: 700,
-                lineHeight: 1,
-                letterSpacing: "-0.025em",
-                color: "#0A0A0A",
-              }}
-            >
               De nieuwste juridische vacatures
-              <span style={{ color: "#587DFE" }}>.</span>
             </h2>
-            <Link href="/vacatures" className="btn-primary shrink-0 mb-1">
+            <Link href="/vacatures" className="btn-primary shrink-0 mb-1 hidden md:inline-flex">
               Alle vacatures
             </Link>
           </div>
@@ -216,38 +186,21 @@ export default async function HomePage() {
       >
         <div className="max-w-[1400px] mx-auto">
 
-          {/* ── Mobile header (left-aligned, natural wrap) ── */}
-          <div className="md:hidden mb-8">
+          {/* Eén H2 voor mobile én desktop. Knop alleen op desktop (mobiel staat ie onder de lijst). */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between md:gap-6 mb-8 md:mb-16">
             <h2
               className="text-left"
               style={{
-                fontSize: "clamp(30px, 9.5vw, 42px)",
+                fontSize: "clamp(30px, 6vw, 56px)",
                 fontWeight: 700,
                 lineHeight: 1.05,
                 letterSpacing: "-0.025em",
                 color: "#0A0A0A",
               }}
             >
-              Uitgelichte werkgevers
-              <span style={{ color: "#587DFE" }}>.</span>
+              Uitgelichte juridische werkgevers
             </h2>
-          </div>
-
-          {/* ── Desktop header (title + button side by side) ── */}
-          <div className="hidden md:flex items-end justify-between gap-6 mb-16">
-            <h2
-              style={{
-                fontSize: "clamp(32px, 4vw, 56px)",
-                fontWeight: 700,
-                lineHeight: 1,
-                letterSpacing: "-0.025em",
-                color: "#0A0A0A",
-              }}
-            >
-              Uitgelichte werkgevers
-              <span style={{ color: "#587DFE" }}>.</span>
-            </h2>
-            <Link href="/werkgevers" className="btn-primary shrink-0 mb-1">
+            <Link href="/werkgevers" className="btn-primary shrink-0 mb-1 hidden md:inline-flex">
               Alle werkgevers
             </Link>
           </div>
@@ -592,7 +545,6 @@ export default async function HomePage() {
             }}
           >
             Waarom Legal Talents
-            <span style={{ color: "#587DFE" }}>.</span>
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 mt-12 md:mt-16">
@@ -657,7 +609,6 @@ export default async function HomePage() {
               }}
             >
               Hoe het werkt
-              <span style={{ color: "#587DFE" }}>.</span>
             </h2>
             <p
               className="mt-5"
@@ -745,7 +696,6 @@ export default async function HomePage() {
               }}
             >
               Vind vacatures per rechtsgebied
-              <span style={{ color: "#587DFE" }}>.</span>
             </h2>
             <p
               className="mt-5"
@@ -761,7 +711,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 mt-12 md:mt-16">
-            {PRACTICE_AREAS.map((area) => (
+            {RECHTSGEBIEDEN.map((area) => (
               <Link
                 key={area}
                 href={{ pathname: "/vacatures", query: { rechtsgebied: area } }}
@@ -816,7 +766,6 @@ export default async function HomePage() {
             }}
           >
             Veelgestelde vragen
-            <span style={{ color: "#587DFE" }}>.</span>
           </h2>
 
           <div className="mt-10 md:mt-14 flex flex-col gap-3">
@@ -878,8 +827,7 @@ export default async function HomePage() {
                   padding: 0,
                 }}
               >
-                Artikelen <br className="md:hidden" />&amp; inzichten
-                <span style={{ color: "#587DFE" }}>.</span>
+                Artikelen en inzichten
               </h2>
               <Link
                 href="/kennisbank"

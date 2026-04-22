@@ -3,11 +3,11 @@ import Link from "next/link";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
 import { CITIES, cityDisplayName } from "@/lib/cities";
-import { PRACTICE_AREAS } from "@/lib/practiceAreas";
+import { RECHTSGEBIEDEN } from "@/lib/constants/rechtsgebieden";
 import { JOB_FUNCTIONS } from "@/lib/jobFunctions";
 
 export const metadata: Metadata = {
-  title: "Index van Juridische Vacatures & Stages | Legal Talents",
+  title: "Index van Juridische Vacatures & Stages",
   description:
     "Compleet overzicht van alle juridische vacatures en stages per functie, rechtsgebied en stad in Nederland. Vind snel de juiste positie bij topwerkgevers in de juridische sector.",
   keywords: [
@@ -20,6 +20,9 @@ export const metadata: Metadata = {
     "rechtsgebied vacatures",
     "Legal Talents",
   ],
+  alternates: {
+    canonical: "/juridische-vacatures-index",
+  },
 };
 
 const sectionPadding = {
@@ -188,7 +191,7 @@ export default function JuridischeVacaturesIndexPage() {
           </SectionSubtext>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-3">
-            {PRACTICE_AREAS.filter((a) => a !== "Overig").map((area) => (
+            {RECHTSGEBIEDEN.map((area) => (
               <Link
                 key={area}
                 href={`/vacatures?rechtsgebied=${encodeURIComponent(area)}`}
@@ -253,7 +256,7 @@ export default function JuridischeVacaturesIndexPage() {
           </SectionSubtext>
 
           <div className="space-y-10">
-            {PRACTICE_AREAS.filter((a) => a !== "Overig").map((area) => (
+            {RECHTSGEBIEDEN.map((area) => (
               <div key={area}>
                 <h3 className="text-[15px] font-semibold tracking-wide uppercase text-[#587DFE] mb-3">
                   {area}

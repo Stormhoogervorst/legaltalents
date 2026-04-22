@@ -6,22 +6,7 @@ import RadiusSelect from "@/components/RadiusSelect";
 import { Job, JobFirmPreview } from "@/types";
 import { geocodeCity } from "@/lib/geocode";
 import { Search, MapPin, ChevronDown } from "lucide-react";
-
-const PRACTICE_AREAS = [
-  "Arbeidsrecht",
-  "Bestuursrecht",
-  "Erfrecht",
-  "Familierecht",
-  "Intellectueel eigendom",
-  "IT-recht",
-  "Ondernemingsrecht",
-  "Onroerend goed",
-  "Personen- en familierecht",
-  "Strafrecht",
-  "Vastgoedrecht",
-  "Verbintenissenrecht",
-  "Overig",
-];
+import { RECHTSGEBIEDEN } from "@/lib/constants/rechtsgebieden";
 
 const STAGE_TYPE_VALUES = ["stage", "internship", "student", "Studentbaan"];
 
@@ -35,8 +20,11 @@ interface SearchParams {
 export const revalidate = 0;
 
 export const metadata = {
-  title: "Stages | Legal Talents",
+  title: "Stages",
   description: "Bekijk alle juridische stages bij werkgevers in Nederland.",
+  alternates: {
+    canonical: "/stages",
+  },
 };
 
 export default async function StagesPage({
@@ -287,7 +275,7 @@ export default async function StagesPage({
                     <option value="" className="text-[#0A0F3D]">
                       Alle rechtsgebieden
                     </option>
-                    {PRACTICE_AREAS.map((area) => (
+                    {RECHTSGEBIEDEN.map((area) => (
                       <option
                         key={area}
                         value={area}
