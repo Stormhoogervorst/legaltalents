@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
   KeyRound,
@@ -10,6 +10,7 @@ import {
   AlertCircle,
   Plus,
   X,
+  ShieldAlert,
 } from "lucide-react";
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
   isOwner: boolean;
   initialNotificationEmail?: string;
   initialCcEmails?: string[];
+  isRecovery?: boolean;
 }
 
 const MAX_CC_EMAILS = 20;
@@ -40,6 +42,7 @@ export default function SettingsClient({
   isOwner,
   initialNotificationEmail = "",
   initialCcEmails = [],
+  isRecovery = false,
 }: Props) {
   const supabase = createClient();
 
@@ -51,6 +54,24 @@ export default function SettingsClient({
     "idle"
   );
   const [pwMessage, setPwMessage] = useState("");
+
+  // Recovery-flow: zolang de gebruiker via een password-reset link
+  // binnenkwam én nog geen nieuw wachtwoord heeft gezet, blijft de banner
+  // staan en focussen we direct het wachtwoord-veld. Na een succesvolle
+  // update laten we de banner verdwijnen zodat de pagina weer als normaal
+  // aanvoelt.
+  const [recoveryActive, setRecoveryActive] = useState(isRecovery);
+  const newPasswordRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (isRecovery && newPasswordRef.current) {
+      newPasswordRef.current.focus();
+      newPasswordRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [isRecovery]);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,6 +99,18 @@ export default function SettingsClient({
       setPwMessage("Wachtwoord succesvol gewijzigd.");
       setNewPassword("");
       setConfirmPassword("");
+      // Recovery-flow afgerond: banner verdwijnt en de pagina gedraagt zich
+      // verder als een normale instellingen-pagina. We verwijderen ook de
+      // `recovery=1` query param uit de URL zodat een refresh niet opnieuw
+      // de banner triggert.
+      if (recoveryActive) {
+        setRecoveryActive(false);
+        if (typeof window !== "undefined") {
+          const url = new URL(window.location.href);
+          url.searchParams.delete("recovery");
+          window.history.replaceState({}, "", url.toString());
+        }
+      }
     }
     setPwLoading(false);
   };
@@ -195,6 +228,22 @@ export default function SettingsClient({
         </p>
       </div>
 
+      {recoveryActive && (
+        <div
+          role="alert"
+          className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4"
+        >
+          <ShieldAlert className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="text-sm text-amber-900">
+            <p className="font-semibold">Stel eerst een nieuw wachtwoord in</p>
+            <p className="mt-1 text-amber-800">
+              Je bent ingelogd via een herstel-link. Kies hieronder een nieuw
+              wachtwoord om je account weer veilig te maken.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         {/* Wachtwoord wijzigen */}
         <section className="bg-white border border-gray-200 rounded-2xl p-6">
@@ -216,6 +265,7 @@ export default function SettingsClient({
                 Nieuw wachtwoord
               </label>
               <input
+                ref={newPasswordRef}
                 type="password"
                 required
                 minLength={8}
@@ -269,8 +319,10 @@ export default function SettingsClient({
           </form>
         </section>
 
-        {/* E-mailinstellingen */}
-        {hasFirm && isOwner && (
+        {/* E-mailinstellingen — verborgen tijdens de recovery-flow zodat de
+            gebruiker eerst een nieuw wachtwoord instelt voordat hij andere
+            instellingen aanpast. */}
+        {hasFirm && isOwner && !recoveryActive && (
           <section className="bg-white border border-gray-200 rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-9 h-9 bg-primary-light rounded-lg flex items-center justify-center">

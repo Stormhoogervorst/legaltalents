@@ -131,26 +131,18 @@ export default function LoginPage() {
         }
       }
 
-      // Bouw de redirect altijd vanuit de canonieke site-URL. Supabase
-      // vergelijkt `redirectTo` exact (inclusief hoofdletters, www-prefix en
-      // trailing slash) met de Redirect URLs allowlist; bij een mismatch
-      // wordt hij stilletjes gedropt en valt Supabase terug op de Site URL
-      // (= de homepage). Door `NEXT_PUBLIC_SITE_URL` te gebruiken weten we
-      // zeker dat we altijd dezelfde `https://www.legal-talents.nl` variant
-      // sturen, ongeacht of de gebruiker met of zonder `www` binnenkwam.
+      // Gebruik bewust `window.location.origin` zodat de redirect altijd
+      // matcht met het domein waarop de gebruiker zit (met of zonder `www`).
+      // Supabase vergelijkt alleen de base-URL (scheme + host + path) met de
+      // Redirect URLs allowlist; query-params blijven gewoon behouden. Beide
+      // host-varianten (met en zonder `www`) moeten in het Supabase Dashboard
+      // onder Authentication → URL Configuration → Redirect URLs staan.
       //
-      // `type=recovery` voegen we zelf toe als marker: in de default PKCE
-      // flow van @supabase/ssr wordt `type=recovery` door Supabase niet
-      // automatisch aan de callback-URL geplakt, alleen aan het interne
-      // /auth/v1/verify endpoint. Door hem zelf in `redirectTo` mee te
-      // geven, blijft hij bewaard en kan /auth/callback betrouwbaar
-      // herkennen dat dit een password-recovery flow is.
-      const siteUrl =
-        process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-        window.location.origin;
-
+      // `type=recovery` is een interne marker zodat /auth/callback herkent dat
+      // dit een password-reset flow is en de gebruiker naar /portal/settings
+      // met `?recovery=1` stuurt, waar we een wachtwoord-update afdwingen.
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${siteUrl}/auth/callback?type=recovery&next=/portal/settings`,
+        redirectTo: `${window.location.origin}/auth/callback?type=recovery&next=/portal/settings`,
       });
 
       if (resetError) {

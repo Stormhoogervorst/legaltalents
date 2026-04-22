@@ -18,9 +18,10 @@ import { createClient } from "@/lib/supabase/server";
  *     mee in de `redirectTo` waarmee `resetPasswordForEmail` wordt aangeroepen
  *     (zie src/app/login/page.tsx). Supabase laat eigen query-params in
  *     `redirectTo` intact, dus de marker komt hier weer binnen.
- *   - `next` wordt in de recovery-flow bewust genegeerd: de gebruiker moet
- *     eerst het wachtwoord bijwerken op /dashboard/instellingen/wachtwoord
- *     voordat hij ergens anders mag landen.
+ *   - Bij een recovery-flow sturen we de gebruiker naar /portal/settings met
+ *     `?recovery=1`. Een door de aanroeper meegegeven `next` negeren we
+ *     bewust, zodat de settings-pagina altijd zelf kan afdwingen dat er eerst
+ *     een nieuw wachtwoord wordt ingesteld.
  */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -55,14 +56,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${base}/login?error=auth_callback_failed`);
   }
 
-  // Recovery flow: Supabase hangt `type=recovery` aan de callback URL bij een
-  // password reset mail. De gebruiker heeft nu een geldige sessie, maar moet
-  // meteen een nieuw wachtwoord kiezen — daar hebben we een dedicated pagina
-  // voor. Een door de aanroeper meegegeven `next` negeren we bewust in deze
-  // flow, zodat de gebruiker nooit per ongeluk in een andere context belandt
-  // voordat het wachtwoord is bijgewerkt.
+  // Recovery flow: de gebruiker heeft nu een geldige sessie, maar moet meteen
+  // een nieuw wachtwoord kiezen. We sturen hem naar /portal/settings met een
+  // `recovery=1` marker; die pagina toont een prominente banner en focust
+  // direct het wachtwoord-veld. Een door de aanroeper meegegeven `next`
+  // negeren we bewust in deze flow.
   if (type === "recovery") {
-    return NextResponse.redirect(`${base}/dashboard/instellingen/wachtwoord`);
+    return NextResponse.redirect(`${base}/portal/settings?recovery=1`);
   }
 
   // Normale login / e-mail verificatie: respecteer `next` indien opgegeven,
