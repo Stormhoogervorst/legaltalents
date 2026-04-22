@@ -132,7 +132,7 @@ export default function LoginPage() {
       }
 
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${location.origin}/api/auth/callback?next=/portal/settings`,
+        redirectTo: `${location.origin}/auth/callback?next=/portal/settings`,
       });
 
       if (resetError) {
