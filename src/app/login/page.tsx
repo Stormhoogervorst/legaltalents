@@ -131,19 +131,14 @@ export default function LoginPage() {
         }
       }
 
-      // Gebruik bewust `window.location.origin` zodat de redirect altijd
-      // matcht met het domein waarop de gebruiker zit (met of zonder `www`).
-      // Supabase vergelijkt alleen de base-URL (scheme + host + path) met de
-      // Redirect URLs allowlist; query-params blijven gewoon behouden. Beide
-      // host-varianten (met en zonder `www`) moeten in het Supabase Dashboard
-      // onder Authentication → URL Configuration → Redirect URLs staan.
-      //
-      // `type=recovery` is een interne marker zodat /auth/callback herkent dat
-      // dit een password-reset flow is en de gebruiker naar /portal/settings
-      // met `?recovery=1` stuurt, waar we een wachtwoord-update afdwingen.
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?type=recovery&next=/portal/settings`,
+      console.log(
+        "Reset email sent with redirectTo:",
+        'https://www.legal-talents.nl/auth/callback?next=/portal/settings'
+      );
+      const { data, error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://www.legal-talents.nl/auth/callback?next=/portal/settings',
       });
+      console.log("[forgot-password] resetPasswordForEmail response", { data, resetError });
 
       if (resetError) {
         console.error("[forgot-password] resetPasswordForEmail error", {
