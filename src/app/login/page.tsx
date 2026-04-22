@@ -131,8 +131,26 @@ export default function LoginPage() {
         }
       }
 
+      // Bouw de redirect altijd vanuit de canonieke site-URL. Supabase
+      // vergelijkt `redirectTo` exact (inclusief hoofdletters, www-prefix en
+      // trailing slash) met de Redirect URLs allowlist; bij een mismatch
+      // wordt hij stilletjes gedropt en valt Supabase terug op de Site URL
+      // (= de homepage). Door `NEXT_PUBLIC_SITE_URL` te gebruiken weten we
+      // zeker dat we altijd dezelfde `https://www.legal-talents.nl` variant
+      // sturen, ongeacht of de gebruiker met of zonder `www` binnenkwam.
+      //
+      // `type=recovery` voegen we zelf toe als marker: in de default PKCE
+      // flow van @supabase/ssr wordt `type=recovery` door Supabase niet
+      // automatisch aan de callback-URL geplakt, alleen aan het interne
+      // /auth/v1/verify endpoint. Door hem zelf in `redirectTo` mee te
+      // geven, blijft hij bewaard en kan /auth/callback betrouwbaar
+      // herkennen dat dit een password-recovery flow is.
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+        window.location.origin;
+
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${location.origin}/auth/callback?next=/portal/settings`,
+        redirectTo: `${siteUrl}/auth/callback?type=recovery&next=/portal/settings`,
       });
 
       if (resetError) {

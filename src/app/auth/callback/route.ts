@@ -13,10 +13,14 @@ import { createClient } from "@/lib/supabase/server";
  * `?code=…` in de URL — precies het probleem dat we hier oplossen.
  *
  * Recovery-detectie:
- *   - `type=recovery` wordt door Supabase toegevoegd bij een password reset
- *     link. Dat is de primaire signal.
- *   - Daarnaast respecteren we een optionele `next` query param zodat
- *     aanroepers zelf de bestemming kunnen kiezen.
+ *   - In de PKCE flow die @supabase/ssr gebruikt, plakt Supabase `type=recovery`
+ *     NIET automatisch op de callback-URL. Daarom geven wij die marker zelf
+ *     mee in de `redirectTo` waarmee `resetPasswordForEmail` wordt aangeroepen
+ *     (zie src/app/login/page.tsx). Supabase laat eigen query-params in
+ *     `redirectTo` intact, dus de marker komt hier weer binnen.
+ *   - `next` wordt in de recovery-flow bewust genegeerd: de gebruiker moet
+ *     eerst het wachtwoord bijwerken op /dashboard/instellingen/wachtwoord
+ *     voordat hij ergens anders mag landen.
  */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -52,29 +56,17 @@ export async function GET(request: NextRequest) {
   }
 
   // Recovery flow: Supabase hangt `type=recovery` aan de callback URL bij een
-  // password reset mail. In dat geval sturen we de gebruiker naar een pagina
-  // waar ze een nieuw wachtwoord kunnen instellen. We plakken altijd
-  // `reset=1` aan de bestemming zodat de settings-pagina kan herkennen dat
-  // dit een recovery-flow is (en bovenaan een duidelijke melding toont),
-  // ongeacht welke `next` de aanroeper meegaf.
+  // password reset mail. De gebruiker heeft nu een geldige sessie, maar moet
+  // meteen een nieuw wachtwoord kiezen — daar hebben we een dedicated pagina
+  // voor. Een door de aanroeper meegegeven `next` negeren we bewust in deze
+  // flow, zodat de gebruiker nooit per ongeluk in een andere context belandt
+  // voordat het wachtwoord is bijgewerkt.
   if (type === "recovery") {
-    const destination = withResetFlag(nextParam || "/portal/settings");
-    return NextResponse.redirect(`${base}${destination}`);
+    return NextResponse.redirect(`${base}/dashboard/instellingen/wachtwoord`);
   }
 
   // Normale login / e-mail verificatie: respecteer `next` indien opgegeven,
   // anders naar het dashboard.
   const destination = nextParam || "/dashboard";
   return NextResponse.redirect(`${base}${destination}`);
-}
-
-/**
- * Voegt `reset=1` toe aan een (mogelijk al van query-params voorziene)
- * relatieve URL, zonder bestaande parameters te verliezen.
- */
-function withResetFlag(relativeUrl: string): string {
-  const [path, query = ""] = relativeUrl.split("?");
-  const params = new URLSearchParams(query);
-  params.set("reset", "1");
-  return `${path}?${params.toString()}`;
 }

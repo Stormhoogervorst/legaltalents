@@ -10,7 +10,6 @@ import {
   AlertCircle,
   Plus,
   X,
-  ShieldCheck,
 } from "lucide-react";
 
 interface Props {
@@ -18,7 +17,6 @@ interface Props {
   isOwner: boolean;
   initialNotificationEmail?: string;
   initialCcEmails?: string[];
-  isResetFlow?: boolean;
 }
 
 const MAX_CC_EMAILS = 20;
@@ -42,7 +40,6 @@ export default function SettingsClient({
   isOwner,
   initialNotificationEmail = "",
   initialCcEmails = [],
-  isResetFlow = false,
 }: Props) {
   const supabase = createClient();
 
@@ -189,12 +186,6 @@ export default function SettingsClient({
     setEmailLoading(false);
   };
 
-  // De banner wordt getoond wanneer de gebruiker via de
-  // wachtwoordherstel-flow op deze pagina is beland (`?reset=1`). Zodra het
-  // wachtwoord succesvol is gewijzigd verbergen we hem om te voorkomen dat
-  // de melding blijft hangen terwijl hij niet meer relevant is.
-  const showResetBanner = isResetFlow && pwStatus !== "success";
-
   return (
     <div className="max-w-5xl">
       <div className="mb-8">
@@ -203,28 +194,6 @@ export default function SettingsClient({
           Beheer je accountinstellingen
         </p>
       </div>
-
-      {showResetBanner && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="mb-6 flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary-light px-5 py-4"
-        >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/70">
-            <ShieldCheck className="h-4 w-4 text-primary" />
-          </div>
-          <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-black">
-              Stel je nieuwe wachtwoord in
-            </h2>
-            <p className="mt-1 text-sm text-gray-600 leading-relaxed">
-              Je bent ingelogd via de herstel-link uit je e-mail. Kies hieronder
-              een nieuw wachtwoord van minimaal 8 tekens om je account weer
-              volledig te beveiligen.
-            </p>
-          </div>
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         {/* Wachtwoord wijzigen */}
