@@ -25,13 +25,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .eq("is_published", true)
     .maybeSingle();
 
-  if (!firm) return { title: "Werkgever niet gevonden | Legal Talents" };
+  if (!firm) return { title: "Werkgever niet gevonden" };
 
   return {
-    title: `${firm.name} | Legal Talents`,
+    title: `${firm.name}`,
     description:
       firm.description?.substring(0, 160) ??
       `Bekijk het profiel van ${firm.name} op Legal Talents.`,
+    alternates: {
+      canonical: `/werkgevers/${slug}`,
+    },
   };
 }
 

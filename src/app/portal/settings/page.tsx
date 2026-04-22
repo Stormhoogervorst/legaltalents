@@ -4,7 +4,7 @@ import { getActingFirm } from "@/lib/impersonation";
 import SettingsClient from "./SettingsClient";
 
 export const metadata = {
-  title: "Instellingen | Legal Talents",
+  title: "Instellingen",
 };
 
 export default async function SettingsPage() {

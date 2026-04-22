@@ -11,7 +11,7 @@ import DeleteApplicationButton from "@/components/portal/DeleteApplicationButton
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Sollicitanten | Legal Talents",
+  title: "Sollicitanten",
 };
 
 interface Props {

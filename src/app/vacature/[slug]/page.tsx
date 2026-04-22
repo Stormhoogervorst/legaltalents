@@ -10,27 +10,14 @@ import ApplicationStatusToast from "@/components/ApplicationStatusToast";
 import LinkedInQuickApply from "@/components/LinkedInQuickApply";
 import { Job, Firm, jobTypeLabels } from "@/types";
 import { Metadata } from "next";
-import { JobType } from "@/types";
-import { SITE_URL as BASE_URL } from "@/lib/site";
 import { CITIES, cityDisplayName } from "@/lib/cities";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import {
+  buildJobPostingSchema,
+  computeValidThrough,
+} from "@/lib/schemas/jobPosting";
 
 export const revalidate = 0;
-
-const EMPLOYMENT_TYPE_MAP: Record<string, string> = {
-  fulltime: "FULL_TIME",
-  "full-time": "FULL_TIME",
-  parttime: "PART_TIME",
-  "part-time": "PART_TIME",
-  stage: "INTERN",
-  internship: "INTERN",
-  student: "INTERN",
-  "business-course": "CONTRACTOR",
-  lawcourse: "CONTRACTOR",
-  "summer-course": "CONTRACTOR",
-};
-
-const VALID_THROUGH_FALLBACK_DAYS = 60;
 
 /**
  * Probeert een vrije locatie-string (bv. "Amsterdam Zuid", "Den Haag")
@@ -52,86 +39,6 @@ function locationToCitySlug(location: string): string | null {
   return null;
 }
 
-function computeValidThrough(createdAt: string, expiresAt: string | null | undefined): Date {
-  if (expiresAt) return new Date(expiresAt);
-  const created = new Date(createdAt).getTime();
-  return new Date(created + VALID_THROUGH_FALLBACK_DAYS * 24 * 60 * 60 * 1000);
-}
-
-function ensureHtmlDescription(description: string): string {
-  const trimmed = description.trim();
-  if (!trimmed) return "";
-  return /^<(p|ul|ol|div|h[1-6])[\s>]/i.test(trimmed) ? trimmed : `<p>${trimmed}</p>`;
-}
-
-function buildJobPostingJsonLd(
-  job: {
-    title: string;
-    slug: string;
-    description: string;
-    location: string;
-    type: JobType;
-    practice_area: string | null;
-    created_at: string;
-    expires_at?: string | null;
-    salary_indication: string | null;
-  },
-  firm: { name: string; logo_url: string | null; website_url: string | null } | null,
-  validThrough: Date,
-) {
-  const jsonLd: Record<string, unknown> = {
-    "@context": "https://schema.org/",
-    "@type": "JobPosting",
-    title: job.title,
-    description: ensureHtmlDescription(job.description),
-    datePosted: new Date(job.created_at).toISOString(),
-    validThrough: validThrough.toISOString(),
-    employmentType: EMPLOYMENT_TYPE_MAP[job.type] ?? "OTHER",
-    directApply: true,
-    industry: "Legal Services",
-    url: `${BASE_URL}/vacature/${job.slug}`,
-  };
-
-  if (job.practice_area) {
-    jsonLd.occupationalCategory = job.practice_area;
-  }
-
-  if (firm) {
-    const org: Record<string, unknown> = {
-      "@type": "Organization",
-      name: firm.name,
-    };
-    if (firm.logo_url) org.logo = firm.logo_url;
-    if (firm.website_url) org.sameAs = firm.website_url;
-    jsonLd.hiringOrganization = org;
-  }
-
-  if (job.location) {
-    jsonLd.jobLocation = {
-      "@type": "Place",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: job.location,
-        addressCountry: "NL",
-      },
-    };
-  }
-
-  if (job.salary_indication) {
-    jsonLd.baseSalary = {
-      "@type": "MonetaryAmount",
-      currency: "EUR",
-      value: {
-        "@type": "QuantitativeValue",
-        value: job.salary_indication,
-        unitText: "MONTH",
-      },
-    };
-  }
-
-  return jsonLd;
-}
-
 interface Props {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ error?: string; status?: string }>;
@@ -148,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .eq("status", "active")
     .maybeSingle();
 
-  if (!data) return { title: "Vacature niet gevonden | Legal Talents" };
+  if (!data) return { title: "Vacature niet gevonden" };
 
   const firmName = Array.isArray(data.firms)
     ? data.firms[0]?.name
@@ -161,8 +68,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .substring(0, 160);
 
   return {
-    title: `${data.title}${firmName ? ` bij ${firmName}` : ""} | Legal Talents`,
+    title: `${data.title}${firmName ? ` bij ${firmName}` : ""}`,
     description: plainDescription,
+    alternates: {
+      canonical: `/vacature/${slug}`,
+    },
   };
 }
 
@@ -219,8 +129,9 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
     year: "numeric",
   });
 
-  const jobPostingJsonLd = buildJobPostingJsonLd(
+  const jobPostingJsonLd = buildJobPostingSchema(
     {
+      id: typedJob.id,
       title: typedJob.title,
       slug: typedJob.slug,
       description: typedJob.description,
@@ -230,9 +141,16 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
       created_at: typedJob.created_at,
       expires_at: typedJob.expires_at,
       salary_indication: typedJob.salary_indication,
+      required_education: typedJob.required_education,
+      hours_per_week: typedJob.hours_per_week,
     },
-    firm,
-    validThrough,
+    firm
+      ? {
+          name: firm.name,
+          logo_url: firm.logo_url,
+          website_url: firm.website_url,
+        }
+      : null,
   );
 
   const citySlug = locationToCitySlug(typedJob.location ?? "");

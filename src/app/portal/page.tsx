@@ -8,7 +8,7 @@ import { Briefcase, Users, Plus, AlertCircle, ChevronRight } from "lucide-react"
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Dashboard | Legal Talents",
+  title: "Dashboard",
 };
 
 export default async function PortalDashboardPage() {

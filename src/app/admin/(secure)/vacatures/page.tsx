@@ -6,7 +6,7 @@ import { JobDeleteButton } from "./JobDeleteButton";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Vacaturebeheer | Legal Talents",
+  title: "Vacaturebeheer",
 };
 
 /**

@@ -45,9 +45,12 @@ const FEATURES = [
 ];
 
 export const metadata = {
-  title: "Voor Werkgevers | Legal Talents",
+  title: "Voor Werkgevers",
   description:
     "Plaats gratis vacatures en bereik juridisch talent. Het nicheplatform voor advocatenkantoren en juridische werkgevers.",
+  alternates: {
+    canonical: "/voor-werkgevers",
+  },
 };
 
 export default function VoorWerkgeversPage() {

@@ -5,7 +5,7 @@ import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Pagina niet gevonden | Legal Talents",
+  title: "Pagina niet gevonden",
   description:
     "De pagina die je zoekt bestaat niet of is verplaatst. Doorzoek vacatures, stages of de kennisbank.",
   robots: {

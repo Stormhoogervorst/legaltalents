@@ -4,7 +4,7 @@ import ProfileForm from "./ProfileForm";
 import DangerZone from "./DangerZone";
 
 export const metadata = {
-  title: "Mijn profiel | Legal Talents",
+  title: "Mijn profiel",
 };
 
 export default async function ProfilePage() {

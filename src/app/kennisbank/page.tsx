@@ -7,9 +7,12 @@ import Footer from "@/components/Footer";
 import CtaBand from "@/components/CtaBand";
 
 export const metadata: Metadata = {
-  title: "Kennisbank voor Juridisch Talent | Legal Talents",
+  title: "Kennisbank voor Juridisch Talent",
   description:
     "Lees blogs en artikelen over carrière in de advocatuur, juridische stages en het werkleven bij werkgevers. Geschreven door topwerkgevers in Nederland.",
+  alternates: {
+    canonical: "/kennisbank",
+  },
 };
 
 interface Blog {

@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .eq("status", "published")
     .maybeSingle();
 
-  if (!data) return { title: "Artikel niet gevonden | Legal Talents" };
+  if (!data) return { title: "Artikel niet gevonden" };
 
   const firmName = Array.isArray(data.firms)
     ? data.firms[0]?.name
@@ -43,8 +43,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .substring(0, 160);
 
   return {
-    title: `${data.title}${firmName ? ` — ${firmName}` : ""} | Legal Talents`,
+    title: `${data.title}${firmName ? ` — ${firmName}` : ""}`,
     description: plainDescription,
+    alternates: {
+      canonical: `/kennisbank/${slug}`,
+    },
     openGraph: {
       title: data.title,
       description: plainDescription,

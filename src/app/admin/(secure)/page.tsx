@@ -22,7 +22,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Super Admin | Legal Talents",
+  title: "Super Admin",
 };
 
 type FirmRow = {
