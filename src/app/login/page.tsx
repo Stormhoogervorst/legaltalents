@@ -133,10 +133,10 @@ export default function LoginPage() {
 
       console.log(
         "Reset email sent with redirectTo:",
-        'https://www.legal-talents.nl/auth/callback?next=/portal/settings'
+        'https://www.legal-talents.nl/auth/callback?next=/update-wachtwoord'
       );
       const { data, error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.legal-talents.nl/auth/callback?next=/portal/settings',
+        redirectTo: 'https://www.legal-talents.nl/auth/callback?next=/update-wachtwoord',
       });
       console.log("[forgot-password] resetPasswordForEmail response", { data, resetError });
 

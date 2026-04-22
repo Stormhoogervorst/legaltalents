@@ -13,15 +13,14 @@ import { createClient } from "@/lib/supabase/server";
  * `?code=…` in de URL — precies het probleem dat we hier oplossen.
  *
  * Recovery-detectie:
- *   - In de PKCE flow die @supabase/ssr gebruikt, plakt Supabase `type=recovery`
- *     NIET automatisch op de callback-URL. Daarom geven wij die marker zelf
- *     mee in de `redirectTo` waarmee `resetPasswordForEmail` wordt aangeroepen
- *     (zie src/app/login/page.tsx). Supabase laat eigen query-params in
- *     `redirectTo` intact, dus de marker komt hier weer binnen.
- *   - Bij een recovery-flow sturen we de gebruiker naar /portal/settings met
- *     `?recovery=1`. Een door de aanroeper meegegeven `next` negeren we
- *     bewust, zodat de settings-pagina altijd zelf kan afdwingen dat er eerst
- *     een nieuw wachtwoord wordt ingesteld.
+ *   - We geven `next=/update-wachtwoord` mee in de `redirectTo` van
+ *     `resetPasswordForEmail` (zie src/app/login/page.tsx). Supabase laat
+ *     eigen query-params in `redirectTo` intact, dus die marker komt hier
+ *     weer binnen.
+ *   - Na succesvolle code-exchange sturen we de gebruiker naar de losse,
+ *     afgeschermde wachtwoord-resetpagina (`/update-wachtwoord`). Die pagina
+ *     leeft buiten de portal-layout en sluit de tijdelijke recovery-sessie
+ *     na het opslaan zelf weer af.
  */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -57,12 +56,13 @@ export async function GET(request: NextRequest) {
   }
 
   // Recovery flow: de gebruiker heeft nu een geldige sessie, maar moet meteen
-  // een nieuw wachtwoord kiezen. We sturen hem naar /portal/settings met een
-  // `recovery=1` marker; die pagina toont een prominente banner en focust
-  // direct het wachtwoord-veld. Een door de aanroeper meegegeven `next`
-  // negeren we bewust in deze flow.
+  // een nieuw wachtwoord kiezen. We sturen hem naar /update-wachtwoord —
+  // een losstaande, afgeschermde pagina buiten de portal-layout. Wanneer de
+  // aanroeper expliciet een `next` meegeeft respecteren we die, met een
+  // veilige fallback naar /update-wachtwoord.
   if (type === "recovery") {
-    return NextResponse.redirect(`${base}/portal/settings?recovery=1`);
+    const destination = nextParam || "/update-wachtwoord";
+    return NextResponse.redirect(`${base}${destination}`);
   }
 
   // Normale login / e-mail verificatie: respecteer `next` indien opgegeven,
