@@ -3,13 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Building2, Briefcase, LogOut, Shield } from "lucide-react";
+import { LayoutDashboard, Building2, Briefcase, FileText, LogOut, Shield } from "lucide-react";
 import { adminSignOutAction } from "./actions";
 
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/werkgevers", label: "Werkgevers", icon: Building2, exact: false },
   { href: "/admin/vacatures", label: "Vacatures", icon: Briefcase, exact: false },
+  { href: "/admin/blogs", label: "Blogs", icon: FileText, exact: false },
 ];
 
 export function AdminSidebar({ email }: { email: string | null }) {
