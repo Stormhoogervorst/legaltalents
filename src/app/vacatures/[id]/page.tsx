@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import JobCard from "@/components/JobCard";
 import { Job, JobFirmPreview, JOB_TYPE_OPTIONS } from "@/types";
 import { CITIES, cityDisplayName, cityLocationFilter, isValidCity } from "@/lib/cities";
+import { getCityJobCount } from "@/lib/jobs/getCityJobCount";
 import { SITE_URL as BASE_URL } from "@/lib/site";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
@@ -55,45 +56,44 @@ function buildFilterLabel(sp: SearchParams): string | null {
 
 export async function generateMetadata({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   const { id: city } = await params;
-  const sp = await searchParams;
   const name = cityDisplayName(city);
-  const filterLabel = buildFilterLabel(sp);
+  const count = await getCityJobCount(city);
 
-  const title = filterLabel
-    ? `${filterLabel} Vacatures in ${name} | Legal Talents`
-    : `Juridische Vacatures in ${name} | Legal Talents`;
+  const baseKeywords = [
+    "juridische vacatures",
+    "vacatures",
+    name,
+    `juridische vacatures ${name}`,
+    `vacatures ${name}`,
+    "advocatuur",
+    `advocatuur ${name}`,
+    "Legal Talents",
+  ];
 
-  const descFilter = sp.rechtsgebied
-    ? `in het ${sp.rechtsgebied.toLowerCase()}`
-    : sp.functie
-      ? `als ${sp.functie.toLowerCase()}`
-      : "in de juridische sector";
-
-  const description = filterLabel
-    ? `Op zoek naar een baan ${descFilter} in ${name}? Bekijk alle actuele vacatures bij topkantoren op Legal Talents.`
-    : `Bekijk alle actuele juridische vacatures in ${name}. Vind je nieuwe uitdaging bij topwerkgevers in de juridische sector.`;
+  if (count === 0) {
+    return {
+      title: `Juridische Vacatures ${name} — geen actuele openingen`,
+      description: `Momenteel geen juridische vacatures in ${name}. Bekijk alle landelijke juridische vacatures of schrijf je in voor een job alert om direct geïnformeerd te worden bij nieuwe posities.`,
+      robots: { index: false, follow: true },
+      keywords: baseKeywords,
+      alternates: {
+        canonical: `/vacatures/${city}`,
+      },
+    };
+  }
 
   return {
-    title,
-    description,
-    keywords: [
-      "juridische vacatures",
-      "vacatures",
-      name,
-      `juridische vacatures ${name}`,
-      `vacatures ${name}`,
-      "advocatuur",
-      `advocatuur ${name}`,
-      ...(sp.rechtsgebied ? [sp.rechtsgebied.toLowerCase(), `${sp.rechtsgebied.toLowerCase()} vacatures`, `${sp.rechtsgebied.toLowerCase()} ${name}`] : []),
-      ...(sp.functie ? [sp.functie.toLowerCase(), `${sp.functie.toLowerCase()} vacatures`, `${sp.functie.toLowerCase()} ${name}`] : []),
-      "Legal Talents",
-    ],
+    title: `Juridische Vacatures ${name} — ${count} openstaande posities`,
+    description: `${count} actuele juridische vacatures in ${name}. Ontdek stages en vacatures bij advocatenkantoren en juridische werkgevers. Solliciteer direct.`,
+    robots: { index: true, follow: true },
+    keywords: baseKeywords,
+    alternates: {
+      canonical: `/vacatures/${city}`,
+    },
   };
 }
 

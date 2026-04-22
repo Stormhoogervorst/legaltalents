@@ -9,6 +9,7 @@ import CtaBand from "@/components/CtaBand";
 import JobCard from "@/components/JobCard";
 import { Job, JobFirmPreview } from "@/types";
 import { CITIES, cityDisplayName, cityLocationFilter, isValidCity } from "@/lib/cities";
+import { getCityJobCount } from "@/lib/jobs/getCityJobCount";
 import { SITE_URL as BASE_URL } from "@/lib/site";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
@@ -42,32 +43,44 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-  searchParams,
 }: {
   params: Promise<{ city: string }>;
-  searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
   const { city } = await params;
-  const sp = await searchParams;
   const name = cityDisplayName(city);
-  const area = sp.rechtsgebied;
-  const titlePrefix = area ? `${area} Stages ${name}` : `Juridische Stages ${name}`;
+  const count = await getCityJobCount(city, { stagesOnly: true });
+
+  const baseKeywords = [
+    "juridische stages",
+    "stages",
+    name,
+    `juridische stages ${name}`,
+    `stages ${name}`,
+    "advocatuur",
+    `advocatuur ${name}`,
+    "Legal Talents",
+  ];
+
+  if (count === 0) {
+    return {
+      title: `Juridische Stages ${name} — geen actuele openingen`,
+      description: `Momenteel geen juridische stages in ${name}. Bekijk alle landelijke juridische stages of schrijf je in voor een job alert om direct geïnformeerd te worden bij nieuwe posities.`,
+      robots: { index: false, follow: true },
+      keywords: baseKeywords,
+      alternates: {
+        canonical: `/stages/${city}`,
+      },
+    };
+  }
+
   return {
-    title: `${titlePrefix} | Legal Talents`,
-    description: area
-      ? `Op zoek naar een ${area.toLowerCase()} stage in ${name}? Bekijk het meest complete overzicht van stages bij advocatenkantoren en juridische organisaties.`
-      : `Op zoek naar een juridische stage in ${name}? Bekijk het meest complete overzicht van stages bij advocatenkantoren en juridische organisaties.`,
-    keywords: [
-      "juridische stages",
-      "stages",
-      name,
-      `juridische stages ${name}`,
-      `stages ${name}`,
-      "advocatuur",
-      `advocatuur ${name}`,
-      ...(area ? [area.toLowerCase(), `${area.toLowerCase()} stages`, `${area.toLowerCase()} ${name}`] : []),
-      "Legal Talents",
-    ],
+    title: `Juridische Stages ${name} — ${count} openstaande posities`,
+    description: `${count} actuele juridische stages in ${name}. Ontdek stages bij advocatenkantoren en juridische werkgevers. Solliciteer direct.`,
+    robots: { index: true, follow: true },
+    keywords: baseKeywords,
+    alternates: {
+      canonical: `/stages/${city}`,
+    },
   };
 }
 
