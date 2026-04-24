@@ -19,11 +19,11 @@ export default function Footer() {
                 E-mail
               </p>
               <a
-                href="mailto:info@legal-talents.nl"
+                href="mailto:storm@legal-talents.nl"
                 className="group inline-flex items-center gap-2 transition-colors duration-200 hover:text-[#587DFE]"
                 style={{ fontSize: "clamp(18px, 2vw, 24px)", fontWeight: 600, color: "#FFFFFF" }}
               >
-                info@legal-talents.nl
+                storm@legal-talents.nl
               </a>
               <p className="mt-6" style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>
                 © {new Date().getFullYear()} Legal Talents VOF

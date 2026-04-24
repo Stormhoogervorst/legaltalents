@@ -317,10 +317,10 @@ export default function VoorwaardenPage() {
             <p className="mt-2">
               Vragen over deze voorwaarden?{" "}
               <a
-                href="mailto:info@legal-talents.nl"
+                href="mailto:storm@legal-talents.nl"
                 className="text-[#587DFE] hover:text-[#4B3BD6] hover:underline"
               >
-                info@legal-talents.nl
+                storm@legal-talents.nl
               </a>
             </p>
           </footer>

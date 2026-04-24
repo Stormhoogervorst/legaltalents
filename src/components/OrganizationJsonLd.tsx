@@ -18,7 +18,7 @@ export default function OrganizationJsonLd() {
     sameAs: ["https://www.linkedin.com/company/legal-talents-recruitment"],
     contactPoint: {
       "@type": "ContactPoint",
-      email: "info@legal-talents.nl",
+      email: "storm@legal-talents.nl",
       contactType: "customer support",
       availableLanguage: ["Dutch", "English"],
     },

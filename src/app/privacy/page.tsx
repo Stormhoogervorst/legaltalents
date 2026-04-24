@@ -438,7 +438,7 @@ const SECTIONS: Section[] = [
     blocks: [
       {
         type: "p",
-        body: "Voor vragen, verzoeken of klachten kunt u contact opnemen met Legal Talents VOF, Sint Annastraat 198c, 6525 GX Nijmegen, via info@legal-talents.nl.",
+        body: "Voor vragen, verzoeken of klachten kunt u contact opnemen met Legal Talents VOF, Sint Annastraat 198c, 6525 GX Nijmegen, via storm@legal-talents.nl.",
       },
       {
         type: "p",
@@ -557,10 +557,10 @@ export default function PrivacyPage() {
             <p className="mt-2">
               Vragen over dit privacybeleid?{" "}
               <a
-                href="mailto:info@legal-talents.nl"
+                href="mailto:storm@legal-talents.nl"
                 className="text-[#587DFE] hover:text-[#4B3BD6] hover:underline"
               >
-                info@legal-talents.nl
+                storm@legal-talents.nl
               </a>
             </p>
           </footer>

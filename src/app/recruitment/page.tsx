@@ -572,11 +572,11 @@ export default function RecruitmentPage() {
                     E-mail
                   </p>
                   <a
-                    href="mailto:info@legal-talents.nl"
+                    href="mailto:storm@legal-talents.nl"
                     className="text-[15px] font-medium border-b border-white/40 pb-0.5 hover:border-white transition-colors duration-200"
                     style={{ color: "#FFFFFF" }}
                   >
-                    info@legal-talents.nl
+                    storm@legal-talents.nl
                   </a>
                 </div>
                 <div>
