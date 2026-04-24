@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import { Toaster } from "sonner";
 import ImpersonationBar from "@/components/ImpersonationBar";
 import { SITE_URL } from "@/lib/site";
@@ -37,16 +38,23 @@ export const metadata: Metadata = {
     type: "website",
     locale: "nl_NL",
     siteName: "Legal Talents",
-    url: "/",
-    title: "Legal Talents | Hét platform voor Juridische Vacatures en Stages",
-    description:
-      "Vind juridische stages en vacatures bij topkantoren in Nederland. Hét carrièreplatform voor rechtenstudenten en young professionals.",
+    url: "https://www.legal-talents.nl",
+    title: "Legal Talents — Juridische Vacatures",
+    description: "De vacaturesite voor de juridische sector",
+    images: [
+      {
+        url: "/socialpreview.png",
+        width: 1200,
+        height: 630,
+        alt: "Legal Talents Preview Image",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Legal Talents | Hét platform voor Juridische Vacatures en Stages",
-    description:
-      "Vind juridische stages en vacatures bij topkantoren in Nederland. Hét carrièreplatform voor rechtenstudenten en young professionals.",
+    title: "Legal Talents — Juridische Vacatures",
+    description: "De vacaturesite voor de juridische sector",
+    images: ["/socialpreview.png"],
   },
 };
 
@@ -54,6 +62,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="nl">
       <body className={inter.className}>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-NFNBYPXR5X"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-NFNBYPXR5X');
+          `}
+        </Script>
         <ImpersonationBar />
         {children}
         <Toaster richColors position="top-right" />
