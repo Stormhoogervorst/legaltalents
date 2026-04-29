@@ -34,6 +34,12 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: [
+      { url: "/logo.png", sizes: "48x48", type: "image/png" },
+      { url: "/logo.png", sizes: "96x96", type: "image/png" },
+    ],
+  },
   openGraph: {
     type: "website",
     locale: "nl_NL",
