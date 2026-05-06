@@ -314,6 +314,11 @@ export default async function FirmsPage({
                     text: `${firm.team_size} medewerkers`,
                   });
                 }
+                const practiceAreas = firm.practice_areas ?? [];
+                const visiblePracticeAreas =
+                  practiceAreas.length > 4
+                    ? [...practiceAreas.slice(0, 4), `+${practiceAreas.length - 4}`]
+                    : practiceAreas;
 
                 return (
                   <GridCard
@@ -327,7 +332,7 @@ export default async function FirmsPage({
                     }
                     title={firm.name}
                     meta={meta}
-                    pills={firm.practice_areas ?? []}
+                    pills={visiblePracticeAreas}
                   />
                 );
               })}

@@ -8,7 +8,7 @@ import { geocodeCity } from "@/lib/geocode";
 import { Search, MapPin, ChevronDown } from "lucide-react";
 import { RECHTSGEBIEDEN } from "@/lib/constants/rechtsgebieden";
 
-const STAGE_TYPE_VALUES = ["stage", "internship", "student", "Studentbaan"];
+const STAGE_TYPE_VALUES = ["stage"];
 
 interface SearchParams {
   q?: string;

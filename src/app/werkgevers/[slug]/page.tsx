@@ -15,25 +15,56 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+function trimMetaDescription(description: string) {
+  if (description.length <= 160) return description;
+
+  const trimmed = description.slice(0, 157).trimEnd();
+  const lastSpace = trimmed.lastIndexOf(" ");
+  const shortened =
+    lastSpace >= 147 ? trimmed.slice(0, lastSpace) : trimmed;
+
+  return `${shortened.replace(/[.,;:!?]+$/, "")}...`;
+}
+
+function buildMetaDescription(name: string, location: string | null) {
+  const place = location?.trim() || "Nederland";
+  const description = `Werken bij ${name} in ${place}? Bekijk alle openstaande vacatures en stages bij ${name} en solliciteer direct via Legal Talents.`;
+
+  if (description.length >= 150) {
+    return trimMetaDescription(description);
+  }
+
+  return trimMetaDescription(
+    `${description} Ontdek het kantoor en actuele mogelijkheden.`
+  );
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
   const { data: firm } = await supabase
     .from("firms")
-    .select("name, location, description")
+    .select("name, location")
     .eq("slug", slug)
     .eq("is_published", true)
     .maybeSingle();
 
   if (!firm) return { title: "Werkgever niet gevonden" };
 
+  const title = `Werken bij ${firm.name} | Vacatures & Stages | Legal Talents`;
+  const description = buildMetaDescription(firm.name, firm.location);
+  const canonical = `/werkgevers/${slug}`;
+
   return {
-    title: `${firm.name}`,
-    description:
-      firm.description?.substring(0, 160) ??
-      `Bekijk het profiel van ${firm.name} op Legal Talents.`,
+    title,
+    description,
     alternates: {
-      canonical: `/werkgevers/${slug}`,
+      canonical,
+    },
+    openGraph: {
+      title: `Werken bij ${firm.name}`,
+      description,
+      url: canonical,
     },
   };
 }

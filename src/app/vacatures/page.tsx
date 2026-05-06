@@ -65,7 +65,8 @@ export default async function JobsPage({
       let geoQuery = supabase
         .from("jobs")
         .select("*, firms ( name, logo_url, slug )")
-        .in("id", nearbyIds);
+        .in("id", nearbyIds)
+        .in("type", ["fulltime"]);
 
       if (params.q) {
         const q = fuzzy(params.q);
@@ -98,6 +99,7 @@ export default async function JobsPage({
       .from("jobs")
       .select("*, firms ( name, logo_url, slug )")
       .eq("status", "active")
+      .in("type", ["fulltime"])
       .order("created_at", { ascending: false });
 
     if (params.q) {
