@@ -39,6 +39,14 @@ function buildMetaDescription(name: string, location: string | null) {
   );
 }
 
+function textToParagraphs(text: string) {
+  return text
+    .trim()
+    .split(/\r?\n\s*\r?\n/)
+    .map((paragraph) => paragraph.replace(/\s*\r?\n\s*/g, " ").trim())
+    .filter(Boolean);
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
@@ -99,6 +107,12 @@ export default async function FirmPage({ params }: Props) {
 
   const jobList = (jobs ?? []) as Job[];
   const initials = firmData.name.slice(0, 2).toUpperCase();
+  const descriptionParagraphs = firmData.description
+    ? textToParagraphs(firmData.description)
+    : [];
+  const whyWorkParagraphs = firmData.why_work_with_us
+    ? textToParagraphs(firmData.why_work_with_us)
+    : [];
 
   const hasHeroPracticeTags =
     !!(firmData.practice_areas && firmData.practice_areas.length > 0);
@@ -263,17 +277,18 @@ export default async function FirmPage({ params }: Props) {
                   >
                     Over {firmData.name}
                   </h2>
-                  <p
-                    className="leading-relaxed whitespace-pre-line"
+                  <div
+                    className="prose prose-gray max-w-none"
                     style={{
                       fontSize: "clamp(15px, 1.1vw, 17px)",
                       lineHeight: 1.65,
                       color: "#6B6B6B",
-                      maxWidth: "640px",
                     }}
                   >
-                    {firmData.description}
-                  </p>
+                    {descriptionParagraphs.map((paragraph, index) => (
+                      <p key={index}>{paragraph}</p>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -290,17 +305,18 @@ export default async function FirmPage({ params }: Props) {
                   >
                     Waarom hier werken
                   </h2>
-                  <p
-                    className="leading-relaxed whitespace-pre-line"
+                  <div
+                    className="prose prose-gray max-w-none"
                     style={{
                       fontSize: "clamp(15px, 1.1vw, 17px)",
                       lineHeight: 1.65,
                       color: "#6B6B6B",
-                      maxWidth: "640px",
                     }}
                   >
-                    {firmData.why_work_with_us}
-                  </p>
+                    {whyWorkParagraphs.map((paragraph, index) => (
+                      <p key={index}>{paragraph}</p>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
