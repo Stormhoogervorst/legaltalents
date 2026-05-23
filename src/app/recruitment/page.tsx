@@ -85,7 +85,7 @@ const TEAM_MEMBERS: Array<{
 }> = [
   {
     name: "Max Endrizzi",
-    role: "Oprichter & Eigenaar",
+    role: "Eigenaar",
     credentials: "LLM International and European Business Law",
     bio: "Max richtte Legal Talents op met één overtuiging: recruitment in de juridische sector kan scherper. Minder schuiven met CV's, meer focus op matches die ook over drie jaar nog kloppen. Die overtuiging is nog steeds de basis van hoe wij werken.",
     photo: "/max-v2.png",
