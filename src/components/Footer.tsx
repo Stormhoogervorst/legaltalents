@@ -47,7 +47,6 @@ export default function Footer() {
                   { label: "Stages", href: "/stages" },
                   { label: "Werkgevers", href: "/werkgevers" },
                   { label: "Kennisbank", href: "/kennisbank" },
-                  { label: "Recruitment", href: "/recruitment" },
                 ].map((link) => (
                   <li key={link.href}>
                     <Link

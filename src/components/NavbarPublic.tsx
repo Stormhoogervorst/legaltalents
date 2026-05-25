@@ -27,7 +27,6 @@ function useNavActive(pathname: string | null) {
       p.startsWith("/werkgevers/") ||
       p === "/voor-werkgevers",
     kennisbank: p === "/kennisbank" || p.startsWith("/kennisbank/"),
-    recruitment: p === "/recruitment" || p.startsWith("/recruitment/"),
   };
 }
 
@@ -136,9 +135,6 @@ export default function NavbarPublic({
                 <Link href="/kennisbank" className={linkClass("kennisbank")}>
                   Kennisbank
                 </Link>
-                <Link href="/recruitment" className={linkClass("recruitment")}>
-                  Recruitment
-                </Link>
               </div>
             </div>
 
@@ -185,7 +181,6 @@ export default function NavbarPublic({
               { href: "/stages", key: "stages" as const, label: "Stages", title: "Juridische Stages" },
               { href: "/werkgevers", key: "werkgevers" as const, label: "Werkgevers" },
               { href: "/kennisbank", key: "kennisbank" as const, label: "Kennisbank" },
-              { href: "/recruitment", key: "recruitment" as const, label: "Recruitment" },
             ].map((item) => (
               <Link
                 key={item.href}

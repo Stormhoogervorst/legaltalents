@@ -29,7 +29,6 @@ const STATIC_ROUTES: Array<{
   { path: "/stages", priority: 0.9, changeFrequency: "daily" },
   { path: "/werkgevers", priority: 0.8, changeFrequency: "weekly" },
   { path: "/kennisbank", priority: 0.7, changeFrequency: "weekly" },
-  { path: "/recruitment", priority: 0.6, changeFrequency: "monthly" },
   { path: "/voor-werkgevers", priority: 0.5, changeFrequency: "monthly" },
   { path: "/juridische-vacatures-index", priority: 0.6, changeFrequency: "weekly" },
 ];
