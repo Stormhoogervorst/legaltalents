@@ -72,6 +72,11 @@ export default function NavbarPublic({
           : "text-[#5A6094] hover:text-[#2C337A]",
     );
 
+  const externalLinkClass = cn(
+    "inline-flex items-center text-[14px] font-medium transition-colors duration-300",
+    isHeroTop ? "text-white/70 hover:text-white" : "text-[#5A6094] hover:text-[#2C337A]",
+  );
+
   // When the mobile menu is open we render the light liquid-glass panel, so
   // the close icon must be dark to stay visible on that lighter surface.
   const menuIconClass = menuOpen
@@ -135,6 +140,12 @@ export default function NavbarPublic({
                 <Link href="/kennisbank" className={linkClass("kennisbank")}>
                   Kennisbank
                 </Link>
+                <a
+                  href="https://www.legaltalentsrecruitment.nl/"
+                  className={externalLinkClass}
+                >
+                  Recruitment
+                </a>
               </div>
             </div>
 
@@ -197,6 +208,13 @@ export default function NavbarPublic({
                 {item.label}
               </Link>
             ))}
+            <a
+              href="https://www.legaltalentsrecruitment.nl/"
+              onClick={() => setMenuOpen(false)}
+              className="block w-full py-4 text-[16px] font-medium border-b border-white/30 text-[#2C337A]/85 hover:text-[#2C337A] transition-colors duration-200"
+            >
+              Recruitment
+            </a>
             <div className="pt-5">
               <Link
                 href="/register"
