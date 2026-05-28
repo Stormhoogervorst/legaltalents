@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteUrl } from "@/lib/site";
 
 /**
  * Supabase auth callback.
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
   const errorParam = searchParams.get("error");
   const errorDescription = searchParams.get("error_description");
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL || origin;
+  const base = getSiteUrl(origin);
 
   // Supabase kan ook direct met een fout terugkomen (bijv. verlopen link).
   if (errorParam) {

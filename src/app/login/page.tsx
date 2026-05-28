@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { verifyRecaptchaAction } from "@/app/actions/recaptcha";
 import { RecaptchaCheckbox } from "@/components/recaptcha/RecaptchaCheckbox";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { getSiteUrl } from "@/lib/site";
 import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
 
 type View = "login" | "forgot";
@@ -131,12 +132,10 @@ export default function LoginPage() {
         }
       }
 
-      console.log(
-        "Reset email sent with redirectTo:",
-        'https://www.legal-talents.nl/auth/callback?next=/update-wachtwoord'
-      );
+      const redirectTo = `${getSiteUrl()}/auth/callback?next=/update-wachtwoord`;
+      console.log("Reset email sent with redirectTo:", redirectTo);
       const { data, error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://www.legal-talents.nl/auth/callback?next=/update-wachtwoord',
+        redirectTo,
       });
       console.log("[forgot-password] resetPasswordForEmail response", { data, resetError });
 
@@ -176,7 +175,7 @@ export default function LoginPage() {
           <Link href="/" className="inline-flex items-center justify-center">
             <Image
               src="/legal-talents-logo.png"
-              alt="Legal Talents logo"
+              alt="Juridische Vacatures logo"
               width={150}
               height={40}
               className="h-10 w-auto"

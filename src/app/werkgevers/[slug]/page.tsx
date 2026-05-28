@@ -28,7 +28,7 @@ function trimMetaDescription(description: string) {
 
 function buildMetaDescription(name: string, location: string | null) {
   const place = location?.trim() || "Nederland";
-  const description = `Werken bij ${name} in ${place}? Bekijk alle openstaande vacatures en stages bij ${name} en solliciteer direct via Legal Talents.`;
+  const description = `Werken bij ${name} in ${place}? Bekijk alle openstaande vacatures en stages bij ${name} en solliciteer direct via Juridische Vacatures.`;
 
   if (description.length >= 150) {
     return trimMetaDescription(description);
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!firm) return { title: "Werkgever niet gevonden" };
 
-  const title = `Werken bij ${firm.name} | Vacatures & Stages | Legal Talents`;
+  const title = `Werken bij ${firm.name} | Vacatures & Stages | Juridisch Vacatures Nederland`;
   const description = buildMetaDescription(firm.name, firm.location);
   const canonical = `/werkgevers/${slug}`;
 

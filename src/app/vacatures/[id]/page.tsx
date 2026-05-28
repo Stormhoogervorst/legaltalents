@@ -56,7 +56,7 @@ export async function generateMetadata({
     `vacatures ${name}`,
     "advocatuur",
     `advocatuur ${name}`,
-    "Legal Talents",
+    "Juridische Vacatures",
   ];
 
   if (count === 0) {

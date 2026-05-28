@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { verifyRecaptchaAction } from "@/app/actions/recaptcha";
 import { RecaptchaCheckbox } from "@/components/recaptcha/RecaptchaCheckbox";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { getSiteUrl } from "@/lib/site";
 import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
 
 function RegisterContent() {
@@ -66,7 +67,7 @@ function RegisterContent() {
       password,
       options: {
         data: metadata,
-        emailRedirectTo: `${location.origin}/api/auth/callback`,
+        emailRedirectTo: `${getSiteUrl()}/api/auth/callback`,
       },
     });
 
@@ -92,7 +93,7 @@ function RegisterContent() {
           <Link href="/" className="inline-flex items-center justify-center">
             <Image
               src="/legal-talents-logo.png"
-              alt="Legal Talents logo"
+              alt="Juridische Vacatures logo"
               width={150}
               height={40}
               className="h-10 w-auto"
@@ -136,7 +137,7 @@ function RegisterContent() {
           <Link href="/" className="inline-flex items-center justify-center">
             <Image
               src="/legal-talents-logo.png"
-              alt="Legal Talents logo"
+              alt="Juridische Vacatures logo"
               width={150}
               height={40}
               className="h-10 w-auto"

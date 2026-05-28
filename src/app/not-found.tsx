@@ -20,7 +20,7 @@ const QUICK_LINKS: Array<{ label: string; href: string; description: string }> =
   {
     label: "Homepage",
     href: "/",
-    description: "Terug naar het beginpunt van Legal Talents.",
+    description: "Terug naar het beginpunt van Juridische Vacatures.",
   },
   {
     label: "Vacatures",

@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { verifyRecaptchaAction } from "@/app/actions/recaptcha";
 import { RecaptchaCheckbox } from "@/components/recaptcha/RecaptchaCheckbox";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { getSiteUrl } from "@/lib/site";
 import { Briefcase, Eye, EyeOff, Loader2 } from "lucide-react";
 import { UserRole } from "@/types";
 
@@ -59,6 +60,7 @@ function RegisterForm() {
           role,
           company_name: role === "employer" ? companyName : null,
         },
+        emailRedirectTo: `${getSiteUrl()}/auth/callback`,
       },
     });
 

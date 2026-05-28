@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getSiteUrl } from "@/lib/site";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get("next") ?? "/portal";
   const errorParam = searchParams.get("error");
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL || origin;
+  const base = getSiteUrl(origin);
 
   console.log("[auth/callback] Redirecting to:", next);
 

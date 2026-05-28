@@ -21,7 +21,7 @@ interface SearchParams {
 export const metadata = {
   title: "Werkgevers",
   description:
-    "Bekijk alle juridische werkgevers die actief vacatures plaatsen op Legal Talents.",
+    "Bekijk alle juridische werkgevers die actief vacatures plaatsen op Juridische Vacatures.",
   alternates: {
     canonical: "/werkgevers",
   },

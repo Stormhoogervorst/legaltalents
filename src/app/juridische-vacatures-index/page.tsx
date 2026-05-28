@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     "kandidaat-notaris vacatures",
     "vacatures per stad",
     "rechtsgebied vacatures",
-    "Legal Talents",
+    "Juridische Vacatures",
   ],
   alternates: {
     canonical: "/juridische-vacatures-index",
@@ -146,7 +146,7 @@ export default function JuridischeVacaturesIndexPage() {
                 textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)",
               }}
             >
-              Legal Talents biedt het meest complete overzicht van juridische
+              Juridische Vacatures biedt het meest complete overzicht van juridische
               vacatures in Nederland. Zoek op functie, rechtsgebied of locatie
               en vind direct de vacatures die bij jou passen. Van advocaat in
               Amsterdam tot kandidaat-notaris in Utrecht — alle combinaties

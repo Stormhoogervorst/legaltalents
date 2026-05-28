@@ -26,7 +26,7 @@ export default function Footer() {
                 storm@legal-talents.nl
               </a>
               <p className="mt-6" style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>
-                © {new Date().getFullYear()} Legal Talents VOF
+                © {new Date().getFullYear()} Juridische Vacatures VOF
               </p>
               <Link
                 href="/privacy"
@@ -169,7 +169,7 @@ export default function Footer() {
                   color: "#FFFFFF",
                 }}
               >
-                Legal Talents
+                Juridische Vacatures
               </p>
             </div>
           </div>

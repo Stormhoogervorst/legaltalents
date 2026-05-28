@@ -1,10 +1,10 @@
-# Privacybeleid Legal Talents
+# Privacybeleid Juridische Vacatures
 
 *Versie april 2026*
 
-Legal Talents hecht grote waarde aan de bescherming van uw persoonsgegevens. Sinds 25 mei 2018 geldt de Algemene Verordening Gegevensbescherming (AVG), en wij verwerken persoonsgegevens volledig in overeenstemming met deze wetgeving. Dit privacybeleid is van toepassing op alle kandidaten, sollicitanten, opdrachtgevers, werkgevers, websitebezoekers en andere relaties die gebruik maken van de diensten van Legal Talents, waaronder het vacatureplatform. Indien u ervoor kiest om vrijwillig persoonsgegevens aan ons te verstrekken — bijvoorbeeld door te solliciteren via het vacatureplatform of u in te schrijven in onze talentpool — verwerken wij deze in overeenstemming met dit privacybeleid.
+Juridische Vacatures hecht grote waarde aan de bescherming van uw persoonsgegevens. Sinds 25 mei 2018 geldt de Algemene Verordening Gegevensbescherming (AVG), en wij verwerken persoonsgegevens volledig in overeenstemming met deze wetgeving. Dit privacybeleid is van toepassing op alle kandidaten, sollicitanten, opdrachtgevers, werkgevers, websitebezoekers en andere relaties die gebruik maken van de diensten van Juridische Vacatures, waaronder het vacatureplatform. Indien u ervoor kiest om vrijwillig persoonsgegevens aan ons te verstrekken — bijvoorbeeld door te solliciteren via het vacatureplatform of u in te schrijven in onze talentpool — verwerken wij deze in overeenstemming met dit privacybeleid.
 
-Legal Talents is een recruitmentbureau gespecialiseerd in de juridische sector en biedt onder meer:
+Juridische Vacatures is een recruitmentbureau gespecialiseerd in de juridische sector en biedt onder meer:
 
 - Werving & selectie van juridisch talent
 - Detachering en interim-oplossingen
@@ -14,13 +14,13 @@ Legal Talents is een recruitmentbureau gespecialiseerd in de juridische sector e
 
 ## 1. Verwerkingsverantwoordelijkheid en rolverdeling
 
-De rol die Legal Talents onder de AVG vervult, hangt af van de dienst waarvan u gebruik maakt:
+De rol die Juridische Vacatures onder de AVG vervult, hangt af van de dienst waarvan u gebruik maakt:
 
-- **Werving & selectie en eigen recruitmentactiviteiten:** Legal Talents treedt op als zelfstandig verwerkingsverantwoordelijke voor de verwerking van persoonsgegevens van kandidaten die wij actief werven, voordragen en bemiddelen, en voor de kandidaten in onze talentpool.
-- **Sollicitaties via het vacatureplatform zonder werving- en selectieopdracht:** Wanneer een werkgever zelfstandig een vacature plaatst en een kandidaat daarop reageert zonder dat Legal Talents een werving- en selectieopdracht uitvoert, is de werkgever de verwerkingsverantwoordelijke voor de sollicitatiegegevens. Legal Talents treedt in dat geval op als faciliterende partij respectievelijk verwerker die de technische infrastructuur (waaronder de database) aanbiedt waarin sollicitaties worden opgeslagen en doorgestuurd.
-- **Websitegebruik en talentpool:** Voor de verwerking van gegevens van websitebezoekers en inschrijvingen in de eigen talentpool van Legal Talents, treedt Legal Talents op als zelfstandig verwerkingsverantwoordelijke.
+- **Werving & selectie en eigen recruitmentactiviteiten:** Juridische Vacatures treedt op als zelfstandig verwerkingsverantwoordelijke voor de verwerking van persoonsgegevens van kandidaten die wij actief werven, voordragen en bemiddelen, en voor de kandidaten in onze talentpool.
+- **Sollicitaties via het vacatureplatform zonder werving- en selectieopdracht:** Wanneer een werkgever zelfstandig een vacature plaatst en een kandidaat daarop reageert zonder dat Juridische Vacatures een werving- en selectieopdracht uitvoert, is de werkgever de verwerkingsverantwoordelijke voor de sollicitatiegegevens. Juridische Vacatures treedt in dat geval op als faciliterende partij respectievelijk verwerker die de technische infrastructuur (waaronder de database) aanbiedt waarin sollicitaties worden opgeslagen en doorgestuurd.
+- **Websitegebruik en talentpool:** Voor de verwerking van gegevens van websitebezoekers en inschrijvingen in de eigen talentpool van Juridische Vacatures, treedt Juridische Vacatures op als zelfstandig verwerkingsverantwoordelijke.
 
-Legal Talents en werkgevers die het vacatureplatform gebruiken, leggen hun onderlinge afspraken over de verwerking van sollicitatiegegevens vast via de Algemene Voorwaarden en, waar nodig, een aanvullende verwerkersovereenkomst.
+Juridische Vacatures en werkgevers die het vacatureplatform gebruiken, leggen hun onderlinge afspraken over de verwerking van sollicitatiegegevens vast via de Algemene Voorwaarden en, waar nodig, een aanvullende verwerkersovereenkomst.
 
 ## 2. Wanneer verzamelen wij persoonsgegevens?
 
@@ -127,7 +127,7 @@ Na afloop van de bewaartermijn worden gegevens verwijderd of geanonimiseerd.
 
 ## 9. Beveiliging van de database
 
-Sollicitaties die via het vacatureplatform binnenkomen, worden opgeslagen in onze eigen beveiligde database. Legal Talents neemt passende technische en organisatorische maatregelen, waaronder:
+Sollicitaties die via het vacatureplatform binnenkomen, worden opgeslagen in onze eigen beveiligde database. Juridische Vacatures neemt passende technische en organisatorische maatregelen, waaronder:
 
 - Versleuteling van gegevens tijdens transport (TLS) en waar passend in rust
 - Strikte toegangsbeperking op basis van 'need to know'
@@ -148,11 +148,11 @@ U heeft onder de AVG de volgende rechten:
 - Recht van bezwaar
 - Recht om toestemming in te trekken
 
-Voor sollicitaties via het vacatureplatform waarbij de werkgever verwerkingsverantwoordelijke is, kunt u deze rechten rechtstreeks bij de betreffende werkgever uitoefenen. Legal Talents zal u op verzoek behulpzaam zijn bij het leggen van dit contact. Voor alle overige verwerkingen kunt u uw rechten uitoefenen door contact met ons op te nemen via de gegevens in artikel 17.
+Voor sollicitaties via het vacatureplatform waarbij de werkgever verwerkingsverantwoordelijke is, kunt u deze rechten rechtstreeks bij de betreffende werkgever uitoefenen. Juridische Vacatures zal u op verzoek behulpzaam zijn bij het leggen van dit contact. Voor alle overige verwerkingen kunt u uw rechten uitoefenen door contact met ons op te nemen via de gegevens in artikel 17.
 
 ## 11. Geautomatiseerde besluitvorming
 
-Legal Talents maakt geen gebruik van volledig geautomatiseerde besluitvorming met rechtsgevolgen voor betrokkenen. Eventuele matching- of sorteerfunctionaliteiten binnen het vacatureplatform zijn uitsluitend ondersteunend en resulteren niet in geautomatiseerde beslissingen over uw sollicitatie.
+Juridische Vacatures maakt geen gebruik van volledig geautomatiseerde besluitvorming met rechtsgevolgen voor betrokkenen. Eventuele matching- of sorteerfunctionaliteiten binnen het vacatureplatform zijn uitsluitend ondersteunend en resulteren niet in geautomatiseerde beslissingen over uw sollicitatie.
 
 ## 12. Marketing en communicatie
 
@@ -177,17 +177,17 @@ Persoonsgegevens worden in beginsel binnen de EER verwerkt. Indien persoonsgegev
 
 ## 15. Datalekken
 
-Bij een (vermoeden van een) datalek verzoeken wij u dit direct te melden via het in artikel 17 genoemde e-mailadres. Legal Talents beoordeelt ieder incident en doet, indien vereist, binnen 72 uur melding bij de Autoriteit Persoonsgegevens en, waar nodig, bij de betrokken personen.
+Bij een (vermoeden van een) datalek verzoeken wij u dit direct te melden via het in artikel 17 genoemde e-mailadres. Juridische Vacatures beoordeelt ieder incident en doet, indien vereist, binnen 72 uur melding bij de Autoriteit Persoonsgegevens en, waar nodig, bij de betrokken personen.
 
 ## 16. Wijzigingen
 
-Legal Talents kan dit privacybeleid wijzigen. De meest actuele versie is altijd beschikbaar op onze website en binnen het vacatureplatform. Bij ingrijpende wijzigingen worden gebruikers actief geïnformeerd.
+Juridische Vacatures kan dit privacybeleid wijzigen. De meest actuele versie is altijd beschikbaar op onze website en binnen het vacatureplatform. Bij ingrijpende wijzigingen worden gebruikers actief geïnformeerd.
 
 ## 17. Contact
 
 Voor vragen, verzoeken of klachten kunt u contact opnemen met:
 
-Legal Talents
+Juridische Vacatures
 Sint Annastraat 198c, 6525 GX Nijmegen
 E-mail: [e-mailadres invullen]
 Telefoon: [telefoonnummer invullen]

@@ -43,7 +43,7 @@ export async function generateMetadata({
     `stages ${name}`,
     "advocatuur",
     `advocatuur ${name}`,
-    "Legal Talents",
+    "Juridische Vacatures",
   ];
 
   if (count === 0) {

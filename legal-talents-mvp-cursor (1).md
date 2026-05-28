@@ -1,6 +1,6 @@
-# Legal Talents — MVP Build Spec voor Cursor
+# Juridische Vacatures — MVP Build Spec voor Cursor
 
-> Dit document is de volledige bouwinstructie voor het MVP van legal-talents.nl. Het is bedoeld als context voor Cursor. Lees dit volledig door voordat je begint met bouwen.
+> Dit document is de volledige bouwinstructie voor het MVP van legal-vacatures.nl. Het is bedoeld als context voor Cursor. Lees dit volledig door voordat je begint met bouwen.
 
 ---
 
@@ -21,7 +21,7 @@ Voorbeeldsite ter referentie: [legalhunt.nl](https://legalhunt.nl)
 ### Kleuren
 
 ```css
-/* Primaire merkkleur — uit het Legal Talents logo */
+/* Primaire merkkleur — uit het Juridische Vacatures logo */
 --color-primary: #6B7BF7;        /* Paars-blauw — hoofdkleur knoppen, accenten, links */
 --color-primary-dark: #4F5FD6;   /* Hover state knoppen */
 --color-primary-light: #EEF0FE;  /* Lichte achtergrond, tags, badges */
@@ -110,7 +110,7 @@ Typografische schaal:
 ### Navigatie (publiek)
 
 - Achtergrond: `white` met `border-b border-gray-100 shadow-sm`
-- Logo: "Legal Talents." in `font-extrabold italic text-primary text-xl`
+- Logo: "Juridische Vacatures." in `font-extrabold italic text-primary text-xl`
 - Links: `text-sm font-medium text-gray-600 hover:text-primary`
 - CTA rechts: primaire knop "Kantoor aanmelden"
 
@@ -512,7 +512,7 @@ export const resend = new Resend(process.env.RESEND_API_KEY)
 
 ```typescript
 await resend.emails.send({
-  from: 'Legal Talents <noreply@legal-talents.nl>',
+  from: 'Juridische Vacatures <noreply@legal-talents.nl>',
   to: firm.notification_email,
   cc: firm.cc_email || undefined,
   subject: `Nieuwe sollicitatie: ${applicantName} voor ${jobTitle}`,
@@ -541,7 +541,7 @@ Wordt automatisch afgehandeld door Supabase Auth.
 ### Homepage (`/`)
 - Hero met zoekbalk (filtert op vacatureoverzicht)
 - Lijst met uitgelichte kantoren
-- CTA voor kantoren: "Plaats je kantoor op Legal Talents"
+- CTA voor kantoren: "Plaats je kantoor op Juridische Vacatures"
 
 ### Vacatureoverzicht (`/jobs`)
 - Alle actieve vacatures (status = 'active')
@@ -579,7 +579,7 @@ Gebruik Next.js `generateMetadata` op alle publieke pagina's:
 export async function generateMetadata({ params }) {
   const job = await getJob(params.slug)
   return {
-    title: `${job.title} bij ${job.firm.name} | Legal Talents`,
+    title: `${job.title} bij ${job.firm.name} | Juridische Vacatures`,
     description: job.description.substring(0, 160),
     openGraph: {
       title: `${job.title} bij ${job.firm.name}`,
@@ -644,4 +644,4 @@ Bouw in deze volgorde — elke stap levert iets werkends op:
 
 ---
 
-*Legal Talents VOF — legal-talents.nl*
+*Juridische Vacatures VOF — legal-vacatures.nl*

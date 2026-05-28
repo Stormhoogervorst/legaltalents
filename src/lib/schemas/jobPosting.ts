@@ -196,7 +196,7 @@ export function buildJobPostingSchema(
     description: descriptionHtml,
     identifier: {
       "@type": "PropertyValue",
-      name: "Legal Talents",
+      name: "Juridische Vacatures",
       value: job.id,
     },
     datePosted: new Date(job.created_at).toISOString(),

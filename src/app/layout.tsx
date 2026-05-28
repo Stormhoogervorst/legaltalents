@@ -14,8 +14,8 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Legal Talents | Hét platform voor Juridische Vacatures en Stages",
-    template: "%s | Legal Talents",
+    default: "Juridisch Vacatures Nederland",
+    template: "%s | Juridisch Vacatures Nederland",
   },
   description:
     "Vind juridische stages en vacatures bij topkantoren in Nederland. Hét carrièreplatform voor rechtenstudenten en young professionals.",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "juridische vacatures",
     "juridische stages",
     "advocatuur",
-    "Legal Talents",
+    "Juridische Vacatures",
     "vacatures advocatuur",
     "stages advocatuur",
   ],
@@ -43,22 +43,22 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "nl_NL",
-    siteName: "Legal Talents",
-    url: "https://www.legal-talents.nl",
-    title: "Legal Talents — Juridische Vacatures",
+    siteName: "Juridische Vacatures",
+    url: SITE_URL,
+    title: "Juridisch Vacatures Nederland",
     description: "De vacaturesite voor de juridische sector",
     images: [
       {
         url: "/socialpreview.png",
         width: 1200,
         height: 630,
-        alt: "Legal Talents Preview Image",
+        alt: "Juridische Vacatures Preview Image",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Legal Talents — Juridische Vacatures",
+    title: "Juridisch Vacatures Nederland",
     description: "De vacaturesite voor de juridische sector",
     images: ["/socialpreview.png"],
   },

@@ -119,7 +119,7 @@ export default function NavbarPublic({
               <Link href="/" className="flex items-center shrink-0">
                 <Image
                   src="/legal-talents-logo.png"
-                  alt="Legal Talents logo"
+                  alt="Juridische Vacatures logo"
                   width={150}
                   height={40}
                   className="h-8 w-auto"

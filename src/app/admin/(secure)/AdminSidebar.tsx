@@ -24,7 +24,7 @@ export function AdminSidebar({ email }: { email: string | null }) {
       <div className="flex items-center gap-2 px-6 py-5 border-b border-gray-200">
         <Image
           src="/legal-talents-logo.png"
-          alt="Legal Talents logo"
+          alt="Juridische Vacatures logo"
           width={130}
           height={32}
           className="h-7 w-auto"

@@ -341,7 +341,7 @@ export default function VoorWerkgeversPage() {
                 color: "#0A0A0A",
               }}
             >
-              Met Legal Talents bereiken wij precies de juridische
+              Met Juridische Vacatures bereiken wij precies de juridische
               professionals die we zoeken. Het platform is intuïtief,
               effectief en zonder drempels.
             </blockquote>

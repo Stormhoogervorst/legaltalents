@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Privacybeleid",
   description:
-    "Hoe Legal Talents VOF persoonsgegevens verwerkt van kandidaten, werkgevers en bezoekers van het vacatureplatform, in lijn met de AVG.",
+    "Hoe Juridische Vacatures VOF persoonsgegevens verwerkt van kandidaten, werkgevers en bezoekers van het vacatureplatform, in lijn met de AVG.",
   alternates: {
     canonical: "/privacy",
   },
@@ -40,11 +40,11 @@ const INTRO: Section = {
   blocks: [
     {
       type: "p",
-      body: "Legal Talents hecht grote waarde aan de bescherming van uw persoonsgegevens. Sinds 25 mei 2018 geldt de Algemene Verordening Gegevensbescherming (AVG), en wij verwerken persoonsgegevens volledig in overeenstemming met deze wetgeving. Dit privacybeleid is van toepassing op alle kandidaten, sollicitanten, opdrachtgevers, werkgevers, websitebezoekers en andere relaties die gebruik maken van de diensten van Legal Talents, waaronder het vacatureplatform. Indien u ervoor kiest om vrijwillig persoonsgegevens aan ons te verstrekken — bijvoorbeeld door te solliciteren via het vacatureplatform of u in te schrijven in onze talentpool — verwerken wij deze in overeenstemming met dit privacybeleid.",
+      body: "Juridische Vacatures hecht grote waarde aan de bescherming van uw persoonsgegevens. Sinds 25 mei 2018 geldt de Algemene Verordening Gegevensbescherming (AVG), en wij verwerken persoonsgegevens volledig in overeenstemming met deze wetgeving. Dit privacybeleid is van toepassing op alle kandidaten, sollicitanten, opdrachtgevers, werkgevers, websitebezoekers en andere relaties die gebruik maken van de diensten van Juridische Vacatures, waaronder het vacatureplatform. Indien u ervoor kiest om vrijwillig persoonsgegevens aan ons te verstrekken — bijvoorbeeld door te solliciteren via het vacatureplatform of u in te schrijven in onze talentpool — verwerken wij deze in overeenstemming met dit privacybeleid.",
     },
     {
       type: "p",
-      body: "Legal Talents is een recruitmentbureau gespecialiseerd in de juridische sector en biedt onder meer:",
+      body: "Juridische Vacatures is een recruitmentbureau gespecialiseerd in de juridische sector en biedt onder meer:",
     },
     {
       type: "ul",
@@ -66,29 +66,29 @@ const SECTIONS: Section[] = [
     blocks: [
       {
         type: "p",
-        body: "De rol die Legal Talents onder de AVG vervult, hangt af van de dienst waarvan u gebruik maakt:",
+        body: "De rol die Juridische Vacatures onder de AVG vervult, hangt af van de dienst waarvan u gebruik maakt:",
       },
       {
         type: "ul-labeled",
         items: [
           {
             label: "Werving & selectie en eigen recruitmentactiviteiten:",
-            body: "Legal Talents treedt op als zelfstandig verwerkingsverantwoordelijke voor de verwerking van persoonsgegevens van kandidaten die wij actief werven, voordragen en bemiddelen, en voor de kandidaten in onze talentpool.",
+            body: "Juridische Vacatures treedt op als zelfstandig verwerkingsverantwoordelijke voor de verwerking van persoonsgegevens van kandidaten die wij actief werven, voordragen en bemiddelen, en voor de kandidaten in onze talentpool.",
           },
           {
             label:
               "Sollicitaties via het vacatureplatform zonder werving- en selectieopdracht:",
-            body: "Wanneer een werkgever zelfstandig een vacature plaatst en een kandidaat daarop reageert zonder dat Legal Talents een werving- en selectieopdracht uitvoert, is de werkgever de verwerkingsverantwoordelijke voor de sollicitatiegegevens. Legal Talents treedt in dat geval op als faciliterende partij respectievelijk verwerker die de technische infrastructuur (waaronder de database) aanbiedt waarin sollicitaties worden opgeslagen en doorgestuurd.",
+            body: "Wanneer een werkgever zelfstandig een vacature plaatst en een kandidaat daarop reageert zonder dat Juridische Vacatures een werving- en selectieopdracht uitvoert, is de werkgever de verwerkingsverantwoordelijke voor de sollicitatiegegevens. Juridische Vacatures treedt in dat geval op als faciliterende partij respectievelijk verwerker die de technische infrastructuur (waaronder de database) aanbiedt waarin sollicitaties worden opgeslagen en doorgestuurd.",
           },
           {
             label: "Websitegebruik en talentpool:",
-            body: "Voor de verwerking van gegevens van websitebezoekers en inschrijvingen in de eigen talentpool van Legal Talents, treedt Legal Talents op als zelfstandig verwerkingsverantwoordelijke.",
+            body: "Voor de verwerking van gegevens van websitebezoekers en inschrijvingen in de eigen talentpool van Juridische Vacatures, treedt Juridische Vacatures op als zelfstandig verwerkingsverantwoordelijke.",
           },
         ],
       },
       {
         type: "p",
-        body: "Legal Talents en werkgevers die het vacatureplatform gebruiken, leggen hun onderlinge afspraken over de verwerking van sollicitatiegegevens vast via de Algemene Voorwaarden en, waar nodig, een aanvullende verwerkersovereenkomst.",
+        body: "Juridische Vacatures en werkgevers die het vacatureplatform gebruiken, leggen hun onderlinge afspraken over de verwerking van sollicitatiegegevens vast via de Algemene Voorwaarden en, waar nodig, een aanvullende verwerkersovereenkomst.",
       },
     ],
   },
@@ -318,7 +318,7 @@ const SECTIONS: Section[] = [
     blocks: [
       {
         type: "p",
-        body: "Sollicitaties die via het vacatureplatform binnenkomen, worden opgeslagen in onze eigen beveiligde database. Legal Talents neemt passende technische en organisatorische maatregelen, waaronder:",
+        body: "Sollicitaties die via het vacatureplatform binnenkomen, worden opgeslagen in onze eigen beveiligde database. Juridische Vacatures neemt passende technische en organisatorische maatregelen, waaronder:",
       },
       {
         type: "ul",
@@ -352,7 +352,7 @@ const SECTIONS: Section[] = [
       },
       {
         type: "p",
-        body: "Voor sollicitaties via het vacatureplatform waarbij de werkgever verwerkingsverantwoordelijke is, kunt u deze rechten rechtstreeks bij de betreffende werkgever uitoefenen. Legal Talents zal u op verzoek behulpzaam zijn bij het leggen van dit contact. Voor alle overige verwerkingen kunt u uw rechten uitoefenen door contact met ons op te nemen via de gegevens in artikel 17.",
+        body: "Voor sollicitaties via het vacatureplatform waarbij de werkgever verwerkingsverantwoordelijke is, kunt u deze rechten rechtstreeks bij de betreffende werkgever uitoefenen. Juridische Vacatures zal u op verzoek behulpzaam zijn bij het leggen van dit contact. Voor alle overige verwerkingen kunt u uw rechten uitoefenen door contact met ons op te nemen via de gegevens in artikel 17.",
       },
     ],
   },
@@ -362,7 +362,7 @@ const SECTIONS: Section[] = [
     blocks: [
       {
         type: "p",
-        body: "Legal Talents maakt geen gebruik van volledig geautomatiseerde besluitvorming met rechtsgevolgen voor betrokkenen. Eventuele matching- of sorteerfunctionaliteiten binnen het vacatureplatform zijn uitsluitend ondersteunend en resulteren niet in geautomatiseerde beslissingen over uw sollicitatie.",
+        body: "Juridische Vacatures maakt geen gebruik van volledig geautomatiseerde besluitvorming met rechtsgevolgen voor betrokkenen. Eventuele matching- of sorteerfunctionaliteiten binnen het vacatureplatform zijn uitsluitend ondersteunend en resulteren niet in geautomatiseerde beslissingen over uw sollicitatie.",
       },
     ],
   },
@@ -418,7 +418,7 @@ const SECTIONS: Section[] = [
     blocks: [
       {
         type: "p",
-        body: "Bij een (vermoeden van een) datalek verzoeken wij u dit direct te melden via het in artikel 17 genoemde e-mailadres. Legal Talents beoordeelt ieder incident en doet, indien vereist, binnen 72 uur melding bij de Autoriteit Persoonsgegevens en, waar nodig, bij de betrokken personen.",
+        body: "Bij een (vermoeden van een) datalek verzoeken wij u dit direct te melden via het in artikel 17 genoemde e-mailadres. Juridische Vacatures beoordeelt ieder incident en doet, indien vereist, binnen 72 uur melding bij de Autoriteit Persoonsgegevens en, waar nodig, bij de betrokken personen.",
       },
     ],
   },
@@ -428,7 +428,7 @@ const SECTIONS: Section[] = [
     blocks: [
       {
         type: "p",
-        body: "Legal Talents kan dit privacybeleid wijzigen. De meest actuele versie is altijd beschikbaar op onze website en binnen het vacatureplatform. Bij ingrijpende wijzigingen worden gebruikers actief geïnformeerd.",
+        body: "Juridische Vacatures kan dit privacybeleid wijzigen. De meest actuele versie is altijd beschikbaar op onze website en binnen het vacatureplatform. Bij ingrijpende wijzigingen worden gebruikers actief geïnformeerd.",
       },
     ],
   },
@@ -438,7 +438,7 @@ const SECTIONS: Section[] = [
     blocks: [
       {
         type: "p",
-        body: "Voor vragen, verzoeken of klachten kunt u contact opnemen met Legal Talents VOF, Sint Annastraat 198c, 6525 GX Nijmegen, via storm@legal-talents.nl.",
+        body: "Voor vragen, verzoeken of klachten kunt u contact opnemen met Juridische Vacatures VOF, Sint Annastraat 198c, 6525 GX Nijmegen, via storm@legal-talents.nl.",
       },
       {
         type: "p",
@@ -551,7 +551,7 @@ export default function PrivacyPage() {
 
           <footer className="mt-8 text-sm text-slate-500">
             <p>
-              Legal Talents VOF — Sint Annastraat 198c, 6525 GX Nijmegen — KvK
+              Juridische Vacatures VOF — Sint Annastraat 198c, 6525 GX Nijmegen — KvK
               98803093
             </p>
             <p className="mt-2">
