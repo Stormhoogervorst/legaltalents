@@ -5,9 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { verifyRecaptchaAction } from "@/app/actions/recaptcha";
-import { RecaptchaCheckbox } from "@/components/recaptcha/RecaptchaCheckbox";
-import { useRecaptcha } from "@/hooks/useRecaptcha";
 import { getSiteUrl } from "@/lib/site";
 import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
 
@@ -25,9 +22,6 @@ export default function LoginPage() {
   const [resetSent, setResetSent] = useState(false);
 
   const supabase = createClient();
-  const { widgetKey: recaptchaWidgetKey, token: recaptchaToken, setToken: setRecaptchaToken, reset: resetRecaptcha, siteKeyConfigured } =
-    useRecaptcha();
-  const recaptchaRequired = siteKeyConfigured;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,25 +29,6 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      if (recaptchaRequired) {
-        if (!recaptchaToken) {
-          setError("Voltooi de reCAPTCHA-verificatie.");
-          setLoading(false);
-          return;
-        }
-        console.debug("[login] verifying reCAPTCHA token...");
-        const captcha = await verifyRecaptchaAction(recaptchaToken);
-        if (!captcha.ok) {
-          console.error("[login] reCAPTCHA verification failed", captcha);
-          const codes = captcha.codes?.length ? ` (codes: ${captcha.codes.join(", ")})` : "";
-          setError(`${captcha.error}${codes}`);
-          resetRecaptcha();
-          setLoading(false);
-          return;
-        }
-        console.debug("[login] reCAPTCHA OK", captcha);
-      }
-
       console.debug("[login] calling supabase.auth.signInWithPassword for", email);
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -73,7 +48,6 @@ export default function LoginPage() {
             ? "E-mailadres of wachtwoord is onjuist."
             : `${signInError.message}${signInError.status ? ` (status ${signInError.status})` : ""}`
         );
-        resetRecaptcha();
         setLoading(false);
       } else {
         console.debug("[login] signIn success", { userId: data?.user?.id });
@@ -104,7 +78,6 @@ export default function LoginPage() {
             ? err
             : JSON.stringify(err);
       setError(`Onverwachte fout: ${message}`);
-      resetRecaptcha();
       setLoading(false);
     }
   };
@@ -115,23 +88,6 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      if (recaptchaRequired) {
-        if (!recaptchaToken) {
-          setError("Voltooi de reCAPTCHA-verificatie.");
-          setLoading(false);
-          return;
-        }
-        const captcha = await verifyRecaptchaAction(recaptchaToken);
-        if (!captcha.ok) {
-          console.error("[forgot-password] reCAPTCHA verification failed", captcha);
-          const codes = captcha.codes?.length ? ` (codes: ${captcha.codes.join(", ")})` : "";
-          setError(`${captcha.error}${codes}`);
-          resetRecaptcha();
-          setLoading(false);
-          return;
-        }
-      }
-
       const redirectTo = `${getSiteUrl()}/auth/callback?next=/update-wachtwoord`;
       console.log("Reset email sent with redirectTo:", redirectTo);
       const { data, error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
@@ -147,7 +103,6 @@ export default function LoginPage() {
           full: resetError,
         });
         setError(resetError.message);
-        resetRecaptcha();
         setLoading(false);
       } else {
         setResetSent(true);
@@ -162,7 +117,6 @@ export default function LoginPage() {
             ? err
             : JSON.stringify(err);
       setError(`Onverwachte fout: ${message}`);
-      resetRecaptcha();
       setLoading(false);
     }
   };
@@ -218,7 +172,7 @@ export default function LoginPage() {
                   </label>
                   <button
                     type="button"
-                    onClick={() => { setView("forgot"); setError(null); resetRecaptcha(); }}
+                    onClick={() => { setView("forgot"); setError(null); }}
                     className="text-xs text-primary hover:underline font-medium"
                   >
                     Wachtwoord vergeten?
@@ -250,12 +204,6 @@ export default function LoginPage() {
                   {error}
                 </div>
               )}
-
-              <RecaptchaCheckbox
-                widgetKey={recaptchaWidgetKey}
-                onChange={setRecaptchaToken}
-                className="flex justify-start mb-4"
-              />
 
               <button
                 type="submit"
@@ -292,12 +240,6 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <RecaptchaCheckbox
-                widgetKey={recaptchaWidgetKey}
-                onChange={setRecaptchaToken}
-                className="flex justify-start mb-4"
-              />
-
               <button
                 type="submit"
                 disabled={loading}
@@ -309,7 +251,7 @@ export default function LoginPage() {
 
               <button
                 type="button"
-                onClick={() => { setView("login"); setError(null); resetRecaptcha(); }}
+                onClick={() => { setView("login"); setError(null); }}
                 className="btn-secondary w-full"
               >
                 ← Terug naar inloggen
@@ -330,7 +272,7 @@ export default function LoginPage() {
               </p>
               <button
                 type="button"
-                onClick={() => { setView("login"); setResetSent(false); setError(null); resetRecaptcha(); }}
+                onClick={() => { setView("login"); setResetSent(false); setError(null); }}
                 className="mt-6 text-sm text-primary hover:underline font-medium"
               >
                 ← Terug naar inloggen

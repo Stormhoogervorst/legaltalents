@@ -5,7 +5,6 @@ import {
   sanitizeLinkedInProfileUrl,
   isValidLinkedInInUrl,
 } from "@/lib/linkedin-profile-url";
-import { verifyRecaptchaToken } from "@/lib/recaptcha/verify-server";
 import { checkRateLimit, getRequestIp } from "@/lib/security/rate-limit";
 import { SITE_URL } from "@/lib/site";
 
@@ -175,26 +174,6 @@ export async function POST(request: NextRequest) {
     linkedInUrl = cleaned;
   }
   const cvFile = formData.get("cv") as File | null;
-
-  if (process.env.RECAPTCHA_SECRET_KEY) {
-    const rawToken = formData.get("recaptchaToken");
-    const token = typeof rawToken === "string" ? rawToken.trim() : "";
-    if (!token) {
-      return NextResponse.json(
-        { success: false, error: "Voltooi de reCAPTCHA-verificatie." },
-        { status: 400 }
-      );
-    }
-    const forwarded = request.headers.get("x-forwarded-for");
-    const remoteip = forwarded?.split(",")[0]?.trim() ?? undefined;
-    const captcha = await verifyRecaptchaToken(token, remoteip);
-    if (!captcha.ok) {
-      return NextResponse.json(
-        { success: false, error: "reCAPTCHA-verificatie mislukt. Probeer opnieuw." },
-        { status: 400 }
-      );
-    }
-  }
 
   // 2. Validate required fields
   if (!jobId || !firstName || !lastName || !email || !motivation) {

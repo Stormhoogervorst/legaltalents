@@ -6,7 +6,6 @@ import {
   sanitizeLinkedInProfileUrl,
   isValidLinkedInInUrl,
 } from "@/lib/linkedin-profile-url";
-import { verifyRecaptchaToken } from "@/lib/recaptcha/verify-server";
 import { checkRateLimit, getRequestIp } from "@/lib/security/rate-limit";
 import { SITE_URL } from "@/lib/site";
 
@@ -34,18 +33,6 @@ export async function POST(request: NextRequest) {
   const linkedinUrl = (formData.get("linkedinUrl") as string | null)?.trim();
   const phone = (formData.get("phone") as string | null)?.trim();
   const cvFile = formData.get("cv") as File | null;
-
-  if (process.env.RECAPTCHA_SECRET_KEY) {
-    const rawToken = formData.get("recaptchaToken");
-    const token = typeof rawToken === "string" ? rawToken.trim() : "";
-    const captcha = await verifyRecaptchaToken(token);
-    if (!captcha.ok) {
-      return NextResponse.json(
-        { error: "reCAPTCHA-verificatie mislukt. Probeer opnieuw." },
-        { status: 400 }
-      );
-    }
-  }
 
   if (!jobId || !linkedinUrl || !phone) {
     return NextResponse.json({ error: "Vul alle velden in." }, { status: 400 });
