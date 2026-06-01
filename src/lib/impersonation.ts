@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { hmacVerify } from "@/lib/security/hmac";
 
 export const IMPERSONATION_COOKIE = "impersonation_firm_id";
 
@@ -11,7 +12,10 @@ export const IMPERSONATION_COOKIE = "impersonation_firm_id";
  */
 export async function getImpersonatedFirmId(): Promise<string | null> {
   const cookieStore = await cookies();
-  const firmId = cookieStore.get(IMPERSONATION_COOKIE)?.value;
+  const raw = cookieStore.get(IMPERSONATION_COOKIE)?.value;
+  if (!raw) return null;
+
+  const firmId = hmacVerify(raw);
   if (!firmId) return null;
 
   const supabase = await createClient();

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { IMPERSONATION_COOKIE } from "./impersonation";
+import { hmacSign } from "@/lib/security/hmac";
 
 const COOKIE_MAX_AGE = 60 * 60 * 8;
 
@@ -33,7 +34,7 @@ export async function impersonateEmployerAction(formData: FormData) {
   }
 
   const cookieStore = await cookies();
-  cookieStore.set(IMPERSONATION_COOKIE, employerId, {
+  cookieStore.set(IMPERSONATION_COOKIE, hmacSign(employerId), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
