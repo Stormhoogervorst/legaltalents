@@ -26,7 +26,7 @@ export default function Footer() {
                 storm@legal-talents.nl
               </a>
               <p className="mt-6" style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>
-                © {new Date().getFullYear()} Juridische Vacatures VOF
+                © {new Date().getFullYear()} Legal Talents VOF
               </p>
               <Link
                 href="/privacy"
@@ -110,14 +110,14 @@ export default function Footer() {
           {/* Vacatures per stad */}
           <div className="mt-14 pt-10 border-t border-[#2E3247]">
             <p className="text-xs font-bold tracking-widest uppercase mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>
-              Juridische Vacatures
+              Legal Vacatures
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start">
               {CITIES.map((slug) => (
                 <Link
                   key={slug}
                   href={`/vacatures/${slug}`}
-                  title={`Juridische Vacatures ${cityDisplayName(slug)}`}
+                  title={`Legal Vacatures ${cityDisplayName(slug)}`}
                   className="text-sm text-slate-400 hover:text-[#668dff] transition-colors duration-200"
                 >
                   {cityDisplayName(slug)}
@@ -169,7 +169,7 @@ export default function Footer() {
                   color: "#FFFFFF",
                 }}
               >
-                Juridische Vacatures
+                Legal Vacatures
               </p>
             </div>
           </div>

@@ -14,8 +14,8 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Juridisch Vacatures Nederland",
-    template: "%s | Juridisch Vacatures Nederland",
+    default: "Legal Vacatures Nederland",
+    template: "%s | Legal Vacatures Nederland",
   },
   description:
     "Vind juridische stages en vacatures bij topkantoren in Nederland. Hét carrièreplatform voor rechtenstudenten en young professionals.",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     "juridische vacatures",
     "juridische stages",
     "advocatuur",
-    "Juridische Vacatures",
+    "Legal Vacatures",
     "vacatures advocatuur",
     "stages advocatuur",
   ],
@@ -43,22 +43,22 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "nl_NL",
-    siteName: "Juridische Vacatures",
+    siteName: "Legal Vacatures",
     url: SITE_URL,
-    title: "Juridisch Vacatures Nederland",
+    title: "Legal Vacatures Nederland",
     description: "De vacaturesite voor de juridische sector",
     images: [
       {
         url: "/socialpreview.png",
         width: 1200,
         height: 630,
-        alt: "Juridische Vacatures Preview Image",
+        alt: "Legal Vacatures Preview Image",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Juridisch Vacatures Nederland",
+    title: "Legal Vacatures Nederland",
     description: "De vacaturesite voor de juridische sector",
     images: ["/socialpreview.png"],
   },

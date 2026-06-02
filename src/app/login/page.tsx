@@ -129,7 +129,7 @@ export default function LoginPage() {
           <Link href="/" className="inline-flex items-center justify-center">
             <Image
               src="/legal-talents-logo.png"
-              alt="Juridische Vacatures logo"
+              alt="Legal Vacatures logo"
               width={150}
               height={40}
               className="h-10 w-auto"

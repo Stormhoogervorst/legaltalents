@@ -119,7 +119,7 @@ export default function NavbarPublic({
               <Link href="/" className="flex items-center shrink-0">
                 <Image
                   src="/legal-talents-logo.png"
-                  alt="Juridische Vacatures logo"
+                  alt="Legal Vacatures logo"
                   width={150}
                   height={40}
                   className="h-8 w-auto"
@@ -128,7 +128,7 @@ export default function NavbarPublic({
               </Link>
 
               <div className="hidden md:flex items-center gap-6 lg:gap-8">
-                <Link href="/vacatures" className={linkClass("vacatures")} title="Juridische Vacatures">
+                <Link href="/vacatures" className={linkClass("vacatures")} title="Legal Vacatures">
                   Vacatures
                 </Link>
                 <Link href="/stages" className={linkClass("stages")} title="Juridische Stages">
@@ -188,7 +188,7 @@ export default function NavbarPublic({
         >
           <div className="max-w-[1400px] mx-auto flex flex-col items-stretch">
             {[
-              { href: "/vacatures", key: "vacatures" as const, label: "Vacatures", title: "Juridische Vacatures" },
+              { href: "/vacatures", key: "vacatures" as const, label: "Vacatures", title: "Legal Vacatures" },
               { href: "/stages", key: "stages" as const, label: "Stages", title: "Juridische Stages" },
               { href: "/werkgevers", key: "werkgevers" as const, label: "Werkgevers" },
               { href: "/kennisbank", key: "kennisbank" as const, label: "Kennisbank" },

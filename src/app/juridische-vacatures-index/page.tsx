@@ -7,7 +7,7 @@ import { RECHTSGEBIEDEN } from "@/lib/constants/rechtsgebieden";
 import { JOB_FUNCTIONS } from "@/lib/jobFunctions";
 
 export const metadata: Metadata = {
-  title: "Index van Juridische Vacatures & Stages",
+  title: "Index van Legal Vacatures & Stages",
   description:
     "Compleet overzicht van alle juridische vacatures en stages per functie, rechtsgebied en stad in Nederland. Vind snel de juiste positie bij topwerkgevers in de juridische sector.",
   keywords: [
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     "kandidaat-notaris vacatures",
     "vacatures per stad",
     "rechtsgebied vacatures",
-    "Juridische Vacatures",
+    "Legal Vacatures",
   ],
   alternates: {
     canonical: "/juridische-vacatures-index",
@@ -146,7 +146,7 @@ export default function JuridischeVacaturesIndexPage() {
                 textShadow: "0 1px 16px rgba(20, 24, 80, 0.22)",
               }}
             >
-              Juridische Vacatures biedt het meest complete overzicht van juridische
+              Legal Vacatures biedt het meest complete overzicht van juridische
               vacatures in Nederland. Zoek op functie, rechtsgebied of locatie
               en vind direct de vacatures die bij jou passen. Van advocaat in
               Amsterdam tot kandidaat-notaris in Utrecht — alle combinaties

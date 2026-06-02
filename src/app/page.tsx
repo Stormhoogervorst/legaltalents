@@ -42,23 +42,23 @@ const blogCategoryLabels: Record<string, string> = {
 const FAQS: Array<{ q: string; a: string }> = [
   {
     q: "Hoe vind ik een juridische stage?",
-    a: "Op Juridische Vacatures filter je het vacature-aanbod op stagetype, rechtsgebied en stad. Zoek bijvoorbeeld op student-stages in Amsterdam of zomer-stages in het arbeidsrecht. Je sollicitatie stuur je rechtstreeks naar het kantoor. Wil je een overzicht per stad? Bekijk dan de pagina's voor juridische stages in Amsterdam, Rotterdam, Utrecht of Den Haag.",
+    a: "Op Legal Vacatures filter je het vacature-aanbod op stagetype, rechtsgebied en stad. Zoek bijvoorbeeld op student-stages in Amsterdam of zomer-stages in het arbeidsrecht. Je sollicitatie stuur je rechtstreeks naar het kantoor. Wil je een overzicht per stad? Bekijk dan de pagina's voor juridische stages in Amsterdam, Rotterdam, Utrecht of Den Haag.",
   },
   {
     q: "Wat verdient een advocaat-stagiaire?",
-    a: "Het startsalaris van een advocaat-stagiaire ligt gemiddeld tussen de €3.200 en €4.500 bruto per maand, afhankelijk van het kantoor en de stad. Grote Zuidas-kantoren betalen doorgaans hoger dan middelgrote en kleinere kantoren in de regio. Bij veel vacatures op Juridische Vacatures staat een indicatie van het salaris vermeld.",
+    a: "Het startsalaris van een advocaat-stagiaire ligt gemiddeld tussen de €3.200 en €4.500 bruto per maand, afhankelijk van het kantoor en de stad. Grote Zuidas-kantoren betalen doorgaans hoger dan middelgrote en kleinere kantoren in de regio. Bij veel vacatures op Legal Vacatures staat een indicatie van het salaris vermeld.",
   },
   {
     q: "Wat is het verschil tussen een stage en een student-stageplek?",
-    a: "Een advocaat-stagiaire is een volwaardige functie: je hebt je master afgerond en doorloopt de driejarige beroepsopleiding tot advocaat. Een student-stageplek is bedoeld voor rechtenstudenten die nog studeren en kennis willen maken met het kantoorleven, vaak voor een paar weken tot enkele maanden. Beide vind je op Juridische Vacatures, onder aparte categorieën.",
+    a: "Een advocaat-stagiaire is een volwaardige functie: je hebt je master afgerond en doorloopt de driejarige beroepsopleiding tot advocaat. Een student-stageplek is bedoeld voor rechtenstudenten die nog studeren en kennis willen maken met het kantoorleven, vaak voor een paar weken tot enkele maanden. Beide vind je op Legal Vacatures, onder aparte categorieën.",
   },
   {
     q: "Hoe schrijf ik een goede motivatiebrief voor een advocatenkantoor?",
     a: "Een goede motivatiebrief is kort, concreet en persoonlijk. Leg uit waarom je juist voor dit kantoor kiest — verwijs naar een specifiek rechtsgebied, een recente zaak of iets dat jou aanspreekt in hun cultuur. Vermijd standaardzinnen en laat je unieke motivatie zien. Voeg ook een cijferlijst toe en eventueel je scriptieonderwerp, want beide worden bij juridische sollicitaties doorgaans gewaardeerd.",
   },
   {
-    q: "Wat doet Juridische Vacatures precies?",
-    a: "Juridische Vacatures is het carrièreplatform voor de Nederlandse juridische sector. We brengen werkgevers en talent samen: advocatenkantoren, notariskantoren en juridische afdelingen plaatsen hun vacatures en stages, en rechtenstudenten en juristen solliciteren rechtstreeks. Je gebruikt het platform gratis, je hoeft geen account aan te maken om te zoeken, en je betaalt nooit voor een sollicitatie.",
+    q: "Wat doet Legal Vacatures precies?",
+    a: "Legal Vacatures is het carrièreplatform voor de Nederlandse juridische sector. We brengen werkgevers en talent samen: advocatenkantoren, notariskantoren en juridische afdelingen plaatsen hun vacatures en stages, en rechtenstudenten en juristen solliciteren rechtstreeks. Je gebruikt het platform gratis, je hoeft geen account aan te maken om te zoeken, en je betaalt nooit voor een sollicitatie.",
   },
 ];
 
@@ -530,7 +530,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Waarom Juridische Vacatures ──────────────────────────────── */}
+      {/* ── Waarom Legal Vacatures ──────────────────────────────── */}
       <section
         style={{ padding: "clamp(80px, 10vh, 160px) clamp(24px, 5vw, 80px)" }}
       >
@@ -544,14 +544,14 @@ export default async function HomePage() {
               color: "#0A0A0A",
             }}
           >
-            Waarom Juridische Vacatures
+            Waarom Legal Vacatures
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 mt-12 md:mt-16">
             {[
               {
                 title: "Het meest complete aanbod",
-                body: "Op Juridische Vacatures vind je vacatures en stages van de grootste advocatenkantoren tot kleinere nichekantoren. Je ziet alles op één plek, zonder dat je tien verschillende carrièresites hoeft af te struinen.",
+                body: "Op Legal Vacatures vind je vacatures en stages van de grootste advocatenkantoren tot kleinere nichekantoren. Je ziet alles op één plek, zonder dat je tien verschillende carrièresites hoeft af te struinen.",
               },
               {
                 title: "Gemaakt voor juridisch Nederland",

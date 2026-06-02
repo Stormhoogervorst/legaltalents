@@ -10,7 +10,7 @@ export default function OrganizationJsonLd() {
   const organizationSchema = {
     "@context": "https://schema.org/",
     "@type": "Organization",
-    name: "Juridische Vacatures",
+    name: "Legal Vacatures",
     url: SITE_URL,
     logo: `${SITE_URL}/legal-talents-logo.png`,
     description:

@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Algemene Voorwaarden",
   description:
-    "De algemene voorwaarden van Juridische Vacatures VOF voor werving & selectie en het gebruik van het vacatureplatform.",
+    "De algemene voorwaarden van Legal Talents VOF voor werving & selectie en het gebruik van het vacatureplatform.",
   alternates: {
     canonical: "/voorwaarden",
   },
@@ -27,7 +27,7 @@ type Article = {
   clauses: Clause[];
 };
 
-const INTRO = `Dit document bevat de Algemene Voorwaarden van Juridische Vacatures, een vennootschap onder firma, statutair gevestigd te Nijmegen, kantoorhoudende Sint Annastraat 198c, 6525 GX Nijmegen, ingeschreven in het handelsregister van de Kamer van Koophandel onder nummer 98803093, hierna te noemen "Juridische Vacatures". Deze Algemene Voorwaarden zijn van toepassing op alle offertes, aanvragen, opdrachten, overeenkomsten en op het gebruik van het vacatureplatform tussen Juridische Vacatures en haar opdrachtgevers, werkgevers, kandidaten en overige gebruikers. De toepasselijkheid van eventuele inkoop- of andere voorwaarden van de opdrachtgever of gebruiker wordt hierbij uitdrukkelijk van de hand gewezen. Afwijkingen van deze Algemene Voorwaarden zijn slechts geldig indien deze uitdrukkelijk en schriftelijk door Juridische Vacatures zijn aanvaard en overeengekomen.`;
+const INTRO = `Dit document bevat de Algemene Voorwaarden van Legal Talents VOF, statutair gevestigd te Nijmegen, kantoorhoudende Sint Annastraat 198c, 6525 GX Nijmegen, ingeschreven in het handelsregister van de Kamer van Koophandel onder nummer 98803093, handelend onder de productnaam "Legal Vacatures". Deze Algemene Voorwaarden zijn van toepassing op alle offertes, aanvragen, opdrachten, overeenkomsten en op het gebruik van het vacatureplatform tussen Legal Talents VOF en haar opdrachtgevers, werkgevers, kandidaten en overige gebruikers. De toepasselijkheid van eventuele inkoop- of andere voorwaarden van de opdrachtgever of gebruiker wordt hierbij uitdrukkelijk van de hand gewezen. Afwijkingen van deze Algemene Voorwaarden zijn slechts geldig indien deze uitdrukkelijk en schriftelijk door Legal Talents VOF zijn aanvaard en overeengekomen.`;
 
 const ARTICLES: Article[] = [
   {
@@ -36,23 +36,23 @@ const ARTICLES: Article[] = [
     clauses: [
       {
         label: "1.1. Werving & Selectie:",
-        body: 'De opdracht waarbij Juridische Vacatures zich inspant om voor een opdrachtgever geschikte juridische professionals (hierna: "kandidaten") te selecteren ten behoeve van indiensttreding of een vergelijkbare vorm van tewerkstelling. De opdracht wordt als succesvol vervuld beschouwd zodra een door Juridische Vacatures geïntroduceerde kandidaat een arbeidsovereenkomst of een andere vorm van overeenkomst tot tewerkstelling met de opdrachtgever aangaat.',
+        body: 'De opdracht waarbij Legal Vacatures zich inspant om voor een opdrachtgever geschikte juridische professionals (hierna: "kandidaten") te selecteren ten behoeve van indiensttreding of een vergelijkbare vorm van tewerkstelling. De opdracht wordt als succesvol vervuld beschouwd zodra een door Legal Vacatures geïntroduceerde kandidaat een arbeidsovereenkomst of een andere vorm van overeenkomst tot tewerkstelling met de opdrachtgever aangaat.',
       },
       {
         label: "1.2. Vacatureplatform:",
-        body: "De door Juridische Vacatures beheerde online omgeving waarop werkgevers kosteloos vacatures kunnen plaatsen en kandidaten kunnen solliciteren. Het vacatureplatform vormt een afzonderlijke dienst van Juridische Vacatures, waarbij Juridische Vacatures optreedt als technisch faciliterende partij tussen werkgever en kandidaat.",
+        body: "De door Legal Vacatures beheerde online omgeving waarop werkgevers kosteloos vacatures kunnen plaatsen en kandidaten kunnen solliciteren. Het vacatureplatform vormt een afzonderlijke dienst van Legal Vacatures, waarbij Legal Vacatures optreedt als technisch faciliterende partij tussen werkgever en kandidaat.",
       },
       {
         label: "1.3. Werkgever:",
-        body: "De natuurlijke of rechtspersoon die via het vacatureplatform één of meer vacatures publiceert, zonder dat daarbij een werving- en selectieopdracht aan Juridische Vacatures is verstrekt.",
+        body: "De natuurlijke of rechtspersoon die via het vacatureplatform één of meer vacatures publiceert, zonder dat daarbij een werving- en selectieopdracht aan Legal Vacatures is verstrekt.",
       },
       {
         label: "1.4. Opdrachtgever:",
-        body: "De werkgever die daarnaast ook een werving- en selectieopdracht aan Juridische Vacatures heeft verstrekt.",
+        body: "De werkgever die daarnaast ook een werving- en selectieopdracht aan Legal Vacatures heeft verstrekt.",
       },
       {
         label: "1.5. Kandidaat:",
-        body: "De natuurlijke persoon die via het vacatureplatform solliciteert, zich inschrijft in de database van Juridische Vacatures, of in het kader van een werving- en selectietraject door Juridische Vacatures wordt voorgedragen.",
+        body: "De natuurlijke persoon die via het vacatureplatform solliciteert, zich inschrijft in de database van Legal Vacatures, of in het kader van een werving- en selectietraject door Legal Vacatures wordt voorgedragen.",
       },
       {
         label: "1.6. Opdrachtbevestiging:",
@@ -60,7 +60,7 @@ const ARTICLES: Article[] = [
       },
       {
         label: "1.7. Vertrouwelijkheid:",
-        body: "Het is de opdrachtgever en de werkgever niet toegestaan om zonder voorafgaande schriftelijke toestemming van Juridische Vacatures (persoons)gegevens van voorgestelde of sollicitende kandidaten met derden te delen. Indien de introductie of sollicitatie van een kandidaat niet leidt tot een overeenkomst, is de opdrachtgever respectievelijk werkgever verplicht de verstrekte gegevens conform de geldende AVG-wetgeving te vernietigen of te retourneren, tenzij de kandidaat uitdrukkelijk heeft ingestemd met langere bewaring.",
+        body: "Het is de opdrachtgever en de werkgever niet toegestaan om zonder voorafgaande schriftelijke toestemming van Legal Vacatures (persoons)gegevens van voorgestelde of sollicitende kandidaten met derden te delen. Indien de introductie of sollicitatie van een kandidaat niet leidt tot een overeenkomst, is de opdrachtgever respectievelijk werkgever verplicht de verstrekte gegevens conform de geldende AVG-wetgeving te vernietigen of te retourneren, tenzij de kandidaat uitdrukkelijk heeft ingestemd met langere bewaring.",
       },
     ],
   },
@@ -70,7 +70,7 @@ const ARTICLES: Article[] = [
     clauses: [
       {
         label: "2.1. Kosteloos gebruik:",
-        body: "Het plaatsen van vacatures op het vacatureplatform is voor werkgevers kosteloos. Juridische Vacatures behoudt zich het recht voor om op termijn betaalde functionaliteiten of upgrades aan te bieden; deze zijn uitsluitend van toepassing na uitdrukkelijke schriftelijke aanvaarding door de werkgever.",
+        body: "Het plaatsen van vacatures op het vacatureplatform is voor werkgevers kosteloos. Legal Vacatures behoudt zich het recht voor om op termijn betaalde functionaliteiten of upgrades aan te bieden; deze zijn uitsluitend van toepassing na uitdrukkelijke schriftelijke aanvaarding door de werkgever.",
       },
       {
         label: "2.2. Accountregistratie:",
@@ -82,15 +82,15 @@ const ARTICLES: Article[] = [
       },
       {
         label: "2.4. Moderatie en verwijdering:",
-        body: "Juridische Vacatures behoudt zich het recht voor om vacatures zonder voorafgaande kennisgeving te weigeren, aan te passen of te verwijderen indien deze naar het oordeel van Juridische Vacatures niet voldoen aan deze voorwaarden, niet passen binnen het juridische segment, of de reputatie van Juridische Vacatures kunnen schaden.",
+        body: "Legal Vacatures behoudt zich het recht voor om vacatures zonder voorafgaande kennisgeving te weigeren, aan te passen of te verwijderen indien deze naar het oordeel van Legal Vacatures niet voldoen aan deze voorwaarden, niet passen binnen het juridische segment, of de reputatie van Legal Vacatures kunnen schaden.",
       },
       {
         label: "2.5. Verwerking van sollicitaties:",
-        body: "Sollicitaties die via het vacatureplatform worden ingediend, worden opgeslagen in de beveiligde database van Juridische Vacatures conform het Privacybeleid en de toepasselijke AVG-wetgeving. De werkgever ontvangt de sollicitatiegegevens via het platform en/of per e-mail en verplicht zich deze uitsluitend te gebruiken voor de beoordeling van de betreffende vacature.",
+        body: "Sollicitaties die via het vacatureplatform worden ingediend, worden opgeslagen in de beveiligde database van Legal Vacatures conform het Privacybeleid en de toepasselijke AVG-wetgeving. De werkgever ontvangt de sollicitatiegegevens via het platform en/of per e-mail en verplicht zich deze uitsluitend te gebruiken voor de beoordeling van de betreffende vacature.",
       },
       {
         label: "2.6. Rolverdeling onder de AVG:",
-        body: "Ten aanzien van sollicitaties die via het vacatureplatform binnenkomen zonder dat sprake is van een werving- en selectieopdracht, treedt de werkgever op als verwerkingsverantwoordelijke en Juridische Vacatures als technisch verwerker of faciliterende partij. Indien Juridische Vacatures tevens een werving- en selectieopdracht uitvoert, treedt Juridische Vacatures op als (zelfstandig) verwerkingsverantwoordelijke voor haar eigen recruitmentactiviteiten. De nadere uitwerking hiervan is opgenomen in het Privacybeleid van Juridische Vacatures.",
+        body: "Ten aanzien van sollicitaties die via het vacatureplatform binnenkomen zonder dat sprake is van een werving- en selectieopdracht, treedt de werkgever op als verwerkingsverantwoordelijke en Legal Vacatures als technisch verwerker of faciliterende partij. Indien Legal Vacatures tevens een werving- en selectieopdracht uitvoert, treedt Legal Vacatures op als (zelfstandig) verwerkingsverantwoordelijke voor haar eigen recruitmentactiviteiten. De nadere uitwerking hiervan is opgenomen in het Privacybeleid van Legal Vacatures.",
       },
       {
         label: "2.7. Verplichtingen van de werkgever jegens kandidaten:",
@@ -98,11 +98,11 @@ const ARTICLES: Article[] = [
       },
       {
         label: "2.8. Rechtstreekse benadering van kandidaten:",
-        body: "Indien een werkgever buiten Juridische Vacatures om een kandidaat benadert of aanneemt die oorspronkelijk via een door Juridische Vacatures uitgevoerde werving- en selectieopdracht is geïntroduceerd, is het bepaalde in artikel 3.6 (uitbreiding succesvolle vervulling) onverkort van toepassing. Voor sollicitaties die uitsluitend via het vacatureplatform zijn binnengekomen en waarbij geen werving- en selectieopdracht aan Juridische Vacatures is verstrekt, geldt deze bepaling uitdrukkelijk niet.",
+        body: "Indien een werkgever buiten Legal Vacatures om een kandidaat benadert of aanneemt die oorspronkelijk via een door Legal Vacatures uitgevoerde werving- en selectieopdracht is geïntroduceerd, is het bepaalde in artikel 3.6 (uitbreiding succesvolle vervulling) onverkort van toepassing. Voor sollicitaties die uitsluitend via het vacatureplatform zijn binnengekomen en waarbij geen werving- en selectieopdracht aan Legal Vacatures is verstrekt, geldt deze bepaling uitdrukkelijk niet.",
       },
       {
         label: "2.9. Beschikbaarheid:",
-        body: "Juridische Vacatures spant zich in om het vacatureplatform zo goed mogelijk beschikbaar te houden, maar garandeert geen ononderbroken beschikbaarheid. Juridische Vacatures is niet aansprakelijk voor schade voortvloeiend uit tijdelijke onbeschikbaarheid, onderhoud of technische storingen van het platform.",
+        body: "Legal Vacatures spant zich in om het vacatureplatform zo goed mogelijk beschikbaar te houden, maar garandeert geen ononderbroken beschikbaarheid. Legal Vacatures is niet aansprakelijk voor schade voortvloeiend uit tijdelijke onbeschikbaarheid, onderhoud of technische storingen van het platform.",
       },
     ],
   },
@@ -112,7 +112,7 @@ const ARTICLES: Article[] = [
     clauses: [
       {
         label: "3.1. No Cure, No Pay:",
-        body: "Juridische Vacatures werkt voor werving- en selectieopdrachten op basis van 'no cure, no pay'. Dit houdt in dat het honorarium uitsluitend verschuldigd is bij een succesvolle vervulling van de opdracht, zoals gedefinieerd in artikel 1.1 en nader gespecificeerd in artikel 3.6. Voor het gebruik van het vacatureplatform is, behoudens uitdrukkelijk overeengekomen betaalde functionaliteiten, geen honorarium verschuldigd.",
+        body: "Legal Vacatures werkt voor werving- en selectieopdrachten op basis van 'no cure, no pay'. Dit houdt in dat het honorarium uitsluitend verschuldigd is bij een succesvolle vervulling van de opdracht, zoals gedefinieerd in artikel 1.1 en nader gespecificeerd in artikel 3.6. Voor het gebruik van het vacatureplatform is, behoudens uitdrukkelijk overeengekomen betaalde functionaliteiten, geen honorarium verschuldigd.",
       },
       {
         label: "3.2. Berekening Honorarium:",
@@ -128,11 +128,11 @@ const ARTICLES: Article[] = [
       },
       {
         label: "3.5. Informatieplicht Opdrachtgever:",
-        body: "De opdrachtgever is gehouden om Juridische Vacatures binnen 14 dagen na een daartoe strekkend verzoek te voorzien van een kopie van de getekende arbeidsovereenkomst en de relevante salarisgegevens die noodzakelijk zijn voor de bepaling van het honorarium. Indien de opdrachtgever nalaat deze gegevens tijdig, volledig of correct te verstrekken, is Juridische Vacatures gerechtigd de hoogte van het bruto jaarsalaris redelijkerwijs te schatten en conform die schatting te factureren.",
+        body: "De opdrachtgever is gehouden om Legal Vacatures binnen 14 dagen na een daartoe strekkend verzoek te voorzien van een kopie van de getekende arbeidsovereenkomst en de relevante salarisgegevens die noodzakelijk zijn voor de bepaling van het honorarium. Indien de opdrachtgever nalaat deze gegevens tijdig, volledig of correct te verstrekken, is Legal Vacatures gerechtigd de hoogte van het bruto jaarsalaris redelijkerwijs te schatten en conform die schatting te factureren.",
       },
       {
         label: "3.6. Uitbreiding Succesvolle Vervulling:",
-        body: "Het honorarium is eveneens verschuldigd indien een door Juridische Vacatures in het kader van een werving- en selectieopdracht voorgestelde kandidaat binnen 12 maanden na de introductie direct, indirect of via derden, in enige hoedanigheid werkzaam wordt voor de opdrachtgever of een daaraan gelieerde onderneming. Dit geldt ook indien de kandidaat reeds (oppervlakkig) bekend was bij de opdrachtgever, tenzij de opdrachtgever de kandidaat aantoonbaar en actief in een lopende sollicitatieprocedure had op het moment van introductie door Juridische Vacatures en dit binnen 48 uur na introductie schriftelijk meldt. Deze bepaling is uitdrukkelijk niet van toepassing op kandidaten die uitsluitend via het vacatureplatform op een eigen vacature van de werkgever hebben gesolliciteerd zonder dat sprake is geweest van een werving- en selectieopdracht.",
+        body: "Het honorarium is eveneens verschuldigd indien een door Legal Vacatures in het kader van een werving- en selectieopdracht voorgestelde kandidaat binnen 12 maanden na de introductie direct, indirect of via derden, in enige hoedanigheid werkzaam wordt voor de opdrachtgever of een daaraan gelieerde onderneming. Dit geldt ook indien de kandidaat reeds (oppervlakkig) bekend was bij de opdrachtgever, tenzij de opdrachtgever de kandidaat aantoonbaar en actief in een lopende sollicitatieprocedure had op het moment van introductie door Legal Vacatures en dit binnen 48 uur na introductie schriftelijk meldt. Deze bepaling is uitdrukkelijk niet van toepassing op kandidaten die uitsluitend via het vacatureplatform op een eigen vacature van de werkgever hebben gesolliciteerd zonder dat sprake is geweest van een werving- en selectieopdracht.",
       },
     ],
   },
@@ -142,7 +142,7 @@ const ARTICLES: Article[] = [
     clauses: [
       {
         label: "4.1.",
-        body: "De betalingstermijn voor facturen van Juridische Vacatures bedraagt 14 dagen na factuurdatum. Bij overschrijding van deze termijn is de opdrachtgever van rechtswege in verzuim, zonder dat een nadere ingebrekestelling is vereist. Indien de opdrachtgever de declaraties niet binnen deze termijn voldoet, is Juridische Vacatures gerechtigd haar werkzaamheden per direct op te schorten en/of de toegang tot het vacatureplatform tijdelijk te blokkeren, zonder dat zij gehouden is eventuele schade die als gevolg hiervan ontstaat te vergoeden.",
+        body: "De betalingstermijn voor facturen van Legal Vacatures bedraagt 14 dagen na factuurdatum. Bij overschrijding van deze termijn is de opdrachtgever van rechtswege in verzuim, zonder dat een nadere ingebrekestelling is vereist. Indien de opdrachtgever de declaraties niet binnen deze termijn voldoet, is Legal Vacatures gerechtigd haar werkzaamheden per direct op te schorten en/of de toegang tot het vacatureplatform tijdelijk te blokkeren, zonder dat zij gehouden is eventuele schade die als gevolg hiervan ontstaat te vergoeden.",
       },
     ],
   },
@@ -152,7 +152,7 @@ const ARTICLES: Article[] = [
     clauses: [
       {
         label: "5.1.",
-        body: "Eventuele klachten over de dienstverlening van Juridische Vacatures, waaronder het vacatureplatform, dienen binnen 8 dagen na het ontstaan van de klacht gemotiveerd en schriftelijk te worden gemeld. Het indienen van een klacht schort de betalingsverplichting van de opdrachtgever niet op.",
+        body: "Eventuele klachten over de dienstverlening van Legal Vacatures, waaronder het vacatureplatform, dienen binnen 8 dagen na het ontstaan van de klacht gemotiveerd en schriftelijk te worden gemeld. Het indienen van een klacht schort de betalingsverplichting van de opdrachtgever niet op.",
       },
     ],
   },
@@ -162,7 +162,7 @@ const ARTICLES: Article[] = [
     clauses: [
       {
         label: "6.1.",
-        body: "Indien de opdrachtgever in verzuim is met de betaling van de factuur, is over het openstaande bedrag de wettelijke handelsrente (ex art. 6:119a BW) verschuldigd. Alle gerechtelijke en buitengerechtelijke (incasso)kosten die Juridische Vacatures maakt als gevolg van de niet-nakoming door de opdrachtgever, komen volledig voor rekening van de opdrachtgever.",
+        body: "Indien de opdrachtgever in verzuim is met de betaling van de factuur, is over het openstaande bedrag de wettelijke handelsrente (ex art. 6:119a BW) verschuldigd. Alle gerechtelijke en buitengerechtelijke (incasso)kosten die Legal Vacatures maakt als gevolg van de niet-nakoming door de opdrachtgever, komen volledig voor rekening van de opdrachtgever.",
       },
     ],
   },
@@ -172,15 +172,15 @@ const ARTICLES: Article[] = [
     clauses: [
       {
         label: "7.1.",
-        body: "Juridische Vacatures verplicht zich tot een inspanningsverbintenis om naar beste inzicht en vermogen geschikte kandidaten te werven en selecteren, en om het vacatureplatform zo goed mogelijk te faciliteren. De uiteindelijke beslissing om een kandidaat aan te stellen en de inhoud van de arbeidsovereenkomst blijven te allen tijde de verantwoordelijkheid van de opdrachtgever respectievelijk werkgever.",
+        body: "Legal Vacatures verplicht zich tot een inspanningsverbintenis om naar beste inzicht en vermogen geschikte kandidaten te werven en selecteren, en om het vacatureplatform zo goed mogelijk te faciliteren. De uiteindelijke beslissing om een kandidaat aan te stellen en de inhoud van de arbeidsovereenkomst blijven te allen tijde de verantwoordelijkheid van de opdrachtgever respectievelijk werkgever.",
       },
       {
         label: "7.2.",
-        body: "Juridische Vacatures is niet aansprakelijk voor enige schade of verliezen, inclusief gevolgschade, die voortvloeien uit (i) de selectie van of de gedragingen van een voorgestelde of sollicitende kandidaat, zowel tijdens de selectieprocedure als na indiensttreding, (ii) de inhoud van door werkgevers geplaatste vacatures, (iii) de handelwijze van werkgevers ten aanzien van sollicitanten, of (iv) technische onbeschikbaarheid of storingen van het vacatureplatform. De opdrachtgever respectievelijk werkgever is zelf verantwoordelijk voor het verifiëren van referenties, diploma's en de geschiktheid van de kandidaat.",
+        body: "Legal Vacatures is niet aansprakelijk voor enige schade of verliezen, inclusief gevolgschade, die voortvloeien uit (i) de selectie van of de gedragingen van een voorgestelde of sollicitende kandidaat, zowel tijdens de selectieprocedure als na indiensttreding, (ii) de inhoud van door werkgevers geplaatste vacatures, (iii) de handelwijze van werkgevers ten aanzien van sollicitanten, of (iv) technische onbeschikbaarheid of storingen van het vacatureplatform. De opdrachtgever respectievelijk werkgever is zelf verantwoordelijk voor het verifiëren van referenties, diploma's en de geschiktheid van de kandidaat.",
       },
       {
         label: "7.3.",
-        body: "Voor zover Juridische Vacatures toch aansprakelijk is, is haar aansprakelijkheid beperkt tot het bedrag dat in het betreffende geval door haar aansprakelijkheidsverzekering wordt uitgekeerd, dan wel — indien geen uitkering plaatsvindt — tot het bedrag dat in de twaalf maanden voorafgaand aan de schadeveroorzakende gebeurtenis door de opdrachtgever aan Juridische Vacatures is betaald.",
+        body: "Voor zover Legal Vacatures toch aansprakelijk is, is haar aansprakelijkheid beperkt tot het bedrag dat in het betreffende geval door haar aansprakelijkheidsverzekering wordt uitgekeerd, dan wel — indien geen uitkering plaatsvindt — tot het bedrag dat in de twaalf maanden voorafgaand aan de schadeveroorzakende gebeurtenis door de opdrachtgever aan Legal Vacatures is betaald.",
       },
     ],
   },
@@ -194,7 +194,7 @@ const ARTICLES: Article[] = [
       },
       {
         label: "8.2.",
-        body: "Indien een garantieregeling is afgesproken en de geplaatste kandidaat de organisatie op eigen initiatief of wegens disfunctioneren verlaat binnen de overeengekomen garantieperiode, zal Juridische Vacatures zich inspannen om eenmalig en kosteloos een vervangende kandidaat te werven voor dezelfde functie.",
+        body: "Indien een garantieregeling is afgesproken en de geplaatste kandidaat de organisatie op eigen initiatief of wegens disfunctioneren verlaat binnen de overeengekomen garantieperiode, zal Legal Vacatures zich inspannen om eenmalig en kosteloos een vervangende kandidaat te werven voor dezelfde functie.",
       },
       {
         label: "8.3.",
@@ -208,11 +208,11 @@ const ARTICLES: Article[] = [
     clauses: [
       {
         label: "9.1.",
-        body: "Alle intellectuele eigendomsrechten met betrekking tot het vacatureplatform, waaronder de vormgeving, software, teksten en database, berusten uitsluitend bij Juridische Vacatures of haar licentiegevers. Het is niet toegestaan zonder voorafgaande schriftelijke toestemming (delen van) het platform te kopiëren, te scrapen, geautomatiseerd te raadplegen of commercieel te exploiteren.",
+        body: "Alle intellectuele eigendomsrechten met betrekking tot het vacatureplatform, waaronder de vormgeving, software, teksten en database, berusten uitsluitend bij Legal Vacatures of haar licentiegevers. Het is niet toegestaan zonder voorafgaande schriftelijke toestemming (delen van) het platform te kopiëren, te scrapen, geautomatiseerd te raadplegen of commercieel te exploiteren.",
       },
       {
         label: "9.2.",
-        body: "Door het plaatsen van een vacature verleent de werkgever aan Juridische Vacatures een niet-exclusieve, royaltyvrije licentie om de vacature te publiceren, te verspreiden en te promoten via het vacatureplatform en daaraan gelieerde kanalen, zolang de vacature actief is.",
+        body: "Door het plaatsen van een vacature verleent de werkgever aan Legal Vacatures een niet-exclusieve, royaltyvrije licentie om de vacature te publiceren, te verspreiden en te promoten via het vacatureplatform en daaraan gelieerde kanalen, zolang de vacature actief is.",
       },
     ],
   },
@@ -222,7 +222,7 @@ const ARTICLES: Article[] = [
     clauses: [
       {
         label: "10.1.",
-        body: "Juridische Vacatures is gerechtigd deze Algemene Voorwaarden eenzijdig te wijzigen. Wijzigingen worden via het vacatureplatform en/of per e-mail aan gebruikers gecommuniceerd en treden in werking 14 dagen na kennisgeving. Voortgezet gebruik van de diensten na deze termijn geldt als aanvaarding van de gewijzigde voorwaarden.",
+        body: "Legal Vacatures is gerechtigd deze Algemene Voorwaarden eenzijdig te wijzigen. Wijzigingen worden via het vacatureplatform en/of per e-mail aan gebruikers gecommuniceerd en treden in werking 14 dagen na kennisgeving. Voortgezet gebruik van de diensten na deze termijn geldt als aanvaarding van de gewijzigde voorwaarden.",
       },
     ],
   },
@@ -232,11 +232,11 @@ const ARTICLES: Article[] = [
     clauses: [
       {
         label: "11.1.",
-        body: "Op de rechtsverhoudingen tussen Juridische Vacatures en de opdrachtgever, werkgever of overige gebruikers is Nederlands recht van toepassing.",
+        body: "Op de rechtsverhoudingen tussen Legal Vacatures en de opdrachtgever, werkgever of overige gebruikers is Nederlands recht van toepassing.",
       },
       {
         label: "11.2.",
-        body: "De bevoegde rechter van de rechtbank Gelderland is bevoegd in het geval een geschil wordt voorgelegd aan de gewone rechter, met dien verstande dat Juridische Vacatures bevoegd blijft geschillen voor te leggen aan de rechter die bevoegd zou zijn indien van deze forumkeuze geen sprake zou zijn.",
+        body: "De bevoegde rechter van de rechtbank Gelderland is bevoegd in het geval een geschil wordt voorgelegd aan de gewone rechter, met dien verstande dat Legal Vacatures bevoegd blijft geschillen voor te leggen aan de rechter die bevoegd zou zijn indien van deze forumkeuze geen sprake zou zijn.",
       },
     ],
   },
@@ -311,7 +311,7 @@ export default function VoorwaardenPage() {
 
           <footer className="mt-8 text-sm text-slate-500">
             <p>
-              Juridische Vacatures VOF — Sint Annastraat 198c, 6525 GX Nijmegen — KvK
+              Legal Talents VOF — Sint Annastraat 198c, 6525 GX Nijmegen — KvK
               98803093
             </p>
             <p className="mt-2">

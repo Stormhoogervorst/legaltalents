@@ -56,12 +56,12 @@ export async function generateMetadata({
     `vacatures ${name}`,
     "advocatuur",
     `advocatuur ${name}`,
-    "Juridische Vacatures",
+    "Legal Vacatures",
   ];
 
   if (count === 0) {
     return {
-      title: `Juridische Vacatures ${name} — geen actuele openingen`,
+      title: `Legal Vacatures ${name} — geen actuele openingen`,
       description: `Momenteel geen juridische vacatures in ${name}. Bekijk alle landelijke juridische vacatures of schrijf je in voor een job alert om direct geïnformeerd te worden bij nieuwe posities.`,
       robots: { index: false, follow: true },
       keywords: baseKeywords,
@@ -72,7 +72,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `Juridische Vacatures ${name} — ${count} openstaande posities`,
+    title: `Legal Vacatures ${name} — ${count} openstaande posities`,
     description: `${count} actuele juridische vacatures in ${name}. Ontdek stages en vacatures bij advocatenkantoren en juridische werkgevers. Solliciteer direct.`,
     robots: { index: true, follow: true },
     keywords: baseKeywords,
@@ -127,7 +127,7 @@ export default async function CityJobsPage({
 
   const headingText = filterLabel
     ? `Juridische vacatures: ${filterLabel} in ${name}`
-    : `Juridische Vacatures ${name}`;
+    : `Legal Vacatures ${name}`;
 
   const subtitleText = filterLabel
     ? `Bekijk alle actuele ${filterLabel.toLowerCase()} vacatures bij juridische werkgevers in ${name}.`

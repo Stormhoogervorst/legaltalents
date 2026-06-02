@@ -30,7 +30,7 @@ function firmEmailHtml(data: {
 <head><meta charset="UTF-8" /></head>
 <body style="font-family: Arial, sans-serif; color: #0F0F0F; max-width: 600px; margin: 0 auto; padding: 24px;">
   <div style="background: #587DFE; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-    <p style="color: white; font-size: 20px; font-weight: 800; font-style: italic; margin: 0;">Juridische Vacatures.</p>
+    <p style="color: white; font-size: 20px; font-weight: 800; font-style: italic; margin: 0;">Legal Vacatures.</p>
   </div>
 
   <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">
@@ -75,7 +75,7 @@ function firmEmailHtml(data: {
   <div style="background: #F3F4F6; border-radius: 8px; padding: 16px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; margin-bottom: 24px;">${data.motivation}</div>
 
   <p style="font-size: 13px; color: #9CA3AF; border-top: 1px solid #F3F4F6; padding-top: 16px;">
-    CV is bijgevoegd als bijlage · Ontvangen via <a href="${SITE_URL}" style="color: #587DFE;">Juridische Vacatures</a>
+    CV is bijgevoegd als bijlage · Ontvangen via <a href="${SITE_URL}" style="color: #587DFE;">Legal Vacatures</a>
   </p>
 </body>
 </html>`;
@@ -92,7 +92,7 @@ function studentEmailHtml(data: {
 <head><meta charset="UTF-8" /></head>
 <body style="font-family: Arial, sans-serif; color: #0F0F0F; max-width: 600px; margin: 0 auto; padding: 24px;">
   <div style="background: #587DFE; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-    <p style="color: white; font-size: 20px; font-weight: 800; font-style: italic; margin: 0;">Juridische Vacatures.</p>
+    <p style="color: white; font-size: 20px; font-weight: 800; font-style: italic; margin: 0;">Legal Vacatures.</p>
   </div>
 
   <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">
@@ -113,10 +113,10 @@ function studentEmailHtml(data: {
   </div>
 
   <p style="font-size: 14px; color: #4B5563;">Succes! 🎓</p>
-  <p style="font-size: 14px; font-weight: 700; color: #587DFE;">Het Juridische Vacatures team</p>
+  <p style="font-size: 14px; font-weight: 700; color: #587DFE;">Het team van Legal Vacatures</p>
 
   <p style="font-size: 13px; color: #9CA3AF; border-top: 1px solid #F3F4F6; padding-top: 16px; margin-top: 24px;">
-    <a href="${SITE_URL}" style="color: #587DFE;">legal-vacatures.nl</a> · Je ontvangt dit bericht omdat je gesolliciteerd hebt via Juridische Vacatures.
+    <a href="${SITE_URL}" style="color: #587DFE;">legal-vacatures.nl</a> · Je ontvangt dit bericht omdat je gesolliciteerd hebt via Legal Vacatures.
   </p>
 </body>
 </html>`;
@@ -306,7 +306,7 @@ export async function POST(request: NextRequest) {
   try {
     const resend = createResend();
     await resend.emails.send({
-      from: "Juridische Vacatures <noreply@legal-talents.nl>",
+      from: "Legal Vacatures <noreply@legal-vacatures.nl>",
       to: notificationEmail,
       ...(ccEmails.length > 0 ? { cc: ccEmails } : {}),
       subject: `Nieuwe sollicitatie: ${firstName} ${lastName} voor ${job.title}`,
@@ -339,7 +339,7 @@ export async function POST(request: NextRequest) {
   try {
     const resend = createResend();
     await resend.emails.send({
-      from: "Juridische Vacatures <noreply@legal-talents.nl>",
+      from: "Legal Vacatures <noreply@legal-vacatures.nl>",
       to: email,
       subject: `Je sollicitatie bij ${firmName} is ontvangen`,
       html: studentEmailHtml({ firstName, jobTitle: job.title, firmName }),

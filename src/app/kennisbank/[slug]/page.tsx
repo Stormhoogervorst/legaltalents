@@ -121,7 +121,7 @@ export default async function BlogArticlePage({ params }: Props) {
           },
           publisher: {
             "@type": "Organization",
-            name: "Juridische Vacatures",
+            name: "Legal Vacatures",
             url: BASE_URL,
           },
         }

@@ -296,7 +296,7 @@ export default function ProfileForm({
             <CheckCircle className="h-5 w-5 shrink-0" />
             <span>
               Profiel is live —{" "}
-              <span className="font-normal">zichtbaar voor studenten op Juridische Vacatures</span>
+              <span className="font-normal">zichtbaar voor studenten op Legal Vacatures</span>
             </span>
           </>
         ) : (

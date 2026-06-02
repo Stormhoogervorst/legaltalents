@@ -29,8 +29,8 @@ export default async function ProfilePage() {
         <h1 className="text-2xl font-bold text-black">Mijn profiel</h1>
         <p className="mt-1 text-sm text-gray-500">
           {firm
-            ? "Beheer de informatie van je werkgever die zichtbaar is op Juridische Vacatures."
-            : "Stel je werkgeversprofiel in om zichtbaar te worden op Juridische Vacatures."}
+            ? "Beheer de informatie van je werkgever die zichtbaar is op Legal Vacatures."
+            : "Stel je werkgeversprofiel in om zichtbaar te worden op Legal Vacatures."}
         </p>
       </div>
 
