@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
-import DOMPurify from "isomorphic-dompurify";
+import { sanitizeHtml } from "@/lib/sanitize";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import NavbarPublic from "@/components/NavbarPublic";
@@ -436,7 +436,7 @@ export default async function JobDetailPage({ params, searchParams }: Props) {
                       fontSize: "clamp(15px, 1.1vw, 17px)",
                       lineHeight: 1.65,
                     }}
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(typedJob.description) }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(typedJob.description) }}
                   />
                 </div>
               )}

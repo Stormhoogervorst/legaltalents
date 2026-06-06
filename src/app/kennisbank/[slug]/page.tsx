@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import DOMPurify from "isomorphic-dompurify";
+import { sanitizeHtml } from "@/lib/sanitize";
 import { createClient } from "@/lib/supabase/server";
 import NavbarPublic from "@/components/NavbarPublic";
 import Footer from "@/components/Footer";
@@ -319,7 +319,7 @@ export default async function BlogArticlePage({ params }: Props) {
                   prose-blockquote:border-l-[#587DFE] prose-blockquote:border-l-2 prose-blockquote:pl-6 prose-blockquote:text-[#0A0A0A] prose-blockquote:font-semibold prose-blockquote:text-[20px] prose-blockquote:leading-[1.4] prose-blockquote:not-italic
                   prose-img:rounded-[12px]
                   prose-hr:border-[#E5E5E5]"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(blog.content) }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(blog.content) }}
               />
             </article>
 
