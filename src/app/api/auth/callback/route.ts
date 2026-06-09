@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getSiteUrl } from "@/lib/site";
+import { getSiteUrl, sanitizeNextPath } from "@/lib/site";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/portal";
+  // `next` wordt tegen een safelist gevalideerd om open-redirect-misbruik te
+  // voorkomen; valt terug op /portal als er niets (geldigs) is meegegeven.
+  const next = sanitizeNextPath(searchParams.get("next"), "/portal");
   const errorParam = searchParams.get("error");
 
   const base = getSiteUrl(origin);
@@ -29,20 +31,16 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      if (errorParam) {
-        return NextResponse.redirect(
-          new URL(`${next}?error=${errorParam}`, request.url)
-        );
-      }
-
-      return NextResponse.redirect(`${base}${next}`);
+      const destination = new URL(next, base);
+      if (errorParam) destination.searchParams.set("error", errorParam);
+      return NextResponse.redirect(destination);
     }
   }
 
-  if (next && next !== "/portal") {
-    return NextResponse.redirect(
-      new URL(`${next}?error=auth_failed`, request.url)
-    );
+  if (next !== "/portal") {
+    const failure = new URL(next, base);
+    failure.searchParams.set("error", "auth_failed");
+    return NextResponse.redirect(failure);
   }
 
   return NextResponse.redirect(`${base}/login?error=auth_callback_failed`);

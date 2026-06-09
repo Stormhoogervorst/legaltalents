@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getSiteUrl } from "@/lib/site";
+import { getSiteUrl, sanitizeNextPath } from "@/lib/site";
 
 /**
  * Supabase auth callback.
@@ -62,12 +62,14 @@ export async function GET(request: NextRequest) {
   // aanroeper expliciet een `next` meegeeft respecteren we die, met een
   // veilige fallback naar /update-wachtwoord.
   if (type === "recovery") {
-    const destination = nextParam || "/update-wachtwoord";
+    // `next` wordt tegen de safelist gevalideerd (open-redirect-bescherming),
+    // met veilige fallback naar de wachtwoord-resetpagina.
+    const destination = sanitizeNextPath(nextParam, "/update-wachtwoord");
     return NextResponse.redirect(`${base}${destination}`);
   }
 
-  // Normale login / e-mail verificatie: respecteer `next` indien opgegeven,
-  // anders naar het dashboard.
-  const destination = nextParam || "/dashboard";
+  // Normale login / e-mail verificatie: respecteer een gesafeliste `next`
+  // indien opgegeven, anders naar het dashboard.
+  const destination = sanitizeNextPath(nextParam, "/dashboard");
   return NextResponse.redirect(`${base}${destination}`);
 }

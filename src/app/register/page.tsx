@@ -46,7 +46,7 @@ function RegisterContent() {
       password,
       options: {
         data: metadata,
-        emailRedirectTo: `${getSiteUrl()}/api/auth/callback`,
+        emailRedirectTo: `${getSiteUrl()}/api/auth/callback?next=/login`,
       },
     });
 
