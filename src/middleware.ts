@@ -1,41 +1,25 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-const RATE_LIMIT = 20;
-const WINDOW_MS = 60 * 1000;
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return true;
-  }
-
-  if (entry.count >= RATE_LIMIT) {
-    return false;
-  }
-
-  entry.count++;
-  return true;
-}
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/api")) {
-    const ip =
-      request.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
-      "unknown";
-
-    if (!checkRateLimit(ip)) {
-      return new NextResponse("Te veel verzoeken. Wacht een minuutje.", {
-        status: 429,
-      });
-    }
+  // ── Vangnet voor Supabase-bevestigingsmails ────────────────────────────────
+  // Supabase valt soms terug op de Site URL (homepage) i.p.v. de meegegeven
+  // `redirect_to`. Daardoor landt een bevestigingslink op bijv.
+  // "/?code=<uuid>": de homepage met een auth-code die nergens wordt
+  // ingewisseld. We onderscheppen elk NIET-callback request met een ?code= en
+  // sturen het — zonder `next` — door naar /api/auth/callback. Die route
+  // wisselt de code in en bepaalt role-aware de juiste bestemming.
+  // De callback-route is via de matcher uitgesloten; de pathname-check is een
+  // extra waarborg tegen een redirect-loop.
+  const authCode = request.nextUrl.searchParams.get("code");
+  if (authCode && pathname !== "/api/auth/callback") {
+    const callbackUrl = request.nextUrl.clone();
+    callbackUrl.pathname = "/api/auth/callback";
+    callbackUrl.search = "";
+    callbackUrl.searchParams.set("code", authCode);
+    return NextResponse.redirect(callbackUrl);
   }
 
   let supabaseResponse = NextResponse.next({ request });
@@ -157,6 +141,14 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Het vangnet hoeft enkel te draaien op paginaroutes waar een gebruiker met
+    // ?code= kan landen (typisch de homepage). We sluiten daarom expliciet uit:
+    //   - api/   → alle API-routes (incl. /api/auth/callback; voorkomt loop én
+    //              voorkomt dat de middleware overhead op /api introduceert)
+    //   - _next/ → Next.js-internals (static + image)
+    //   - favicon.ico en elk pad met een bestandsextensie → statische assets
+    // Zo draait de ?code=-catch nooit op /api en introduceert het vangnet geen
+    // rate limiting of andere overhead op API-verkeer.
+    "/((?!api/|_next/|favicon.ico|.*\\.[^/]+$).*)",
   ],
 };

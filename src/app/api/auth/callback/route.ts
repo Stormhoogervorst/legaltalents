@@ -7,13 +7,13 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   // `next` wordt tegen een safelist gevalideerd om open-redirect-misbruik te
-  // voorkomen; valt terug op /portal als er niets (geldigs) is meegegeven.
-  const next = sanitizeNextPath(searchParams.get("next"), "/portal");
+  // voorkomen. We gebruiken een lege fallback zodat we kunnen onderscheiden
+  // tussen "expliciet & geldig next" en "ontbrekend/ongeldig next" — in dat
+  // laatste geval bepalen we de bestemming op basis van de rol.
+  const validatedNext = sanitizeNextPath(searchParams.get("next"), "");
   const errorParam = searchParams.get("error");
 
   const base = getSiteUrl(origin);
-
-  console.log("[auth/callback] Redirecting to:", next);
 
   if (code) {
     const supabase = await createClient();
@@ -31,19 +31,50 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      const destination = new URL(next, base);
+      // Geldig `next` heeft voorrang; anders role-aware fallback zodat
+      // werkgevers/admins op /dashboard landen en de rest op /portal — ook
+      // wanneer Supabase de `next`-param liet vallen.
+      const target = validatedNext || (await resolveRoleDestination(supabase, user));
+
+      const destination = new URL(target, base);
       if (errorParam) destination.searchParams.set("error", errorParam);
+      console.log("[auth/callback] Redirecting to:", target);
       return NextResponse.redirect(destination);
     }
   }
 
-  if (next !== "/portal") {
-    const failure = new URL(next, base);
+  // Code ontbreekt of inwisselen mislukte.
+  if (validatedNext && validatedNext !== "/portal") {
+    const failure = new URL(validatedNext, base);
     failure.searchParams.set("error", "auth_failed");
     return NextResponse.redirect(failure);
   }
 
   return NextResponse.redirect(`${base}/login?error=auth_callback_failed`);
+}
+
+type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>;
+
+/**
+ * Bepaalt de post-auth bestemming op basis van de rol in de `profiles`-tabel —
+ * dezelfde bron die het dashboard zelf gebruikt. Werkgevers en admins gaan naar
+ * /dashboard, alle andere (of onbekende) rollen naar /portal.
+ */
+async function resolveRoleDestination(
+  supabase: ServerSupabaseClient,
+  user: { id: string } | null
+): Promise<string> {
+  if (!user) return "/portal";
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  return profile?.role === "employer" || profile?.role === "admin"
+    ? "/dashboard"
+    : "/portal";
 }
 
 async function processInvitationToken(user: {
