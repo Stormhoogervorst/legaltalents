@@ -46,7 +46,10 @@ function RegisterContent() {
       password,
       options: {
         data: metadata,
-        emailRedirectTo: `${getSiteUrl()}/api/auth/callback?next=/login`,
+        // Na e-mailbevestiging belandt de werkgever direct ingelogd op zijn
+        // dashboard. De callback wisselt eerst de code in voor een sessie en
+        // redirect daarna naar `next` (gevalideerd tegen de safelist in site.ts).
+        emailRedirectTo: `${getSiteUrl()}/api/auth/callback?next=/dashboard`,
       },
     });
 
