@@ -4,7 +4,6 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { getSiteUrl } from "@/lib/site";
 import { Briefcase, Eye, EyeOff, Loader2 } from "lucide-react";
 import { UserRole } from "@/types";
 
@@ -30,10 +29,6 @@ function RegisterForm() {
     setLoading(true);
     setError(null);
 
-    // Bestemming na e-mailbevestiging hangt af van het registratie-type:
-    // werkgevers naar hun dashboard, kandidaten naar de vacature-overzichtspagina.
-    const next = role === "employer" ? "/dashboard" : "/vacancies";
-
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
@@ -43,7 +38,6 @@ function RegisterForm() {
           role,
           company_name: role === "employer" ? companyName : null,
         },
-        emailRedirectTo: `${getSiteUrl()}/auth/callback?next=${next}`,
       },
     });
 

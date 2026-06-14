@@ -1,11 +1,11 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { getSiteUrl } from "@/lib/site";
-import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 function RegisterContent() {
   const [firmName, setFirmName] = useState("");
@@ -17,8 +17,8 @@ function RegisterContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
+  const router = useRouter();
   const supabase = createClient();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -41,15 +41,11 @@ function RegisterContent() {
       role: metadata.role ?? "(default)",
     });
 
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: metadata,
-        // Na e-mailbevestiging belandt de werkgever direct ingelogd op zijn
-        // dashboard. De callback wisselt eerst de code in voor een sessie en
-        // redirect daarna naar `next` (gevalideerd tegen de safelist in site.ts).
-        emailRedirectTo: `${getSiteUrl()}/api/auth/callback?next=/dashboard`,
       },
     });
 
@@ -63,52 +59,18 @@ function RegisterContent() {
       return;
     }
 
-    setSuccess(true);
-    setLoading(false);
-  };
+    // Zonder e-mailverificatie levert signUp direct een sessie op; daarmee
+    // sturen we de werkgever meteen ingelogd naar zijn dashboard.
+    if (!data.session) {
+      setError(
+        "Account aangemaakt, maar automatisch inloggen is mislukt. Probeer in te loggen."
+      );
+      setLoading(false);
+      return;
+    }
 
-  if (success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
-        <div className="w-full max-w-md text-center">
-          <Link href="/" className="inline-flex items-center justify-center">
-            <Image
-              src="/legal-talents-logo.png"
-              alt="Legal Vacatures logo"
-              width={150}
-              height={40}
-              className="h-10 w-auto"
-              priority
-            />
-          </Link>
-          <div className="mt-8 bg-white border border-gray-200 rounded-2xl p-10">
-            <div className="w-14 h-14 rounded-full bg-primary-light flex items-center justify-center mx-auto mb-5">
-              <Mail className="h-7 w-7 text-primary" />
-            </div>
-            <h2 className="text-xl font-bold text-black mb-2">
-              Check je inbox
-            </h2>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              We hebben een verificatielink gestuurd naar{" "}
-              <span className="font-medium text-black">{email}</span>.
-              <br />
-              Klik op de link in de e-mail om je account te activeren.
-            </p>
-            <p className="mt-6 text-xs text-gray-400">
-              Geen e-mail ontvangen? Controleer je spam-map of{" "}
-              <button
-                onClick={() => setSuccess(false)}
-                className="text-primary hover:underline font-medium"
-              >
-                probeer opnieuw
-              </button>
-              .
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    router.push("/dashboard");
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
