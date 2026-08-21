@@ -35,6 +35,18 @@ export default function Footer() {
               >
                 Privacybeleid
               </Link>
+              <p className="mt-1" style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>
+                website door{" "}
+                <a
+                  href="https://neqst.nl/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors duration-200 hover:text-white"
+                  style={{ fontWeight: 500, color: "rgba(255,255,255,0.6)" }}
+                >
+                  Neqst
+                </a>
+              </p>
             </div>
 
             <div>
